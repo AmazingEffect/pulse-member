@@ -65,7 +65,8 @@ dependencies {
 	annotationProcessor 'org.projectlombok:lombok'
 
 	// mapstruct 설정
-	implementation 'com.github.shijingsh:common-mapstruct:1.6.0'
+	implementation 'org.mapstruct:mapstruct:1.5.5.Final'
+	annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
 
 	// 라이브러리 추가
 	implementation 'com.pulse.common:event-library:1.0.0-SNAPSHOT'
@@ -76,6 +77,8 @@ dependencies {
 	testImplementation 'org.springframework.kafka:spring-kafka-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
+	// mockito 설정
+	testImplementation 'org.mockito:mockito-core:5.12.0'
 }
 
 tasks.named('test') {
