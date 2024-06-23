@@ -19,6 +19,12 @@ public class OutboxServiceImpl implements OutboxService {
 
     private final OutboxRepository outboxRepository;
 
+    /**
+     * OutboxEvent를 저장한다.
+     * 상태는 PENDING(대기)으로 저장
+     *
+     * @param event
+     */
     @Override
     public void saveOutboxEvent(OutboxEvent event) {
         MemberOutbox outbox = MemberOutbox.builder()
@@ -29,14 +35,11 @@ public class OutboxServiceImpl implements OutboxService {
         outboxRepository.save(outbox);
     }
 
-    @Override
-    public Long getOutboxId(OutboxEvent event) {
-        MemberOutbox outbox = outboxRepository.findByEventIdAndEventType(event.getId(), event.getEventType())
-                .orElseThrow(() -> new IllegalArgumentException("OutboxEvent not found"));
-
-        return outbox != null ? outbox.getId() : null;
-    }
-
+    /**
+     * OutboxEvent를 처리완료(PROCESSED)로 변경
+     *
+     * @param event
+     */
     @Override
     public void markOutboxEventProcessed(OutboxEvent event) {
         MemberOutbox outbox = outboxRepository.findByEventIdAndEventType(event.getId(), event.getEventType())
@@ -49,6 +52,28 @@ public class OutboxServiceImpl implements OutboxService {
         }
     }
 
+    /**
+     * OutboxEvent를 성공(SUCCESS)로 변경
+     * 만약 Feign 요청이 성공해서 데이터를 전달한 후 오류가 없다면 이 메서드를 호출한다.
+     *
+     * @param event
+     */
+    @Override
+    public void markOutboxEventSuccess(OutboxEvent event) {
+        MemberOutbox outbox = outboxRepository.findByEventIdAndEventType(event.getId(), event.getEventType())
+                .orElseThrow(() -> new IllegalArgumentException("OutboxEvent not found"));
+
+        if (outbox != null) {
+            outbox.changeStatus(MessageStatus.SUCCESS);
+            outboxRepository.save(outbox);
+        }
+    }
+
+    /**
+     * OutboxEvent를 실패(FAIL)로 변경
+     *
+     * @param event
+     */
     @Override
     public void markOutboxEventFailed(OutboxEvent event) {
         MemberOutbox outbox = outboxRepository.findByEventIdAndEventType(event.getId(), event.getEventType())
@@ -60,19 +85,22 @@ public class OutboxServiceImpl implements OutboxService {
         }
     }
 
+    /**
+     * OutboxEvent의 Kafka 토픽을 반환
+     * getType() 메서드로 꺼낸 이벤트 타입에 따라 적절한 토픽 이름을 반환한다.
+     *
+     * @param event
+     * @return
+     */
     @Override
     public String getKafkaTopic(OutboxEvent event) {
         // 이벤트 타입이나 기타 조건에 따라 적절한 토픽 이름을 반환
-        switch (event.getEventType()) {
-            case "MemberCreatedEvent":
-                return "member-created-topic";
-            case "MemberUpdatedEvent":
-                return "member-updated-topic";
-            case "MemberDeletedEvent":
-                return "member-deleted-topic";
-            default:
-                return "default-topic";
-        }
+        return switch (event.getEventType()) {
+            case "MemberCreatedEvent" -> "member-created-topic";
+            case "MemberUpdatedEvent" -> "member-updated-topic";
+            case "MemberDeletedEvent" -> "member-deleted-topic";
+            default -> "default-topic";
+        };
     }
 
 }

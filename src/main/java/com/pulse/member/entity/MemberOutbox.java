@@ -23,7 +23,7 @@ public class MemberOutbox extends BaseEntity {
     private Long id;
 
     @Column(name = "event_type", nullable = false)
-    private String eventType;   // 이벤트 유형 ex) MemberCreatedEvent
+    private String eventType;   // 토픽정보 ex.MemberCreatedEvent
 
     @Column(name = "event_id", nullable = false)
     private Long eventId;       // 이벤트 내부의 id 필드를 저장. ex) memberId: 1L
