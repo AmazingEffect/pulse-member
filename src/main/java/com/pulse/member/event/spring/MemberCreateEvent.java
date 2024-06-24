@@ -14,7 +14,7 @@ public class MemberCreateEvent implements OutboxEvent {
 
     @Override
     public String getEventType() {
-        return "MemberCreatedEvent";
+        return "MemberCreatedOutboxEvent";
     }
 
 }

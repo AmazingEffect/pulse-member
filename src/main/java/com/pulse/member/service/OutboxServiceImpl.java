@@ -96,9 +96,9 @@ public class OutboxServiceImpl implements OutboxService {
     public String getKafkaTopic(OutboxEvent event) {
         // 이벤트 타입이나 기타 조건에 따라 적절한 토픽 이름을 반환
         return switch (event.getEventType()) {
-            case "MemberCreatedEvent" -> "member-created-topic";
-            case "MemberUpdatedEvent" -> "member-updated-topic";
-            case "MemberDeletedEvent" -> "member-deleted-topic";
+            case "MemberCreatedOutboxEvent" -> "member-created-outbox";
+            case "MemberUpdatedOutboxEvent" -> "member-updated-outbox";
+            case "MemberDeletedOutboxEvent" -> "member-deleted-outbox";
             default -> "default-topic";
         };
     }
