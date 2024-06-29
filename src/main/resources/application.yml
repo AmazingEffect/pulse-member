@@ -35,3 +35,7 @@ spring:
       group-id: member-group
     producer:
       bootstrap-servers: localhost:10000,localhost:10001,localhost:10002
+
+grpc:
+  server:
+    port: 9090  # gRPC 서버 포트 설정
