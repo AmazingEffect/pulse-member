@@ -3,7 +3,9 @@ package com.pulse.member.mapper;
 
 import com.pulse.member.dto.MemberDTO;
 import com.pulse.member.entity.Member;
+import com.pulse.member.grpc.MemberProto;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 
 /**
@@ -15,5 +17,10 @@ public interface MemberMapper {
 
     MemberDTO toDto(Member member);
     Member toEntity(MemberDTO memberDTO);
+
+    @Mapping(target = "id", ignore = true) // id는 생략 가능, 자동 생성되는 경우
+    MemberDTO toDto(MemberProto.MemberRequest memberRequest);
+    MemberProto.MemberResponse toProto(MemberDTO memberDTO);
+    MemberDTO toDto(MemberProto.MemberResponse memberResponse);
 
 }

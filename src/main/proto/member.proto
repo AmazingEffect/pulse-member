@@ -1,0 +1,49 @@
+syntax = "proto3";
+
+option java_package = "com.pulse.member.grpc";
+option java_outer_classname = "MemberProto";
+
+service MemberService {
+  rpc GetMemberById (MemberIdRequest) returns (MemberResponse);
+  rpc CreateMember (MemberRequest) returns (MemberResponse);
+}
+
+message MemberIdRequest {
+  int64 id = 1;
+}
+
+message MemberRequest {
+  int64 id = 1;
+  string email = 2;
+  string password = 3;
+  string name = 4;
+  string profilePictureUrl = 5;
+  string introduction = 6;
+  string phoneNumber = 7;
+  string address = 8;
+  string birthDate = 9;
+  string gender = 10;
+  string website = 11;
+  string statusMessage = 12;
+  string accountStatus = 13;
+  string joinedDate = 14;
+  string lastLogin = 15;
+}
+
+message MemberResponse {
+  int64 id = 1;
+  string email = 2;
+  string password = 3;
+  string name = 4;
+  string profilePictureUrl = 5;
+  string introduction = 6;
+  string phoneNumber = 7;
+  string address = 8;
+  string birthDate = 9;
+  string gender = 10;
+  string website = 11;
+  string statusMessage = 12;
+  string accountStatus = 13;
+  string joinedDate = 14;
+  string lastLogin = 15;
+}
