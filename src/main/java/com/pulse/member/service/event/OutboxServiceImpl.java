@@ -1,4 +1,4 @@
-package com.pulse.member.service;
+package com.pulse.member.service.event;
 
 import com.pulse.event_library.event.OutboxEvent;
 import com.pulse.event_library.service.OutboxService;
@@ -7,12 +7,14 @@ import com.pulse.member.entity.constant.MessageStatus;
 import com.pulse.member.repository.OutboxRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
 /**
  * 이벤트 발행여부를 핸들링하는 OutboxService의 구현체
  */
+@Transactional
 @RequiredArgsConstructor
 @Service
 public class OutboxServiceImpl implements OutboxService {
