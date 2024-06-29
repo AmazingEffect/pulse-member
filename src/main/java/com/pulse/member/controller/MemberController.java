@@ -5,6 +5,7 @@ import com.pulse.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+@RequestMapping("/member")
 @RequiredArgsConstructor
 @RestController
 public class MemberController {
@@ -16,7 +17,7 @@ public class MemberController {
         return memberService.getMemberById(id);
     }
 
-    @PostMapping
+    @PostMapping("/register")
     public MemberDTO createMember(@RequestBody MemberDTO memberDTO) {
         return memberService.createMember(memberDTO);
     }
