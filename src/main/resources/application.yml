@@ -1,3 +1,12 @@
+# 포트 설정
+server:
+  port: 8081
+
+logging:
+  level:
+    org.springframework.boot.context.properties: DEBUG
+
+# 스프링 설정
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/member
@@ -5,18 +14,24 @@ spring:
     password: 1234
     driver-class-name: org.postgresql.Driver
 
+  # JPA 설정
   jpa:
     database: POSTGRESQL
     defer-datasource-initialization: true
     hibernate:
-      ddl-auto: none
+      ddl-auto: create
     open-in-view: false
-    #    show-sql: true
+    # show-sql: true
     properties:
       hibernate:
         format_sql: true
         default_batch_fetch_size: 10
         highlight_sql: true
 
-server:
-  port: 8081
+  # 카프카 설정
+  kafka:
+    consumer:
+      bootstrap-servers: localhost:10000,localhost:10001,localhost:10002
+      group-id: member-group
+    producer:
+      bootstrap-servers: localhost:10000,localhost:10001,localhost:10002
