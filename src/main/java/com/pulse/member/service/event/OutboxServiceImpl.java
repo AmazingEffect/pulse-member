@@ -29,8 +29,9 @@ public class OutboxServiceImpl implements OutboxService {
      */
     @Override
     public void saveOutboxEvent(OutboxEvent event) {
+        String eventType = getKafkaTopic(event);
         MemberOutbox outbox = MemberOutbox.builder()
-                .eventType(event.getEventType())
+                .eventType(eventType)
                 .eventId(event.getId())
                 .status(MessageStatus.PENDING)
                 .build();
@@ -44,7 +45,8 @@ public class OutboxServiceImpl implements OutboxService {
      */
     @Override
     public void markOutboxEventProcessed(OutboxEvent event) {
-        MemberOutbox outbox = outboxRepository.findByEventIdAndEventType(event.getId(), event.getEventType())
+        String eventType = getKafkaTopic(event);
+        MemberOutbox outbox = outboxRepository.findByEventIdAndEventType(event.getId(), eventType)
                 .orElseThrow(() -> new IllegalArgumentException("OutboxEvent not found"));
 
         if (outbox != null) {
@@ -62,7 +64,8 @@ public class OutboxServiceImpl implements OutboxService {
      */
     @Override
     public void markOutboxEventSuccess(OutboxEvent event) {
-        MemberOutbox outbox = outboxRepository.findByEventIdAndEventType(event.getId(), event.getEventType())
+        String eventType = getKafkaTopic(event);
+        MemberOutbox outbox = outboxRepository.findByEventIdAndEventType(event.getId(), eventType)
                 .orElseThrow(() -> new IllegalArgumentException("OutboxEvent not found"));
 
         if (outbox != null) {
@@ -78,7 +81,8 @@ public class OutboxServiceImpl implements OutboxService {
      */
     @Override
     public void markOutboxEventFailed(OutboxEvent event) {
-        MemberOutbox outbox = outboxRepository.findByEventIdAndEventType(event.getId(), event.getEventType())
+        String eventType = getKafkaTopic(event);
+        MemberOutbox outbox = outboxRepository.findByEventIdAndEventType(event.getId(), eventType)
                 .orElseThrow(() -> new IllegalArgumentException("OutboxEvent not found"));
 
         if (outbox != null) {
