@@ -1,6 +1,8 @@
 package com.pulse.member.service.grpc;
 
+import com.pulse.event_library.service.OutboxService;
 import com.pulse.member.dto.MemberDTO;
+import com.pulse.member.event.spring.MemberCreateEvent;
 import com.pulse.member.grpc.MemberProto;
 import com.pulse.member.grpc.MemberServiceGrpc;
 import com.pulse.member.mapper.MemberMapper;
@@ -23,6 +25,7 @@ public class MemberServiceGrpcImpl extends MemberServiceGrpc.MemberServiceImplBa
 
     private final MemberService memberService;
     private final MemberMapper memberMapper;
+    private final OutboxService outboxService;
 
     /**
      * id로 회원 조회
@@ -37,10 +40,27 @@ public class MemberServiceGrpcImpl extends MemberServiceGrpc.MemberServiceImplBa
             MemberProto.MemberIdRequest request,
             StreamObserver<MemberProto.MemberResponse> responseObserver
     ) {
-        MemberDTO member = memberService.getMemberById(request.getId());
-        MemberProto.MemberResponse response = memberMapper.toProto(member);
-        responseObserver.onNext(response);
-        responseObserver.onCompleted();
+        MemberCreateEvent event = new MemberCreateEvent(request.getId());
+
+        try {
+            // 1. MemberService를 사용하여 ID로 회원 조회 (조회라서 outboxService와 트랜잭션을 하나로 묶지 않음)
+            MemberDTO member = memberService.getMemberById(request.getId());
+            // 2. 조회한 회원 정보를 MemberProto.MemberResponse로 변환
+            MemberProto.MemberResponse response = memberMapper.toProto(member);
+
+            // 3. 응답을 클라이언트에게 보냅니다. (비동기가 아님)
+            responseObserver.onNext(response);
+            responseObserver.onCompleted();
+
+            // 4. outbox 테이블에 이벤트 기록을 성공으로 처리
+            outboxService.markOutboxEventSuccess(event);
+        } catch (Exception e) {
+            // 5. 에러 발생 시 에러를 클라이언트에게 전달
+            responseObserver.onError(e);
+
+            // 6. outbox 테이블에 이벤트 기록을 실패로 처리
+            outboxService.markOutboxEventFailed(event);
+        }
     }
 
     /**

@@ -38,7 +38,8 @@ public class OutboxMessageListener {
             containerFactory = "kafkaListenerContainerFactory"
     )
     public void listenExternal(
-            ConsumerRecord<String, String> record, Acknowledgment acknowledgment,
+            ConsumerRecord<String, String> record,
+            Acknowledgment acknowledgment,
             @Header(KafkaHeaders.RECEIVED_PARTITION) int partition,
             @Header(KafkaHeaders.OFFSET) long offset
     ) {
@@ -62,7 +63,8 @@ public class OutboxMessageListener {
             containerFactory = "kafkaListenerContainerFactory"
     )
     public void listenInternal(
-            ConsumerRecord<String, String> record, Acknowledgment acknowledgment,
+            ConsumerRecord<String, String> record,
+            Acknowledgment acknowledgment,
             @Header(KafkaHeaders.RECEIVED_PARTITION) int partition,
             @Header(KafkaHeaders.OFFSET) long offset
     ) throws JsonProcessingException {
