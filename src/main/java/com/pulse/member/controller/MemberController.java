@@ -1,7 +1,7 @@
 package com.pulse.member.controller;
 
 import com.pulse.member.dto.MemberDTO;
-import com.pulse.member.service.MemberService;
+import com.pulse.member.service.usecase.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
