@@ -4,7 +4,7 @@ import com.pulse.member.dto.MemberDTO;
 import com.pulse.member.grpc.MemberProto;
 import com.pulse.member.grpc.MemberServiceGrpc;
 import com.pulse.member.mapper.MemberMapper;
-import com.pulse.member.service.MemberService;
+import com.pulse.member.service.usecase.MemberService;
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
 import net.devh.boot.grpc.server.service.GrpcService;
@@ -19,7 +19,7 @@ import net.devh.boot.grpc.server.service.GrpcService;
  */
 @RequiredArgsConstructor
 @GrpcService
-public class MemberServiceImpl extends MemberServiceGrpc.MemberServiceImplBase {
+public class MemberServiceGrpcImpl extends MemberServiceGrpc.MemberServiceImplBase {
 
     private final MemberService memberService;
     private final MemberMapper memberMapper;
@@ -27,7 +27,7 @@ public class MemberServiceImpl extends MemberServiceGrpc.MemberServiceImplBase {
     /**
      * id로 회원 조회
      * 요청 예시:
-     * grpcurl -plaintext -d '{"id": 1}' localhost:9090 MemberService/GetMemberById
+     * grpcurl -plaintext -d '{"id": 1}' localhost:50051 MemberService/GetMemberById
      *
      * @param request
      * @param responseObserver
@@ -61,7 +61,7 @@ public class MemberServiceImpl extends MemberServiceGrpc.MemberServiceImplBase {
      *   "accountStatus": "Active",
      *   "joinedDate": "2024-06-29T13:00:00",
      *   "lastLogin": "2024-06-29T13:30:00"
-     * }' localhost:9090 MemberService/CreateMember
+     * }' localhost:50051 MemberService/CreateMember
      *
      * @param request
      * @param responseObserver

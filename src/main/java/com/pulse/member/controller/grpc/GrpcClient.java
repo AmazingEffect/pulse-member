@@ -18,7 +18,7 @@ public class GrpcClient {
 
     // gRPC 서버에 연결 (생성자)
     public GrpcClient() {
-        ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", 9090)
+        ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", 50051)
                 .usePlaintext()
                 .build();
         blockingStub = MemberServiceGrpc.newBlockingStub(channel);
