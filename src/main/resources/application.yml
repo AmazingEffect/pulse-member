@@ -38,4 +38,4 @@ spring:
 
 grpc:
   server:
-    port: 9090  # gRPC 서버 포트 설정
+    port: 50051  # gRPC 서버 포트 설정

@@ -25,6 +25,6 @@ spring:
     console:
       enabled: true
 
-#grpc:
-#  server:
-#    port: 0 # 사용 가능한 임의의 포트를 선택하도록 설정
+grpc:
+  server:
+    port: 0 # 사용 가능한 임의의 포트를 선택하도록 설정
