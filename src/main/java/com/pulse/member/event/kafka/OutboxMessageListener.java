@@ -5,6 +5,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pulse.event_library.event.OutboxEvent;
 import com.pulse.event_library.service.OutboxService;
 import com.pulse.member.event.spring.MemberCreateEvent;
+import com.pulse.member.util.TraceUtil;
+import io.opentelemetry.api.GlobalOpenTelemetry;
+import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.api.trace.Tracer;
+import io.opentelemetry.context.Context;
+import io.opentelemetry.context.Scope;
+import io.opentelemetry.context.propagation.TextMapGetter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -13,6 +20,10 @@ import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Service;
+
+import java.nio.charset.StandardCharsets;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 /**
  * 서버간 데이터 전송: Outbox 관련 Kafka 리스너
@@ -27,6 +38,29 @@ public class OutboxMessageListener {
 
     private final OutboxService outboxService;
     private final ObjectMapper objectMapper = new ObjectMapper();
+    private final Tracer tracer = GlobalOpenTelemetry.getTracer("kafka-consumer");
+    private final TraceUtil traceUtil;
+
+    // Kafka 메시지에서 헤더를 추출하기 위한 TextMapGetter
+//    private static final TextMapGetter<ConsumerRecord<String, String>> getter = new TextMapGetter<ConsumerRecord<String, String>>() {
+//        @Override
+//        public Iterable<String> keys(ConsumerRecord<String, String> carrier) {
+//            return StreamSupport.stream(carrier.headers().spliterator(), false)
+//                    .map(org.apache.kafka.common.header.Header::key)
+//                    .collect(Collectors.toList());
+//        }
+//
+//        @Override
+//        public String get(ConsumerRecord<String, String> carrier, String key) {
+//            org.apache.kafka.common.header.Header header = carrier.headers().lastHeader(key);
+//            if (header != null) {
+//                String value = new String(header.value(), StandardCharsets.UTF_8);
+////                return new String(header.value(), StandardCharsets.UTF_8);
+//                log.info("Extracting header key: {}, value: {}", key, value);
+//            }
+//            return null; // 헤더가 존재하지 않으면 null을 반환
+//        }
+//    };
 
     /**
      * Kafka 외부 리스너
@@ -43,11 +77,21 @@ public class OutboxMessageListener {
             @Header(KafkaHeaders.RECEIVED_PARTITION) int partition,
             @Header(KafkaHeaders.OFFSET) long offset
     ) {
-        try {
-            log.info("Received message: {} from partition: {} with offset: {}", record.value(), partition, offset);
+        Context extractedContext = traceUtil.extractContextFromRecord(record);
+        Span span = tracer.spanBuilder("KafkaListener Process Message")
+                .setAttribute("partition", partition)
+                .setAttribute("offset", offset)
+                .setParent(extractedContext)
+                .startSpan();
 
+        try (Scope scope = span.makeCurrent()) {
+            log.info("Received message: {} from partition: {} with offset: {}", record.value(), partition, offset);
+            // 메시지 처리 로직
         } catch (Exception e) {
-            throw e;
+            span.recordException(e);
+            log.error("Error occurred while processing message: {}", e.getMessage());
+        } finally {
+            span.end();
         }
 
         acknowledgment.acknowledge();
@@ -68,21 +112,32 @@ public class OutboxMessageListener {
             @Header(KafkaHeaders.RECEIVED_PARTITION) int partition,
             @Header(KafkaHeaders.OFFSET) long offset
     ) throws JsonProcessingException {
-        try {
-            log.info("Received message: {} from partition: {} with offset: {}", record.value(), partition, offset);
+        // 1. Span을 생성한다.
+        Context extractedContext = traceUtil.extractContextFromRecord(record);
+        Span span = tracer.spanBuilder("KafkaListener Process Message - Member")
+                .setAttribute("partition", partition)
+                .setAttribute("offset", offset)
+                .setParent(extractedContext)
+                .startSpan();
 
-            // JSON 데이터를 OutboxEvent로 변환한다.
+        // 2. Span을 현재 컨텍스트에 설정한다.
+        try (Scope scope = span.makeCurrent()) {
+            log.info("Received message: {} from partition: {} with offset: {}", record.value(), partition, offset);
+            log.info("Received message with traceId: {}, spanId: {}", span.getSpanContext().getTraceId(), span.getSpanContext().getSpanId());
+
             String jsonValue = record.value();
             OutboxEvent event = objectMapper.readValue(jsonValue, MemberCreateEvent.class);
-
-            // OutboxService의 markOutboxEventProcessed 메서드를 호출하여 OutboxEvent를 처리완료(PROCESSED)로 변경한다.
-            outboxService.markOutboxEventProcessed(event);
+//            outboxService.markOutboxEventProcessed(event);
             acknowledgment.acknowledge();
         } catch (Exception e) {
-            // JSON 변환 중 오류가 발생한 경우 처리
-            System.err.println("Error while converting record value to OutboxEvent: " + e.getMessage());
+            span.recordException(e);
+            log.error("Error occurred while processing message: {}", e.getMessage());
             throw e;
+        } finally {
+            span.end();
         }
+
+        acknowledgment.acknowledge();
     }
 
 }
