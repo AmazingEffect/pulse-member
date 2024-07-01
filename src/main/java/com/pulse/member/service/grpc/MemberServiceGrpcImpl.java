@@ -7,7 +7,14 @@ import com.pulse.member.grpc.MemberProto;
 import com.pulse.member.grpc.MemberServiceGrpc;
 import com.pulse.member.mapper.MemberMapper;
 import com.pulse.member.service.usecase.MemberService;
+import io.grpc.Metadata;
 import io.grpc.stub.StreamObserver;
+import io.opentelemetry.api.GlobalOpenTelemetry;
+import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.api.trace.Tracer;
+import io.opentelemetry.context.Context;
+import io.opentelemetry.context.Scope;
+import io.opentelemetry.context.propagation.TextMapGetter;
 import lombok.RequiredArgsConstructor;
 import net.devh.boot.grpc.server.service.GrpcService;
 
@@ -26,6 +33,21 @@ public class MemberServiceGrpcImpl extends MemberServiceGrpc.MemberServiceImplBa
     private final MemberService memberService;
     private final MemberMapper memberMapper;
     private final OutboxService outboxService;
+    private final Tracer tracer = GlobalOpenTelemetry.getTracer("grpc-server");
+
+    // gRPC 요청을 위한 TextMapGetter
+    private static final TextMapGetter<Metadata> getter = new TextMapGetter<Metadata>() {
+        @Override
+        public Iterable<String> keys(Metadata carrier) {
+            return carrier.keys();
+        }
+
+        @Override
+        public String get(Metadata carrier, String key) {
+            Metadata.Key<String> headerKey = Metadata.Key.of(key, Metadata.ASCII_STRING_MARSHALLER);
+            return carrier.get(headerKey);
+        }
+    };
 
     /**
      * id로 회원 조회
@@ -40,26 +62,36 @@ public class MemberServiceGrpcImpl extends MemberServiceGrpc.MemberServiceImplBa
             MemberProto.MemberIdRequest request,
             StreamObserver<MemberProto.MemberResponse> responseObserver
     ) {
-        MemberCreateEvent event = new MemberCreateEvent(request.getId());
+        // 1. gRPC 메타데이터를 사용하여 컨텍스트를 추출합니다.
+        Metadata metadata = new Metadata();
+        Context context = GlobalOpenTelemetry.getPropagators().getTextMapPropagator().extract(Context.current(), metadata, getter);
 
-        try {
-            // 1. MemberService를 사용하여 ID로 회원 조회 (조회라서 outboxService와 트랜잭션을 하나로 묶지 않음)
+        // 2. Span을 생성하고 부모 컨텍스트를 설정합니다.
+        Span span = tracer.spanBuilder("grpc-server")
+                .setParent(context)
+                .startSpan();
+
+        MemberCreateEvent event = new MemberCreateEvent(request.getId());
+        try (Scope scope = span.makeCurrent()) {
+            // 3. MemberService를 사용하여 ID로 회원 조회
             MemberDTO member = memberService.getMemberById(request.getId());
-            // 2. 조회한 회원 정보를 MemberProto.MemberResponse로 변환
+            // 4. 조회한 회원 정보를 MemberProto.MemberResponse로 변환
             MemberProto.MemberResponse response = memberMapper.toProto(member);
 
-            // 3. 응답을 클라이언트에게 보냅니다. (비동기가 아님)
+            // 5. 응답을 클라이언트에게 보냅니다.
             responseObserver.onNext(response);
             responseObserver.onCompleted();
 
-            // 4. outbox 테이블에 이벤트 기록을 성공으로 처리
+            // 6. outbox 테이블에 이벤트 기록을 성공으로 처리
             outboxService.markOutboxEventSuccess(event);
         } catch (Exception e) {
-            // 5. 에러 발생 시 에러를 클라이언트에게 전달
+            // 7. 에러 발생 시 에러를 클라이언트에게 전달하고 스팬에 기록합니다.
+            span.recordException(e);
             responseObserver.onError(e);
-
-            // 6. outbox 테이블에 이벤트 기록을 실패로 처리
             outboxService.markOutboxEventFailed(event);
+        } finally {
+            // 8. Span 종료
+            span.end();
         }
     }
 
@@ -67,20 +99,9 @@ public class MemberServiceGrpcImpl extends MemberServiceGrpc.MemberServiceImplBa
      * 회원 생성 + 이벤트 발행
      * 요청 예시:
      * grpcurl -plaintext -d '{
-     *   "email": "test252@example.com",
-     *   "password": "1234",
-     *   "name": "Test User",
-     *   "profilePictureUrl": "http://example.com/profile.jpg",
-     *   "introduction": "Hello, I am a test user.",
-     *   "phoneNumber": "123-456-7890",
-     *   "address": "123 Test Street, Test City, TX 12345",
-     *   "birthDate": "1990-01-01T00:00:00",
-     *   "gender": "Male",
-     *   "website": "http://example.com",
-     *   "statusMessage": "Feeling good!",
-     *   "accountStatus": "Active",
-     *   "joinedDate": "2024-06-29T13:00:00",
-     *   "lastLogin": "2024-06-29T13:30:00"
+     * "email": "test252@example.com",
+     * "password": "1234",
+     * "name": "Test User",
      * }' localhost:50051 MemberService/CreateMember
      *
      * @param request
@@ -91,11 +112,19 @@ public class MemberServiceGrpcImpl extends MemberServiceGrpc.MemberServiceImplBa
             MemberProto.MemberRequest request,
             StreamObserver<MemberProto.MemberResponse> responseObserver
     ) {
-        MemberDTO memberDTO = memberMapper.toDto(request);
-        MemberDTO createdMember = memberService.createMember(memberDTO);
-        MemberProto.MemberResponse response = memberMapper.toProto(createdMember);
-        responseObserver.onNext(response);
-        responseObserver.onCompleted();
+        Span span = tracer.spanBuilder("create-member").startSpan();
+        try (Scope scope = span.makeCurrent()) {
+            MemberDTO memberDTO = memberMapper.toDto(request);
+            MemberDTO createdMember = memberService.createMember(memberDTO);
+            MemberProto.MemberResponse response = memberMapper.toProto(createdMember);
+            responseObserver.onNext(response);
+            responseObserver.onCompleted();
+        } catch (Exception e) {
+            span.recordException(e);
+            responseObserver.onError(e);
+        } finally {
+            span.end();
+        }
     }
 
 }
