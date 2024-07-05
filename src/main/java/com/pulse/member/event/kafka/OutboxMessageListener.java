@@ -11,7 +11,6 @@ import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.context.Context;
 import io.opentelemetry.context.Scope;
-import io.opentelemetry.context.propagation.TextMapGetter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -20,10 +19,6 @@ import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Service;
-
-import java.nio.charset.StandardCharsets;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 /**
  * 서버간 데이터 전송: Outbox 관련 Kafka 리스너
@@ -40,27 +35,6 @@ public class OutboxMessageListener {
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final Tracer tracer = GlobalOpenTelemetry.getTracer("kafka-consumer");
     private final TraceUtil traceUtil;
-
-    // Kafka 메시지에서 헤더를 추출하기 위한 TextMapGetter
-//    private static final TextMapGetter<ConsumerRecord<String, String>> getter = new TextMapGetter<ConsumerRecord<String, String>>() {
-//        @Override
-//        public Iterable<String> keys(ConsumerRecord<String, String> carrier) {
-//            return StreamSupport.stream(carrier.headers().spliterator(), false)
-//                    .map(org.apache.kafka.common.header.Header::key)
-//                    .collect(Collectors.toList());
-//        }
-//
-//        @Override
-//        public String get(ConsumerRecord<String, String> carrier, String key) {
-//            org.apache.kafka.common.header.Header header = carrier.headers().lastHeader(key);
-//            if (header != null) {
-//                String value = new String(header.value(), StandardCharsets.UTF_8);
-////                return new String(header.value(), StandardCharsets.UTF_8);
-//                log.info("Extracting header key: {}, value: {}", key, value);
-//            }
-//            return null; // 헤더가 존재하지 않으면 null을 반환
-//        }
-//    };
 
     /**
      * Kafka 외부 리스너
@@ -123,11 +97,10 @@ public class OutboxMessageListener {
         // 2. Span을 현재 컨텍스트에 설정한다.
         try (Scope scope = span.makeCurrent()) {
             log.info("Received message: {} from partition: {} with offset: {}", record.value(), partition, offset);
-            log.info("Received message with traceId: {}, spanId: {}", span.getSpanContext().getTraceId(), span.getSpanContext().getSpanId());
-
+            
             String jsonValue = record.value();
             OutboxEvent event = objectMapper.readValue(jsonValue, MemberCreateEvent.class);
-//            outboxService.markOutboxEventProcessed(event);
+            outboxService.markOutboxEventProcessed(event);
             acknowledgment.acknowledge();
         } catch (Exception e) {
             span.recordException(e);
