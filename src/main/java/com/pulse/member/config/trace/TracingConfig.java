@@ -9,7 +9,6 @@ import io.opentelemetry.sdk.OpenTelemetrySdk;
 import io.opentelemetry.sdk.resources.Resource;
 import io.opentelemetry.sdk.trace.SdkTracerProvider;
 import io.opentelemetry.sdk.trace.export.BatchSpanProcessor;
-import io.opentelemetry.sdk.trace.export.SpanExporter;
 import io.opentelemetry.semconv.ResourceAttributes;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
