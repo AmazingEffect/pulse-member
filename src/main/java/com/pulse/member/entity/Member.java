@@ -33,6 +33,9 @@ public class Member extends BaseEntity {
     @Column(name = "name")
     private String name;           // 이름
 
+    @Column(name = "nickname")
+    private String nickname;       // 닉네임
+
     @Column(name = "profile_picture_url")
     private String profilePictureUrl; // 프로필 사진
 
@@ -77,4 +80,24 @@ public class Member extends BaseEntity {
     public int hashCode() {
         return Objects.hashCode(getId());
     }
+
+    /**
+     * 닉네임을 변경하는 메서드
+     *
+     * @param newNickname 새로운 닉네임
+     */
+    public void changeNickname(String newNickname) {
+        // 추가 로직이나 검증을 여기에 포함할 수 있음
+        this.nickname = newNickname;
+    }
+
+    /**
+     * 프로필 사진 URL을 변경하는 메서드
+     *
+     * @param newProfilePictureUrl
+     */
+    public void changeProfilePictureUrl(String newProfilePictureUrl) {
+        this.profilePictureUrl = newProfilePictureUrl;
+    }
+
 }

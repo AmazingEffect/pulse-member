@@ -17,7 +17,6 @@ import java.util.Objects;
 @Table(name = "role")
 public class Role extends BaseEntity {
 
-    @EqualsAndHashCode.Include
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
