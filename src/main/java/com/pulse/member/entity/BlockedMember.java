@@ -8,6 +8,9 @@ import lombok.NoArgsConstructor;
 
 import java.util.Objects;
 
+/**
+ * 차단된 회원
+ */
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
