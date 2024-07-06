@@ -4,14 +4,22 @@ option java_package = "com.pulse.member.grpc";
 option java_outer_classname = "MemberProto";
 
 service MemberService {
-  rpc GetMemberById (MemberIdRequest) returns (MemberResponse);
-  rpc CreateMember (MemberRequest) returns (MemberResponse);
+  // 멤버 조회
+  rpc GetMemberById (MemberIdRequest) returns (MemberRetrieveResponse);
+  // 닉네임 조회
+  rpc GetNicknameById (MemberIdRequest) returns (MemberNicknameResponse);
+  // 프로필 이미지 URL 조회
+  rpc GetProfileImageUrlById (MemberIdRequest) returns (MemberProfileImageUrlResponse);
+  // 멤버 생성
+  rpc CreateMember (MemberRequest) returns (MemberCreateResponse);
 }
 
+// zeroPayload Request
 message MemberIdRequest {
   int64 id = 1;
 }
 
+// 멤버 생성 요청 객체
 message MemberRequest {
   int64 id = 1;
   string email = 2;
@@ -30,7 +38,8 @@ message MemberRequest {
   string lastLogin = 15;
 }
 
-message MemberResponse {
+// 멤버 생성 응답
+message MemberCreateResponse {
   int64 id = 1;
   string email = 2;
   string password = 3;
@@ -46,4 +55,24 @@ message MemberResponse {
   string accountStatus = 13;
   string joinedDate = 14;
   string lastLogin = 15;
+}
+
+// 멤버 조회 응답
+message MemberRetrieveResponse {
+  int64 id = 1;
+  string email = 2;
+  string name = 3;
+  string nickname = 4;
+  string profilePictureUrl = 5;
+  string statusMessage = 6;
+}
+
+// 멤버 닉네임 응답
+message MemberNicknameResponse {
+  string nickname = 1;
+}
+
+// 멤버 프로필 이미지 URL 응답
+message MemberProfileImageUrlResponse {
+  string profilePictureUrl = 1;
 }
