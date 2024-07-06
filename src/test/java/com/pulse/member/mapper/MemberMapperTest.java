@@ -1,6 +1,6 @@
 package com.pulse.member.mapper;
 
-import com.pulse.member.dto.MemberDTO;
+import com.pulse.member.dto.MemberCreateDTO;
 import com.pulse.member.entity.Member;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +19,7 @@ class MemberMapperTest {
     private MemberMapper memberMapper;
 
     @Test
-    public void testToDto() {
+    public void testToRetrieveDto() {
         // Given
         Member member = Member.builder()
                 .id(1L)
@@ -40,31 +40,31 @@ class MemberMapperTest {
                 .build();
 
         // When
-        MemberDTO memberDTO = memberMapper.toDto(member);
+        MemberCreateDTO memberCreateDTO = memberMapper.toCreateDto(member);
 
         // Then
-        assertNotNull(memberDTO);
-        assertEquals(member.getId(), memberDTO.getId());
-        assertEquals(member.getEmail(), memberDTO.getEmail());
-        assertEquals(member.getPassword(), memberDTO.getPassword());
-        assertEquals(member.getName(), memberDTO.getName());
-        assertEquals(member.getProfilePictureUrl(), memberDTO.getProfilePictureUrl());
-        assertEquals(member.getIntroduction(), memberDTO.getIntroduction());
-        assertEquals(member.getPhoneNumber(), memberDTO.getPhoneNumber());
-        assertEquals(member.getAddress(), memberDTO.getAddress());
-        assertEquals(member.getBirthDate(), memberDTO.getBirthDate());
-        assertEquals(member.getGender(), memberDTO.getGender());
-        assertEquals(member.getWebsite(), memberDTO.getWebsite());
-        assertEquals(member.getStatusMessage(), memberDTO.getStatusMessage());
-        assertEquals(member.getAccountStatus(), memberDTO.getAccountStatus());
-        assertEquals(member.getJoinedDate(), memberDTO.getJoinedDate());
-        assertEquals(member.getLastLogin(), memberDTO.getLastLogin());
+        assertNotNull(memberCreateDTO);
+        assertEquals(member.getId(), memberCreateDTO.getId());
+        assertEquals(member.getEmail(), memberCreateDTO.getEmail());
+        assertEquals(member.getPassword(), memberCreateDTO.getPassword());
+        assertEquals(member.getName(), memberCreateDTO.getName());
+        assertEquals(member.getProfilePictureUrl(), memberCreateDTO.getProfilePictureUrl());
+        assertEquals(member.getIntroduction(), memberCreateDTO.getIntroduction());
+        assertEquals(member.getPhoneNumber(), memberCreateDTO.getPhoneNumber());
+        assertEquals(member.getAddress(), memberCreateDTO.getAddress());
+        assertEquals(member.getBirthDate(), memberCreateDTO.getBirthDate());
+        assertEquals(member.getGender(), memberCreateDTO.getGender());
+        assertEquals(member.getWebsite(), memberCreateDTO.getWebsite());
+        assertEquals(member.getStatusMessage(), memberCreateDTO.getStatusMessage());
+        assertEquals(member.getAccountStatus(), memberCreateDTO.getAccountStatus());
+        assertEquals(member.getJoinedDate(), memberCreateDTO.getJoinedDate());
+        assertEquals(member.getLastLogin(), memberCreateDTO.getLastLogin());
     }
 
     @Test
     public void testToEntity() {
         // Given
-        MemberDTO memberDTO = new MemberDTO(
+        MemberCreateDTO memberCreateDTO = new MemberCreateDTO(
                 1L,
                 "john.doe@example.com",
                 "password123",
@@ -83,25 +83,25 @@ class MemberMapperTest {
         );
 
         // When
-        Member member = memberMapper.toEntity(memberDTO);
+        Member member = memberMapper.toEntity(memberCreateDTO);
 
         // Then
         assertNotNull(member);
-        assertEquals(memberDTO.getId(), member.getId());
-        assertEquals(memberDTO.getEmail(), member.getEmail());
-        assertEquals(memberDTO.getPassword(), member.getPassword());
-        assertEquals(memberDTO.getName(), member.getName());
-        assertEquals(memberDTO.getProfilePictureUrl(), member.getProfilePictureUrl());
-        assertEquals(memberDTO.getIntroduction(), member.getIntroduction());
-        assertEquals(memberDTO.getPhoneNumber(), member.getPhoneNumber());
-        assertEquals(memberDTO.getAddress(), member.getAddress());
-        assertEquals(memberDTO.getBirthDate(), member.getBirthDate());
-        assertEquals(memberDTO.getGender(), member.getGender());
-        assertEquals(memberDTO.getWebsite(), member.getWebsite());
-        assertEquals(memberDTO.getStatusMessage(), member.getStatusMessage());
-        assertEquals(memberDTO.getAccountStatus(), member.getAccountStatus());
-        assertEquals(memberDTO.getJoinedDate(), member.getJoinedDate());
-        assertEquals(memberDTO.getLastLogin(), member.getLastLogin());
+        assertEquals(memberCreateDTO.getId(), member.getId());
+        assertEquals(memberCreateDTO.getEmail(), member.getEmail());
+        assertEquals(memberCreateDTO.getPassword(), member.getPassword());
+        assertEquals(memberCreateDTO.getName(), member.getName());
+        assertEquals(memberCreateDTO.getProfilePictureUrl(), member.getProfilePictureUrl());
+        assertEquals(memberCreateDTO.getIntroduction(), member.getIntroduction());
+        assertEquals(memberCreateDTO.getPhoneNumber(), member.getPhoneNumber());
+        assertEquals(memberCreateDTO.getAddress(), member.getAddress());
+        assertEquals(memberCreateDTO.getBirthDate(), member.getBirthDate());
+        assertEquals(memberCreateDTO.getGender(), member.getGender());
+        assertEquals(memberCreateDTO.getWebsite(), member.getWebsite());
+        assertEquals(memberCreateDTO.getStatusMessage(), member.getStatusMessage());
+        assertEquals(memberCreateDTO.getAccountStatus(), member.getAccountStatus());
+        assertEquals(memberCreateDTO.getJoinedDate(), member.getJoinedDate());
+        assertEquals(memberCreateDTO.getLastLogin(), member.getLastLogin());
     }
 
 }

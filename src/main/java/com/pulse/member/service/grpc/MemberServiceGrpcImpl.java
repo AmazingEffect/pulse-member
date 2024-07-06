@@ -1,8 +1,9 @@
 package com.pulse.member.service.grpc;
 
 import com.pulse.event_library.service.OutboxService;
-import com.pulse.member.dto.MemberDTO;
-import com.pulse.member.event.spring.MemberCreateEvent;
+import com.pulse.member.dto.MemberCreateDTO;
+import com.pulse.member.dto.MemberRetrieveDTO;
+import com.pulse.member.listener.spring.event.MemberCreateEvent;
 import com.pulse.member.grpc.MemberProto;
 import com.pulse.member.grpc.MemberServiceGrpc;
 import com.pulse.member.mapper.MemberMapper;
@@ -60,7 +61,7 @@ public class MemberServiceGrpcImpl extends MemberServiceGrpc.MemberServiceImplBa
     @Override
     public void getMemberById(
             MemberProto.MemberIdRequest request,
-            StreamObserver<MemberProto.MemberResponse> responseObserver
+            StreamObserver<MemberProto.MemberRetrieveResponse> responseObserver
     ) {
         // 1. gRPC 메타데이터를 사용하여 컨텍스트를 추출합니다.
         Metadata metadata = new Metadata();
@@ -74,9 +75,9 @@ public class MemberServiceGrpcImpl extends MemberServiceGrpc.MemberServiceImplBa
         MemberCreateEvent event = new MemberCreateEvent(request.getId());
         try (Scope scope = span.makeCurrent()) {
             // 3. MemberService를 사용하여 ID로 회원 조회
-            MemberDTO member = memberService.getMemberById(request.getId());
+            MemberRetrieveDTO member = memberService.getMemberById(request.getId());
             // 4. 조회한 회원 정보를 MemberProto.MemberResponse로 변환
-            MemberProto.MemberResponse response = memberMapper.toProto(member);
+            MemberProto.MemberRetrieveResponse response = memberMapper.toProto(member);
 
             // 5. 응답을 클라이언트에게 보냅니다.
             responseObserver.onNext(response);
@@ -110,13 +111,14 @@ public class MemberServiceGrpcImpl extends MemberServiceGrpc.MemberServiceImplBa
     @Override
     public void createMember(
             MemberProto.MemberRequest request,
-            StreamObserver<MemberProto.MemberResponse> responseObserver
+            StreamObserver<MemberProto.MemberCreateResponse> responseObserver
     ) {
         Span span = tracer.spanBuilder("create-member").startSpan();
         try (Scope scope = span.makeCurrent()) {
-            MemberDTO memberDTO = memberMapper.toDto(request);
-            MemberDTO createdMember = memberService.createMember(memberDTO);
-            MemberProto.MemberResponse response = memberMapper.toProto(createdMember);
+
+            MemberCreateDTO memberCreateDTO = memberMapper.toCreateDto(request);
+            MemberCreateDTO createdMember = memberService.createMember(memberCreateDTO);
+            MemberProto.MemberCreateResponse response = memberMapper.toProto(createdMember);
             responseObserver.onNext(response);
             responseObserver.onCompleted();
         } catch (Exception e) {

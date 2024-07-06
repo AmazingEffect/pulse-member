@@ -1,10 +1,10 @@
-package com.pulse.member.event.kafka;
+package com.pulse.member.listener.kafka.outbox.member;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pulse.event_library.event.OutboxEvent;
 import com.pulse.event_library.service.OutboxService;
-import com.pulse.member.event.spring.MemberCreateEvent;
+import com.pulse.member.listener.spring.event.MemberCreateEvent;
 import com.pulse.member.util.TraceUtil;
 import io.opentelemetry.api.GlobalOpenTelemetry;
 import io.opentelemetry.api.trace.Span;
@@ -29,7 +29,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class OutboxMessageListener {
+public class MemberCreateMessageListener {
 
     private final OutboxService outboxService;
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -37,47 +37,12 @@ public class OutboxMessageListener {
     private final TraceUtil traceUtil;
 
     /**
-     * Kafka 외부 리스너
-     * 다른 서버에서 데이터 동기화를 위해 Event를 발행하면 이 리스너가 동작해서 Kafka의 메시지를 수신한다.
-     */
-    @KafkaListener(
-            topics = "ContentCreatedEvent",
-            groupId = "member-group-external",
-            containerFactory = "kafkaListenerContainerFactory"
-    )
-    public void listenExternal(
-            ConsumerRecord<String, String> record,
-            Acknowledgment acknowledgment,
-            @Header(KafkaHeaders.RECEIVED_PARTITION) int partition,
-            @Header(KafkaHeaders.OFFSET) long offset
-    ) {
-        Context extractedContext = traceUtil.extractContextFromRecord(record);
-        Span span = tracer.spanBuilder("KafkaListener Process Message")
-                .setAttribute("partition", partition)
-                .setAttribute("offset", offset)
-                .setParent(extractedContext)
-                .startSpan();
-
-        try (Scope scope = span.makeCurrent()) {
-            log.info("Received message: {} from partition: {} with offset: {}", record.value(), partition, offset);
-            // 메시지 처리 로직
-        } catch (Exception e) {
-            span.recordException(e);
-            log.error("Error occurred while processing message: {}", e.getMessage());
-        } finally {
-            span.end();
-        }
-
-        acknowledgment.acknowledge();
-    }
-
-    /**
      * Kafka 내부 리스너
      * Outbox 테이블에 message_status와 processed_at 컬럼을 업데이트한다.
      */
     @KafkaListener(
             topics = {"member-created-outbox"},
-            groupId = "member-group-internal-outbox",
+            groupId = "member-group-member-create",
             containerFactory = "kafkaListenerContainerFactory"
     )
     public void listenInternal(

@@ -1,11 +1,14 @@
 package com.pulse.member.service.usecase;
 
-import com.pulse.member.dto.MemberDTO;
+import com.pulse.member.dto.MemberCreateDTO;
+import com.pulse.member.dto.MemberRetrieveDTO;
 
 public interface MemberService {
 
-    MemberDTO getMemberById(Long id);
+    MemberRetrieveDTO getMemberById(Long id);
 
-    MemberDTO createMember(MemberDTO memberDTO);
+    MemberCreateDTO createMember(MemberCreateDTO memberCreateDTO);
+
+    Long changeNickname(Long id, String newNickname);
 
 }

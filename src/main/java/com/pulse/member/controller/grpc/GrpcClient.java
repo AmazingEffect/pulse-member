@@ -30,7 +30,7 @@ public class GrpcClient {
      * @param id
      * @return
      */
-    public MemberProto.MemberResponse getMemberById(Long id) {
+    public MemberProto.MemberRetrieveResponse getMemberById(Long id) {
         MemberProto.MemberIdRequest request = MemberProto.MemberIdRequest.newBuilder()
                 .setId(id)
                 .build();
@@ -43,7 +43,7 @@ public class GrpcClient {
      * @param request
      * @return
      */
-    public MemberProto.MemberResponse createMember(MemberProto.MemberRequest request) {
+    public MemberProto.MemberCreateResponse createMember(MemberProto.MemberRequest request) {
         return blockingStub.createMember(request);
     }
 
