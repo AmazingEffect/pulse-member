@@ -1,8 +1,10 @@
 package com.pulse.member.service;
 
-import com.pulse.member.dto.MemberDTO;
+import com.pulse.member.dto.MemberCreateDTO;
+import com.pulse.member.dto.MemberRetrieveDTO;
 import com.pulse.member.entity.Member;
-import com.pulse.member.event.spring.MemberCreateEvent;
+import com.pulse.member.listener.spring.event.MemberCreateEvent;
+import com.pulse.member.listener.spring.event.NicknameChangeEvent;
 import com.pulse.member.mapper.MemberMapper;
 import com.pulse.member.repository.MemberRepository;
 import com.pulse.member.service.usecase.MemberService;
@@ -27,26 +29,43 @@ public class MemberServiceImpl implements MemberService {
      * @return
      */
     @Override
-    public MemberDTO getMemberById(Long id) {
+    public MemberRetrieveDTO getMemberById(Long id) {
         Member member = memberRepository.findById(id).orElseThrow(() -> new RuntimeException("Member not found"));
-        return memberMapper.toDto(member);
+        return memberMapper.toRetrieveDto(member);
     }
 
     /**
      * 회원 생성 + (이벤트 발행)
      *
-     * @param memberDTO
-     * @return
+     * @param memberCreateDTO 회원 정보 DTO
      */
     @Override
     @Transactional
-    public MemberDTO createMember(MemberDTO memberDTO) {
-        Member member = memberMapper.toEntity(memberDTO);
+    public MemberCreateDTO createMember(MemberCreateDTO memberCreateDTO) {
+        Member member = memberMapper.toEntity(memberCreateDTO);
         Member savedMember = memberRepository.saveAndFlush(member);
 
         // MemberCreateEvent 발행
         eventPublisher.publishEvent(new MemberCreateEvent(savedMember.getId()));
-        return memberMapper.toDto(savedMember);
+        return memberMapper.toCreateDto(savedMember);
+    }
+
+    /**
+     * 닉네임 변경
+     *
+     * @param id          회원 ID
+     * @param newNickname 변경할 닉네임
+     */
+    @Override
+    public Long changeNickname(Long id, String newNickname) {
+        Member member = memberRepository.findById(id).orElseThrow(() -> new RuntimeException("Member not found"));
+        member.changeNickname(newNickname);
+        memberRepository.save(member);
+
+        // NicknameChangeEvent 발행
+        eventPublisher.publishEvent(new NicknameChangeEvent(member.getId()));
+
+        return 1L;
     }
 
 }
