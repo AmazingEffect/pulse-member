@@ -1,4 +1,4 @@
-package com.pulse.member.event.spring;
+package com.pulse.member.listener.spring.event;
 
 import com.pulse.event_library.event.OutboxEvent;
 import lombok.AllArgsConstructor;
@@ -8,13 +8,13 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class MemberCreateEvent implements OutboxEvent {
+public class NicknameChangeEvent implements OutboxEvent {
 
     private Long id;
 
     @Override
     public String getEventType() {
-        return "MemberCreatedOutboxEvent";
+        return "MemberNicknameChangeOutboxEvent";
     }
 
 }
