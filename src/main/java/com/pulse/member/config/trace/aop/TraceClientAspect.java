@@ -29,10 +29,12 @@ public class TraceClientAspect {
      * @param context   - OpenTelemetry Context
      * @throws Throwable - 예외
      */
-    @Around(value = "@annotation(com.pulse.member.config.trace.annotation.TraceClient) && args(id, context)", argNames = "joinPoint,id,context")
+    @Around(value = "@annotation(com.pulse.member.config.trace.annotation.TraceGrpcClient) && args(id, context)", argNames = "joinPoint,id,context")
     public Object traceGrpcClient(ProceedingJoinPoint joinPoint, Long id, Context context) throws Throwable {
         // 1. Span 생성
-        Span span = tracer.spanBuilder("grpc-call").setParent(context).startSpan();
+        Span span = tracer.spanBuilder("Member [grpc] client request")
+                .setParent(context)
+                .startSpan();
 
         // 2. Span을 현재 컨텍스트에 설정
         try (Scope scope = span.makeCurrent()) {

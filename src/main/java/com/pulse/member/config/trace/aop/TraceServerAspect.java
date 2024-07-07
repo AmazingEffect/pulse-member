@@ -28,13 +28,13 @@ public class TraceServerAspect {
      * @param joinPoint - 프록시 대상 메서드
      * @throws Throwable - 예외
      */
-    @Around("@annotation(com.pulse.member.config.trace.annotation.TraceServer)")
+    @Around("@annotation(com.pulse.member.config.trace.annotation.TraceGrpcServer)")
     public Object traceGrpcServer(ProceedingJoinPoint joinPoint) throws Throwable {
         // 1. gRPC Context에서 OpenTelemetry Context를 추출합니다. (인터셉터에서 traceId를 추출하여 세팅한 컨텍스트를 사용합니다.)
         io.opentelemetry.context.Context otelContext = GrpcMetadata.OTEL_CONTEXT_KEY.get();
 
         // 2. Span을 생성합니다. (생성한 otelContext를 부모로 설정합니다. 이렇게 하면 부모 Span의 traceId를 사용합니다.)
-        Span span = tracer.spanBuilder("grpc-server")
+        Span span = tracer.spanBuilder("Member [grpc] server response")
                 .setParent(otelContext)
                 .startSpan();
 

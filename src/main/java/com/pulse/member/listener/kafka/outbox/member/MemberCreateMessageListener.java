@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pulse.event_library.event.OutboxEvent;
 import com.pulse.event_library.service.OutboxService;
+import com.pulse.member.config.trace.annotation.TraceOutboxKafka;
 import com.pulse.member.listener.spring.event.MemberCreateEvent;
 import com.pulse.member.util.TraceUtil;
 import io.opentelemetry.api.GlobalOpenTelemetry;
@@ -33,13 +34,12 @@ public class MemberCreateMessageListener {
 
     private final OutboxService outboxService;
     private final ObjectMapper objectMapper = new ObjectMapper();
-    private final Tracer tracer = GlobalOpenTelemetry.getTracer("kafka-consumer");
-    private final TraceUtil traceUtil;
 
     /**
      * Kafka 내부 리스너
      * Outbox 테이블에 message_status와 processed_at 컬럼을 업데이트한다.
      */
+    @TraceOutboxKafka
     @KafkaListener(
             topics = {"member-created-outbox"},
             groupId = "member-group-member-create",
@@ -51,30 +51,14 @@ public class MemberCreateMessageListener {
             @Header(KafkaHeaders.RECEIVED_PARTITION) int partition,
             @Header(KafkaHeaders.OFFSET) long offset
     ) throws JsonProcessingException {
-        // 1. Span을 생성한다.
-        Context extractedContext = traceUtil.extractContextFromRecord(record);
-        Span span = tracer.spanBuilder("KafkaListener Process Message - Member")
-                .setAttribute("partition", partition)
-                .setAttribute("offset", offset)
-                .setParent(extractedContext)
-                .startSpan();
+        // 1. record 값을 이벤트 객체로 변환한다.
+        String jsonValue = record.value();
+        OutboxEvent event = objectMapper.readValue(jsonValue, MemberCreateEvent.class);
 
-        // 2. Span을 현재 컨텍스트에 설정한다.
-        try (Scope scope = span.makeCurrent()) {
-            log.info("Received message: {} from partition: {} with offset: {}", record.value(), partition, offset);
-            
-            String jsonValue = record.value();
-            OutboxEvent event = objectMapper.readValue(jsonValue, MemberCreateEvent.class);
-            outboxService.markOutboxEventProcessed(event);
-            acknowledgment.acknowledge();
-        } catch (Exception e) {
-            span.recordException(e);
-            log.error("Error occurred while processing message: {}", e.getMessage());
-            throw e;
-        } finally {
-            span.end();
-        }
+        // 2. outbox 테이블에 이벤트 처리 상태를 업데이트한다.
+        outboxService.markOutboxEventProcessed(event);
 
+        // 3. ack 처리
         acknowledgment.acknowledge();
     }
 

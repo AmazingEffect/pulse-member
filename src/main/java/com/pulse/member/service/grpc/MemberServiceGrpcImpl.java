@@ -1,7 +1,7 @@
 package com.pulse.member.service.grpc;
 
 import com.pulse.event_library.service.OutboxService;
-import com.pulse.member.config.trace.annotation.TraceServer;
+import com.pulse.member.config.trace.annotation.TraceGrpcServer;
 import com.pulse.member.dto.MemberRetrieveDTO;
 import com.pulse.member.grpc.MemberProto;
 import com.pulse.member.grpc.MemberServiceGrpc;
@@ -9,8 +9,6 @@ import com.pulse.member.listener.spring.event.MemberCreateEvent;
 import com.pulse.member.mapper.MemberMapper;
 import com.pulse.member.service.usecase.MemberService;
 import io.grpc.stub.StreamObserver;
-import io.opentelemetry.api.GlobalOpenTelemetry;
-import io.opentelemetry.api.trace.Tracer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.server.service.GrpcService;
@@ -40,7 +38,7 @@ public class MemberServiceGrpcImpl extends MemberServiceGrpc.MemberServiceImplBa
      * @param request          - 요청
      * @param responseObserver - 응답
      */
-    @TraceServer
+    @TraceGrpcServer
     @Override
     public void getMemberById(
             MemberProto.MemberIdRequest request,
