@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
  */
 @Aspect
 @Component
-public class TraceClientAspect {
+public class TraceGrpcClientAspect {
 
     private final Tracer tracer = GlobalOpenTelemetry.getTracer("grpc-client");
 

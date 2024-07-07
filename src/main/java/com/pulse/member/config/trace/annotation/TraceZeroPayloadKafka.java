@@ -6,7 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * KafkaConsumer의 메서드에 적용해서 Span을 적용하는 어노테이션
+ * ZeroPayload로 gRPC에 요청을 보내는 Kafka Consumer의 메서드에 적용해서 Span을 적용하는 어노테이션
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)

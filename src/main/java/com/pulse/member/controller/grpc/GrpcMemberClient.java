@@ -12,12 +12,12 @@ import org.springframework.stereotype.Component;
  * 이 클래스는 애플리케이션 내에서 gRPC 서버에 요청을 보내는 역할을 합니다.
  */
 @Component
-public class GrpcClient {
+public class GrpcMemberClient {
 
     private final MemberServiceGrpc.MemberServiceBlockingStub blockingStub;
 
     // gRPC 서버에 연결 (생성자)
-    public GrpcClient() {
+    public GrpcMemberClient() {
         ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", 50051)
                 .usePlaintext()
                 .build();
