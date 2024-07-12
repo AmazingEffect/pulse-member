@@ -6,6 +6,7 @@ import com.pulse.member.controller.request.MemberRetrieveDTO;
 import com.pulse.member.entity.Member;
 import com.pulse.member.entity.MemberRole;
 import com.pulse.member.entity.Role;
+import com.pulse.member.entity.constant.RoleName;
 import com.pulse.member.listener.spring.event.MemberCreateEvent;
 import com.pulse.member.listener.spring.event.NicknameChangeEvent;
 import com.pulse.member.mapper.MemberMapper;
@@ -48,7 +49,7 @@ public class MemberServiceImpl implements MemberService {
         Member savedMember = memberRepository.saveAndFlush(member);
 
         // 3. 회원 권한을 찾아와서 저장
-        Role role = roleRepository.findByName("MEMBER")
+        Role role = roleRepository.findByName(RoleName.MEMBER.getRoleName())
                 .orElseThrow(() -> new RuntimeException("Role not found"));
         memberRoleRepository.save(MemberRole.of(savedMember, role));
 
