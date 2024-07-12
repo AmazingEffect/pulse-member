@@ -5,6 +5,7 @@ import com.pulse.event_library.service.OutboxService;
 import com.pulse.member.entity.MemberOutbox;
 import com.pulse.member.entity.constant.MessageStatus;
 import com.pulse.member.repository.OutboxRepository;
+import io.opentelemetry.api.trace.Span;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,10 +30,18 @@ public class OutboxServiceImpl implements OutboxService {
      */
     @Override
     public void saveOutboxEvent(OutboxEvent event) {
+        // 1. 현재 Span에서 Trace ID를 가져옵니다.
+        Span currentSpan = Span.current();
+        String nowTraceId = currentSpan.getSpanContext().getTraceId();
+
+        // 2. 이벤트 타입에 따라 적절한 토픽 이름을 반환합니다.
         String eventType = getKafkaTopic(event);
+
+        // 3. OutboxEvent를 저장합니다.
         MemberOutbox outbox = MemberOutbox.builder()
                 .eventType(eventType)
-                .eventId(event.getId())
+                .payload(event.getId())
+                .traceId(nowTraceId)
                 .status(MessageStatus.PENDING)
                 .build();
         outboxRepository.save(outbox);
@@ -46,7 +55,7 @@ public class OutboxServiceImpl implements OutboxService {
     @Override
     public void markOutboxEventProcessed(OutboxEvent event) {
         String eventType = getKafkaTopic(event);
-        MemberOutbox outbox = outboxRepository.findByEventIdAndEventType(event.getId(), eventType)
+        MemberOutbox outbox = outboxRepository.findByPayloadAndEventType(event.getId(), eventType)
                 .orElseThrow(() -> new IllegalArgumentException("OutboxEvent not found"));
 
         if (outbox != null) {
@@ -65,7 +74,7 @@ public class OutboxServiceImpl implements OutboxService {
     @Override
     public void markOutboxEventSuccess(OutboxEvent event) {
         String eventType = getKafkaTopic(event);
-        MemberOutbox outbox = outboxRepository.findByEventIdAndEventType(event.getId(), eventType)
+        MemberOutbox outbox = outboxRepository.findByPayloadAndEventType(event.getId(), eventType)
                 .orElseThrow(() -> new IllegalArgumentException("OutboxEvent not found"));
 
         if (outbox != null) {
@@ -82,7 +91,7 @@ public class OutboxServiceImpl implements OutboxService {
     @Override
     public void markOutboxEventFailed(OutboxEvent event) {
         String eventType = getKafkaTopic(event);
-        MemberOutbox outbox = outboxRepository.findByEventIdAndEventType(event.getId(), eventType)
+        MemberOutbox outbox = outboxRepository.findByPayloadAndEventType(event.getId(), eventType)
                 .orElseThrow(() -> new IllegalArgumentException("OutboxEvent not found"));
 
         if (outbox != null) {
