@@ -70,7 +70,7 @@ public class Member extends BaseEntity {
     @Column(name = "last_login")
     private LocalDateTime lastLogin;  // 마지막 로그인 시간
 
-    @OneToMany(mappedBy = "member", orphanRemoval = true, cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "member", orphanRemoval = true, cascade = CascadeType.ALL)
     private Set<MemberRole> roles;    // 회원 역할
 
     @Override

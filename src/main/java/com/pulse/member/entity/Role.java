@@ -10,7 +10,7 @@ import java.util.Objects;
  * ADMIN, MEMBER, MODERATOR, GUEST, VIP
  */
 @Builder
-@AllArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor
 @Getter
 @Entity
@@ -23,6 +23,13 @@ public class Role extends BaseEntity {
 
     @Column(unique = true, nullable = false)
     private String name;
+
+    // factory method
+    public static Role of(String roleName) {
+        return Role.builder()
+                .name(roleName)
+                .build();
+    }
 
     @Override
     public boolean equals(Object o) {
