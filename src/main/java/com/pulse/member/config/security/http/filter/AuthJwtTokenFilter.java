@@ -1,6 +1,7 @@
-package com.pulse.member.config.security;
+package com.pulse.member.config.security.http.filter;
 
 import com.pulse.member.config.jwt.JwtTokenProvider;
+import com.pulse.member.config.security.http.user.UserDetailsServiceImpl;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

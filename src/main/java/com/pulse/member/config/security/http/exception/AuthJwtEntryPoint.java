@@ -1,4 +1,4 @@
-package com.pulse.member.config.security;
+package com.pulse.member.config.security.http.exception;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
@@ -10,7 +10,6 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 
 /**

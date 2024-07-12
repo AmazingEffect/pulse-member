@@ -1,7 +1,7 @@
 package com.pulse.member.controller;
 
 import com.pulse.member.config.jwt.JwtTokenProvider;
-import com.pulse.member.config.security.UserDetailsImpl;
+import com.pulse.member.config.security.http.user.UserDetailsImpl;
 import com.pulse.member.controller.request.LoginRequestDTO;
 import com.pulse.member.controller.request.LogoutRequestDTO;
 import com.pulse.member.controller.request.MemberSignUpRequestDTO;

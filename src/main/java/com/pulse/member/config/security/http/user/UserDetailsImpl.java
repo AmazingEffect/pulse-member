@@ -1,4 +1,4 @@
-package com.pulse.member.config.security;
+package com.pulse.member.config.security.http.user;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.pulse.member.entity.Member;

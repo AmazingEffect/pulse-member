@@ -1,6 +1,6 @@
 package com.pulse.member.config.jwt;
 
-import com.pulse.member.config.security.UserDetailsImpl;
+import com.pulse.member.config.security.http.user.UserDetailsImpl;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;

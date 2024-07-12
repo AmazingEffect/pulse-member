@@ -1,5 +1,8 @@
-package com.pulse.member.config.security;
+package com.pulse.member.config.security.http;
 
+import com.pulse.member.config.security.http.exception.AuthJwtEntryPoint;
+import com.pulse.member.config.security.http.filter.AuthJwtTokenFilter;
+import com.pulse.member.config.security.http.user.UserDetailsServiceImpl;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -30,6 +33,7 @@ public class SecurityConfig {
     private final AuthJwtEntryPoint authJwtEntryPoint;
     private final AuthJwtTokenFilter authJwtTokenFilter;
 
+
     /**
      * DAO 인증 제공자 설정. (기본 로그인 인증)
      * DaoAuthenticationProvider는 AuthenticationManager의 구성 요소 중 하나로, 실제 사용자 인증을 수행하는 역할을 합니다.
@@ -55,6 +59,7 @@ public class SecurityConfig {
         return authProvider;
     }
 
+
     /**
      * 인증 관리자 설정. (Provider 지정 및 인증 처리)
      * AuthenticationManager는 여러 AuthenticationProvider를 사용하여 인증을 처리할 수 있는 중앙 관리자입니다.
@@ -70,6 +75,7 @@ public class SecurityConfig {
         return authenticationConfiguration.getAuthenticationManager(); // Spring Security가 설정한 AuthenticationManager 반환
     }
 
+
     /**
      * 비밀번호 인코더 설정.
      *
@@ -79,6 +85,7 @@ public class SecurityConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
 
     /**
      * 보안 필터 체인 설정.
