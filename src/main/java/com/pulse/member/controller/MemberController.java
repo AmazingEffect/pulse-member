@@ -18,9 +18,4 @@ public class MemberController {
         return memberService.getMemberById(id);
     }
 
-    @PostMapping("/register")
-    public MemberCreateDTO createMember(@RequestBody MemberCreateDTO memberCreateDTO) {
-        return memberService.createMember(memberCreateDTO);
-    }
-
 }
