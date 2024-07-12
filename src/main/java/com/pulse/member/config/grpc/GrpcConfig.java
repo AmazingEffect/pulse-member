@@ -30,10 +30,10 @@ public class GrpcConfig {
     /**
      * gRPC 서버 인터셉터 클래스. 이 클래스는 gRPC 요청에서 JWT 토큰을 추출하고 인증을 수행합니다.
      */
-    @Bean
-    @GrpcGlobalServerInterceptor
-    JwtGrpcInterceptor jwtGrpcInterceptor() {
-        return new JwtGrpcInterceptor(customGrpcAuthenticationReader);
-    }
+//    @Bean
+//    @GrpcGlobalServerInterceptor
+//    JwtGrpcInterceptor jwtGrpcInterceptor() {
+//        return new JwtGrpcInterceptor(customGrpcAuthenticationReader);
+//    }
 
 }
