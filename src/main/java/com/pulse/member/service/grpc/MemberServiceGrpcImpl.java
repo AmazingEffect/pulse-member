@@ -2,7 +2,7 @@ package com.pulse.member.service.grpc;
 
 import com.pulse.event_library.service.OutboxService;
 import com.pulse.member.config.trace.annotation.TraceGrpcServer;
-import com.pulse.member.dto.MemberRetrieveDTO;
+import com.pulse.member.controller.request.MemberRetrieveDTO;
 import com.pulse.member.grpc.MemberProto;
 import com.pulse.member.grpc.MemberServiceGrpc;
 import com.pulse.member.listener.spring.event.MemberCreateEvent;
@@ -46,8 +46,8 @@ public class MemberServiceGrpcImpl extends MemberServiceGrpc.MemberServiceImplBa
     ) {
         MemberCreateEvent event = new MemberCreateEvent(request.getId());
         try {
-            MemberRetrieveDTO member = memberService.getMemberById(request.getId());
-            MemberProto.MemberRetrieveResponse response = memberMapper.toProto(member);
+            MemberRetrieveDTO memberRetrieveDTO = memberService.getMemberById(request.getId());
+            MemberProto.MemberRetrieveResponse response = memberMapper.toProto(memberRetrieveDTO);
 
             responseObserver.onNext(response);
             responseObserver.onCompleted();
