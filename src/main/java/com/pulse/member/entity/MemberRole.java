@@ -1,10 +1,7 @@
 package com.pulse.member.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.Objects;
 
@@ -12,7 +9,7 @@ import java.util.Objects;
  * 유저와 역할의 Map 테이블 엔티티
  */
 @Builder
-@AllArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor
 @Getter
 @Entity
@@ -41,6 +38,14 @@ public class MemberRole {
     @Override
     public int hashCode() {
         return Objects.hashCode(getId());
+    }
+
+    // factory method
+    public static MemberRole of(Member member, Role role) {
+        return MemberRole.builder()
+                .member(member)
+                .role(role)
+                .build();
     }
 
 }

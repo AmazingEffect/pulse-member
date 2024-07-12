@@ -1,11 +1,9 @@
-package com.pulse.member.dto;
+package com.pulse.member.controller.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
 
 /**
  * 회원 조회 DTO

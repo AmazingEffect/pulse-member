@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * 회원 엔티티
@@ -68,6 +69,9 @@ public class Member extends BaseEntity {
 
     @Column(name = "last_login")
     private LocalDateTime lastLogin;  // 마지막 로그인 시간
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "member", orphanRemoval = true, cascade = CascadeType.ALL)
+    private Set<MemberRole> roles;    // 회원 역할
 
     @Override
     public boolean equals(Object o) {

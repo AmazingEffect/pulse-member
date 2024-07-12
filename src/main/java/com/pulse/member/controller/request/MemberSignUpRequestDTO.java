@@ -1,4 +1,4 @@
-package com.pulse.member.dto;
+package com.pulse.member.controller.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class MemberCreateDTO {
+public class MemberSignUpRequestDTO {
 
     private Long id;                 // PK
     private String email;            // 이메일

@@ -1,7 +1,6 @@
 package com.pulse.member.controller;
 
-import com.pulse.member.dto.MemberCreateDTO;
-import com.pulse.member.dto.MemberRetrieveDTO;
+import com.pulse.member.controller.request.MemberRetrieveDTO;
 import com.pulse.member.service.usecase.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -16,11 +15,6 @@ public class MemberController {
     @GetMapping("/{id}")
     public MemberRetrieveDTO getMemberById(@PathVariable Long id) {
         return memberService.getMemberById(id);
-    }
-
-    @PostMapping("/register")
-    public MemberCreateDTO createMember(@RequestBody MemberCreateDTO memberCreateDTO) {
-        return memberService.createMember(memberCreateDTO);
     }
 
 }
