@@ -94,7 +94,10 @@ public class SecurityConfig {
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // 세션 상태 비저장 설정
                 .authorizeHttpRequests(auth -> {
                     auth.requestMatchers("/member/auth/**").permitAll()              // 인증 없이 접근 가능한 경로 설정
-                            .anyRequest().authenticated();                             // 나머지 요청은 인증 필요
+                        .requestMatchers("/member/auth/signUp").permitAll()          // 회원가입은 인증 없이 접근 가능
+                        .requestMatchers("/member/role/create").permitAll()          // 역할 생성은 인증 없이 접근 가능
+                        .requestMatchers("/member/role/createRoles").permitAll()     // 역할 생성은 인증 없이 접근 가능
+                        .anyRequest().authenticated();                                 // 나머지 요청은 인증 필요
                 })
                 .authenticationProvider(authenticationProvider())                      // DaoAuthenticationProvider를 인증 제공자로 설정
                 .addFilterBefore(authJwtTokenFilter, UsernamePasswordAuthenticationFilter.class); // JWT 토큰 필터 설정
