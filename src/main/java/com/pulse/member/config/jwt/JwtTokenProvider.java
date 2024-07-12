@@ -59,7 +59,8 @@ public class JwtTokenProvider {
 
         return Jwts.builder()
                 .subject(userDetails.getEmail()) // 이메일을 subject 클레임에 저장
-                .claim("roles", userDetails.getAuthorities())
+                .claim("roles", userDetails.getAuthorities()) // 권한을 클레임에 추가
+                .claim("nickname", userDetails.getNickname()) // nickname을 클레임에 추가
                 .issuedAt(new Date())
                 .expiration(expiryDate)
                 .signWith(secretKey) // 서명 생성
