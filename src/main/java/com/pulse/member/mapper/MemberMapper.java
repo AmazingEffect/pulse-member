@@ -1,9 +1,8 @@
 package com.pulse.member.mapper;
 
 
+import com.pulse.member.controller.request.MemberRetrieveDTO;
 import com.pulse.member.controller.request.MemberSignUpRequestDTO;
-import com.pulse.member.dto.MemberCreateDTO;
-import com.pulse.member.dto.MemberRetrieveDTO;
 import com.pulse.member.entity.Member;
 import com.pulse.member.grpc.MemberProto;
 import org.mapstruct.Mapper;
@@ -34,12 +33,12 @@ public interface MemberMapper {
 
     // gRPC 요청을 위한 매핑
     @Mapping(target = "id", ignore = true) // id는 생략 가능, 자동 생성되는 경우
-    MemberCreateDTO toCreateDto(MemberProto.MemberRequest memberRequest);
+    MemberSignUpRequestDTO toCreateDto(MemberProto.MemberRequest memberRequest);
 
-    MemberCreateDTO toRetrieveDto(MemberProto.MemberRequest memberRequest);
+    MemberSignUpRequestDTO toRetrieveDto(MemberProto.MemberRequest memberRequest);
 
     MemberProto.MemberRetrieveResponse toProto(MemberRetrieveDTO memberRetrieveDTO);
 
-    MemberProto.MemberCreateResponse toProto(MemberCreateDTO memberCreateDTO);
+    MemberProto.MemberCreateResponse toProto(MemberSignUpRequestDTO memberCreateDTO);
 
 }
