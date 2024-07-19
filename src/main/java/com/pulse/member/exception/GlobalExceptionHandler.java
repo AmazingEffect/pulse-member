@@ -6,7 +6,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.context.request.WebRequest;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -17,9 +16,12 @@ import java.util.stream.Collectors;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    /**
+     * 애플리케이션에서 발생하는 모든 예외를 처리하기 위해 사용됩니다.
+     */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<String>> handleException(Exception e) {
-        ApiResponse<String> response = ApiResponse.fail(e.getMessage());
+        ApiResponse<String> response = ApiResponse.fail(ErrorCode.UNEXPECTED_ERROR, e.getMessage());
         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
@@ -29,15 +31,12 @@ public class GlobalExceptionHandler {
      * 이 예외는 주로 Java Bean Validation (JSR 380) 어노테이션(예: @NotNull, @Size, @Min 등)
      */
     @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<ApiResponse<String>> handleConstraintViolationException(ConstraintViolationException ex, WebRequest request) {
-        // 1. 제약 조건 위반 메시지를 수집합니다.
-        List<String> errors = ex.getConstraintViolations()
+    public ResponseEntity<ApiResponse<String>> handleConstraintViolationException(ConstraintViolationException e) {
+        List<String> errors = e.getConstraintViolations()
                 .stream()
                 .map(violation -> violation.getPropertyPath() + ": " + violation.getMessage())
                 .collect(Collectors.toList());
-        
-        // 2. ApiResponse 객체를 생성하여 응답합니다.
-        ApiResponse<String> response = ApiResponse.fail("Validation error", errors);
+        ApiResponse<String> response = ApiResponse.fail(ErrorCode.VALIDATION_FAILED, errors);
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
@@ -47,7 +46,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(MemberException.class)
     public ResponseEntity<ApiResponse<String>> handleMemberException(MemberException e) {
-        ApiResponse<String> response = ApiResponse.fail(e.getMessage());
+        ApiResponse<String> response = ApiResponse.fail(e.getErrorCode());
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
