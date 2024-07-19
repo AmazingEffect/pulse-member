@@ -1,13 +1,20 @@
 package com.pulse.member.exception;
 
+import lombok.Getter;
+
+@Getter
 public class MemberException extends RuntimeException {
 
-    public MemberException(String message) {
-        super(message);
+    private final ErrorCode errorCode;
+
+    public MemberException(ErrorCode errorCode) {
+        super(errorCode.getMessage());
+        this.errorCode = errorCode;
     }
 
-    public MemberException(String message, Throwable cause) {
-        super(message, cause);
+    public MemberException(ErrorCode errorCode, Throwable cause) {
+        super(errorCode.getMessage(), cause);
+        this.errorCode = errorCode;
     }
 
 }
