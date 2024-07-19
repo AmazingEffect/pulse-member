@@ -15,59 +15,63 @@ public class ApiResponse<T> {
     private ResponseStatus success;
     private String message;
     private T data;
-    private List<String> errors;
-    private String errorCode;
+    private ErrorResponse error;
 
     public static <T> ApiResponse<T> success(T data) {
         return new ApiResponse<>(
                 ResponseStatus.SUCCESS,
                 "Request was successful",
                 data,
-                null,
                 null
         );
     }
+
 
     public static <T> ApiResponse<T> success(String message, T data) {
         return new ApiResponse<>(
                 ResponseStatus.SUCCESS,
                 message,
                 data,
-                null,
                 null
         );
     }
 
+
     // 커스텀 예외 fail
-    public static <T> ApiResponse<T> fail(ErrorCode errorCode) {
+    public static <T> ApiResponse<T> fail(ErrorCode errorCode, String stackTrace) {
+        ErrorResponse errorResponse = ErrorResponse.of(errorCode.getCode(), errorCode.getMessage(), null, stackTrace);
+
         return new ApiResponse<>(
                 ResponseStatus.FAIL,
                 errorCode.getMessage(),
                 null,
-                null,
-                errorCode.getCode()
+                errorResponse
         );
     }
 
+
     // 일반적인 예외 fail
-    public static <T> ApiResponse<T> fail(ErrorCode errorCode, String message) {
+    public static <T> ApiResponse<T> fail(ErrorCode errorCode, String message, String stackTrace) {
+        ErrorResponse errorResponse = ErrorResponse.of(errorCode.getCode(), message, null, stackTrace);
+
         return new ApiResponse<>(
                 ResponseStatus.FAIL,
                 message,
                 null,
-                null,
-                errorCode.getCode()
+                errorResponse
         );
     }
 
+
     // validate 전용 fail
-    public static <T> ApiResponse<T> fail(ErrorCode errorCode, List<String> errors) {
+    public static <T> ApiResponse<T> fail(ErrorCode errorCode, List<String> errors, String stackTrace) {
+        ErrorResponse errorResponse = ErrorResponse.of(errorCode.getCode(), errorCode.getMessage(), errors, stackTrace);
+
         return new ApiResponse<>(
                 ResponseStatus.FAIL,
                 errorCode.getMessage(),
                 null,
-                errors,
-                errorCode.getCode()
+                errorResponse
         );
     }
 
