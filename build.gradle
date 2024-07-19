@@ -67,6 +67,9 @@ dependencies {
     implementation 'io.micrometer:micrometer-tracing-bridge-otel'
     implementation 'io.opentelemetry:opentelemetry-exporter-otlp'
 
+    // 예외 stack trace 설정
+    implementation 'org.apache.commons:commons-lang3:3.15.0'
+
 //    implementation 'io.micrometer:micrometer-tracing-bridge-brave'
 //    implementation 'io.zipkin.reporter2:zipkin-reporter-brave'
 
