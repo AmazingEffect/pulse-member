@@ -6,14 +6,12 @@ import io.opentelemetry.api.trace.SpanContext;
 import io.opentelemetry.api.trace.TraceFlags;
 import io.opentelemetry.api.trace.TraceState;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 
 /**
  * gRPC 서버 메서드 호출 시, 요청 헤더에서 traceparent 헤더를 추출하여 SpanContext를 생성합니다.
  * gRPC의 인터셉터 동작이 필요한 경우 지금처럼 ServerInterceptor를 구현합니다.
  */
 @Slf4j
-@Component
 public class GrpcMetadataInterceptor implements ServerInterceptor {
 
     /**
@@ -45,6 +43,7 @@ public class GrpcMetadataInterceptor implements ServerInterceptor {
         // 4. 다음 인터셉터를 호출합니다.
         return Contexts.interceptCall(context, call, headers, next);
     }
+
 
     /**
      * 헤더(Metadata)에서 추출한 traceparent 값을 사용하여 SpanContext를 생성하고 Context로 래핑합니다.
