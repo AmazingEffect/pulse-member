@@ -1,4 +1,4 @@
-package com.pulse.member.config.trace.grpc;
+package com.pulse.member.config.grpc.interceptor;
 
 import io.grpc.Context;
 import io.grpc.Metadata;

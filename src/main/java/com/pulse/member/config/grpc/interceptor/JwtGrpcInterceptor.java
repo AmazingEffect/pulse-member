@@ -1,4 +1,4 @@
-package com.pulse.member.config.security.grpc;
+package com.pulse.member.config.grpc.interceptor;
 
 import io.grpc.*;
 import lombok.RequiredArgsConstructor;
