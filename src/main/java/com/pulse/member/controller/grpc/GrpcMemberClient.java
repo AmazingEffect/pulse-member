@@ -3,7 +3,7 @@ package com.pulse.member.controller.grpc;
 import com.pulse.member.grpc.MemberProto;
 import com.pulse.member.grpc.MemberServiceGrpc;
 import io.grpc.ManagedChannel;
-import io.grpc.ManagedChannelBuilder;
+import io.grpc.netty.shaded.io.grpc.netty.NettyChannelBuilder;
 import org.springframework.stereotype.Component;
 
 /**
@@ -18,7 +18,7 @@ public class GrpcMemberClient {
 
     // gRPC 서버에 연결 (생성자)
     public GrpcMemberClient() {
-        ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", 50051)
+        ManagedChannel channel = NettyChannelBuilder.forAddress("localhost", 50051)
                 .usePlaintext()
                 .build();
         blockingStub = MemberServiceGrpc.newBlockingStub(channel);
