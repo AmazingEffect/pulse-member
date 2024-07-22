@@ -10,6 +10,8 @@ public interface MemberService {
 
     MemberRetrieveDTO getMemberById(Long id);
 
+    MemberRetrieveDTO getMemberByEmail(String email);
+
     Long changeNickname(Long id, String newNickname);
 
     void logout(LogoutRequestDTO logoutRequest);

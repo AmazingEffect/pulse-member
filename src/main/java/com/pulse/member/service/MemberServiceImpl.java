@@ -1,12 +1,13 @@
 package com.pulse.member.service;
 
 import com.pulse.member.controller.request.LogoutRequestDTO;
-import com.pulse.member.controller.request.MemberSignUpRequestDTO;
 import com.pulse.member.controller.request.MemberRetrieveDTO;
+import com.pulse.member.controller.request.MemberSignUpRequestDTO;
 import com.pulse.member.entity.Member;
 import com.pulse.member.entity.MemberRole;
 import com.pulse.member.entity.Role;
 import com.pulse.member.entity.constant.RoleName;
+import com.pulse.member.exception.ErrorCode;
 import com.pulse.member.listener.spring.event.MemberCreateEvent;
 import com.pulse.member.listener.spring.event.NicknameChangeEvent;
 import com.pulse.member.mapper.MemberMapper;
@@ -67,8 +68,23 @@ public class MemberServiceImpl implements MemberService {
      */
     @Override
     public MemberRetrieveDTO getMemberById(Long id) {
-        Member member = memberRepository.findById(id).orElseThrow(() -> new RuntimeException("Member not found"));
-        return memberMapper.toRetrieveDto(member);
+        return memberRepository.findById(id)
+                .map(memberMapper::toRetrieveDto)
+                .orElseThrow(() -> new RuntimeException(ErrorCode.MEMBER_NOT_FOUND.getMessage()));
+    }
+
+
+    /**
+     * 이메일로 회원 조회
+     *
+     * @param email 이메일
+     * @return 회원 조회 DTO
+     */
+    @Override
+    public MemberRetrieveDTO getMemberByEmail(String email) {
+        return memberRepository.findByEmail(email)
+                .map(memberMapper::toRetrieveDto)
+                .orElseThrow(() -> new RuntimeException(ErrorCode.MEMBER_NOT_FOUND.getMessage()));
     }
 
 
