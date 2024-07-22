@@ -8,8 +8,8 @@ import lombok.Getter;
 public enum ErrorCode {
 
     // authentication errors
-    USER_NOT_FOUND("MEM001", "User not found"),
-    USER_ALREADY_EXISTS("MEM002", "User already exists"),
+    MEMBER_NOT_FOUND("MEM001", "Member not found"),
+    MEMBER_ALREADY_EXISTS("MEM002", "User already exists"),
     INVALID_USER_ID("MEM003", "Invalid user ID"),
     INVALID_USER_NAME("MEM004", "Invalid user name"),
     INVALID_USER_EMAIL("MEM005", "Invalid user email"),
@@ -21,6 +21,9 @@ public enum ErrorCode {
     // Internal errors
     INTERNAL_SERVER_ERROR("MEM500", "Internal server error"),
     UNEXPECTED_ERROR("MEM999", "Unexpected error"),
+    REFRESH_TOKEN_EXPIRED("MEM997", "Refresh token expired"),
+    TOKEN_NOT_FOUND("MEM998", "Token not found")
+
     ;
 
     private final String code;

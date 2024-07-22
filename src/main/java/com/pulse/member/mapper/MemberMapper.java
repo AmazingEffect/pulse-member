@@ -31,6 +31,9 @@ public interface MemberMapper {
     // DTO를 엔티티로 변환
     Member toEntity(MemberSignUpRequestDTO signUpRequestDTO);
 
+    // DTO를 엔티티로 변환
+    Member toEntity(MemberRetrieveDTO memberRetrieveDTO);
+
     // gRPC 요청을 위한 매핑
     @Mapping(target = "id", ignore = true) // id는 생략 가능, 자동 생성되는 경우
     MemberSignUpRequestDTO toCreateDto(MemberProto.MemberRequest memberRequest);
