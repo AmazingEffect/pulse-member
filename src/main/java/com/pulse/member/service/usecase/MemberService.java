@@ -1,16 +1,16 @@
 package com.pulse.member.service.usecase;
 
 import com.pulse.member.controller.request.LogoutRequestDTO;
+import com.pulse.member.controller.request.MemberReadRequestDTO;
 import com.pulse.member.controller.request.MemberSignUpRequestDTO;
-import com.pulse.member.controller.request.MemberRetrieveDTO;
 
 public interface MemberService {
 
     MemberSignUpRequestDTO register(MemberSignUpRequestDTO signUpRequest);
 
-    MemberRetrieveDTO getMemberById(Long id);
+    MemberReadRequestDTO getMemberById(Long id);
 
-    MemberRetrieveDTO getMemberByEmail(String email);
+    MemberReadRequestDTO getMemberByEmail(String email);
 
     Long changeNickname(Long id, String newNickname);
 

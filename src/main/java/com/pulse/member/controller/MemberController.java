@@ -1,6 +1,6 @@
 package com.pulse.member.controller;
 
-import com.pulse.member.controller.request.MemberRetrieveDTO;
+import com.pulse.member.controller.request.MemberReadRequestDTO;
 import com.pulse.member.controller.response.ApiResponse;
 import com.pulse.member.service.usecase.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -17,8 +17,12 @@ public class MemberController {
 
     private final MemberService memberService;
 
+    /**
+     * @param id 회원 ID
+     * @apiNote 회원 조회
+     */
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<MemberRetrieveDTO>> getMemberById(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<MemberReadRequestDTO>> getMemberById(@PathVariable Long id) {
         return ResponseEntity.ok(ApiResponse.success(memberService.getMemberById(id)));
     }
 

@@ -1,7 +1,7 @@
 package com.pulse.member.mapper;
 
 
-import com.pulse.member.controller.request.MemberRetrieveDTO;
+import com.pulse.member.controller.request.MemberReadRequestDTO;
 import com.pulse.member.controller.request.MemberSignUpRequestDTO;
 import com.pulse.member.entity.Member;
 import com.pulse.member.grpc.MemberProto;
@@ -26,13 +26,13 @@ public interface MemberMapper {
     @Mapping(source = "nickname", target = "nickname")
     @Mapping(source = "profilePictureUrl", target = "profilePictureUrl")
     @Mapping(source = "statusMessage", target = "statusMessage")
-    MemberRetrieveDTO toRetrieveDto(Member member);
+    MemberReadRequestDTO toRetrieveDto(Member member);
 
     // DTO를 엔티티로 변환
     Member toEntity(MemberSignUpRequestDTO signUpRequestDTO);
 
     // DTO를 엔티티로 변환
-    Member toEntity(MemberRetrieveDTO memberRetrieveDTO);
+    Member toEntity(MemberReadRequestDTO memberReadRequestDTO);
 
     // gRPC 요청을 위한 매핑
     @Mapping(target = "id", ignore = true) // id는 생략 가능, 자동 생성되는 경우
@@ -40,7 +40,7 @@ public interface MemberMapper {
 
     MemberSignUpRequestDTO toRetrieveDto(MemberProto.MemberRequest memberRequest);
 
-    MemberProto.MemberRetrieveResponse toProto(MemberRetrieveDTO memberRetrieveDTO);
+    MemberProto.MemberRetrieveResponse toProto(MemberReadRequestDTO memberReadRequestDTO);
 
     MemberProto.MemberCreateResponse toProto(MemberSignUpRequestDTO memberCreateDTO);
 

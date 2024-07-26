@@ -1,7 +1,7 @@
 package com.pulse.member.service;
 
 import com.pulse.member.controller.request.LogoutRequestDTO;
-import com.pulse.member.controller.request.MemberRetrieveDTO;
+import com.pulse.member.controller.request.MemberReadRequestDTO;
 import com.pulse.member.controller.request.MemberSignUpRequestDTO;
 import com.pulse.member.entity.Member;
 import com.pulse.member.entity.MemberRole;
@@ -67,7 +67,7 @@ public class MemberServiceImpl implements MemberService {
      * @return 회원 조회 DTO
      */
     @Override
-    public MemberRetrieveDTO getMemberById(Long id) {
+    public MemberReadRequestDTO getMemberById(Long id) {
         return memberRepository.findById(id)
                 .map(memberMapper::toRetrieveDto)
                 .orElseThrow(() -> new RuntimeException(ErrorCode.MEMBER_NOT_FOUND.getMessage()));
@@ -81,7 +81,7 @@ public class MemberServiceImpl implements MemberService {
      * @return 회원 조회 DTO
      */
     @Override
-    public MemberRetrieveDTO getMemberByEmail(String email) {
+    public MemberReadRequestDTO getMemberByEmail(String email) {
         return memberRepository.findByEmail(email)
                 .map(memberMapper::toRetrieveDto)
                 .orElseThrow(() -> new RuntimeException(ErrorCode.MEMBER_NOT_FOUND.getMessage()));

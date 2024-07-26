@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class MemberRetrieveDTO {
+public class MemberReadRequestDTO {
 
     private Long id;                 // PK
     private String email;            // 이메일
