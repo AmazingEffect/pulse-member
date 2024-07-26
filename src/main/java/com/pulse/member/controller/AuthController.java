@@ -6,6 +6,7 @@ import com.pulse.member.controller.request.LoginRequestDTO;
 import com.pulse.member.controller.request.LogoutRequestDTO;
 import com.pulse.member.controller.request.MemberReadRequestDTO;
 import com.pulse.member.controller.request.MemberSignUpRequestDTO;
+import com.pulse.member.controller.response.MemberReadResponseDTO;
 import com.pulse.member.entity.RefreshToken;
 import com.pulse.member.service.usecase.MemberService;
 import com.pulse.member.service.usecase.RefreshTokenService;
@@ -60,7 +61,7 @@ public class AuthController {
 
         // 5. UserDetailsImpl 객체에서 이메일을 가져와서 사용자 정보를 가져옵니다.
         String email = userDetails.getEmail();
-        MemberReadRequestDTO memberDTO = memberService.getMemberByEmail(email);
+        MemberReadResponseDTO memberDTO = memberService.getMemberByEmail(email);
 
         // 6. RefreshToken을 생성합니다.
         // todo: 조금 손봐야함 refreshTokenStr을 만들었는데 이걸 안씀
@@ -107,7 +108,7 @@ public class AuthController {
 
             // 3. UserDetailsImpl 객체에서 이메일을 가져와서 사용자 정보를 가져옵니다.
             String email = userDetails.getEmail();
-            MemberReadRequestDTO memberDTO = memberService.getMemberByEmail(email);
+            MemberReadResponseDTO memberDTO = memberService.getMemberByEmail(email);
 
             // 4. refresh token 삭제
             refreshTokenService.deleteByMember(memberDTO);

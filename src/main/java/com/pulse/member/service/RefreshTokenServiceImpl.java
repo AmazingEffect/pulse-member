@@ -1,6 +1,7 @@
 package com.pulse.member.service;
 
 import com.pulse.member.controller.request.MemberReadRequestDTO;
+import com.pulse.member.controller.response.MemberReadResponseDTO;
 import com.pulse.member.entity.RefreshToken;
 import com.pulse.member.exception.ErrorCode;
 import com.pulse.member.exception.MemberException;
@@ -27,9 +28,9 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     private final MemberMapper memberMapper;
 
     @Override
-    public RefreshToken createRefreshToken(MemberReadRequestDTO memberReadRequestDTO) {
+    public RefreshToken createRefreshToken(MemberReadResponseDTO memberReadResponseDTO) {
         RefreshToken refreshToken = RefreshToken.builder()
-                .member(memberMapper.toEntity(memberReadRequestDTO))
+                .member(memberMapper.toEntity(memberReadResponseDTO))
                 .token(UUID.randomUUID().toString())
                 .expiryDate(LocalDateTime.now().plusMinutes(refreshTokenDurationMinutes))
                 .build();
@@ -46,8 +47,8 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
 
 
     @Override
-    public void deleteByMember(MemberReadRequestDTO memberReadRequestDTO) {
-        refreshTokenRepository.deleteByMember(memberMapper.toEntity(memberReadRequestDTO));
+    public void deleteByMember(MemberReadResponseDTO memberReadResponseDTO) {
+        refreshTokenRepository.deleteByMember(memberMapper.toEntity(memberReadResponseDTO));
     }
 
 

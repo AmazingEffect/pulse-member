@@ -3,6 +3,7 @@ package com.pulse.member.mapper;
 
 import com.pulse.member.controller.request.MemberReadRequestDTO;
 import com.pulse.member.controller.request.MemberSignUpRequestDTO;
+import com.pulse.member.controller.response.MemberReadResponseDTO;
 import com.pulse.member.entity.Member;
 import com.pulse.member.grpc.MemberProto;
 import org.mapstruct.Mapper;
@@ -26,22 +27,22 @@ public interface MemberMapper {
     @Mapping(source = "nickname", target = "nickname")
     @Mapping(source = "profilePictureUrl", target = "profilePictureUrl")
     @Mapping(source = "statusMessage", target = "statusMessage")
-    MemberReadRequestDTO toRetrieveDto(Member member);
+    MemberReadResponseDTO toReadDto(Member member);
 
     // DTO를 엔티티로 변환
     Member toEntity(MemberSignUpRequestDTO signUpRequestDTO);
 
     // DTO를 엔티티로 변환
-    Member toEntity(MemberReadRequestDTO memberReadRequestDTO);
+    Member toEntity(MemberReadResponseDTO memberReadResponseDTO);
 
     // gRPC 요청을 위한 매핑
     @Mapping(target = "id", ignore = true) // id는 생략 가능, 자동 생성되는 경우
     MemberSignUpRequestDTO toCreateDto(MemberProto.MemberRequest memberRequest);
 
-    MemberSignUpRequestDTO toRetrieveDto(MemberProto.MemberRequest memberRequest);
+    MemberSignUpRequestDTO toReadDto(MemberProto.MemberRequest memberRequest);
 
-    MemberProto.MemberRetrieveResponse toProto(MemberReadRequestDTO memberReadRequestDTO);
+    MemberProto.MemberRetrieveResponse toProto(MemberReadResponseDTO memberReadResponseDTO);
 
-    MemberProto.MemberCreateResponse toProto(MemberSignUpRequestDTO memberCreateDTO);
+//    MemberProto.MemberCreateResponse toProto(MemberReadResponseDTO memberReadResponseDTO);
 
 }

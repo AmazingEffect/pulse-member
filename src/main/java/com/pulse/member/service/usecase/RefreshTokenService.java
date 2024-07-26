@@ -1,15 +1,15 @@
 package com.pulse.member.service.usecase;
 
-import com.pulse.member.controller.request.MemberReadRequestDTO;
+import com.pulse.member.controller.response.MemberReadResponseDTO;
 import com.pulse.member.entity.RefreshToken;
 
 public interface RefreshTokenService {
 
-    RefreshToken createRefreshToken(MemberReadRequestDTO memberReadRequestDTO);
+    RefreshToken createRefreshToken(MemberReadResponseDTO memberReadResponseDTO);
 
     RefreshToken findByToken(String token);
 
-    void deleteByMember(MemberReadRequestDTO memberReadRequestDTO);
+    void deleteByMember(MemberReadResponseDTO memberReadResponseDTO);
 
     void verifyExpiration(RefreshToken token);
 
