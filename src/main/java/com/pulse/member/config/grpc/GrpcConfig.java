@@ -4,7 +4,6 @@ import com.pulse.member.config.grpc.interceptor.ExceptionHandlingInterceptor;
 import com.pulse.member.config.grpc.interceptor.GrpcMetadataInterceptor;
 import lombok.RequiredArgsConstructor;
 import net.devh.boot.grpc.server.interceptor.GrpcGlobalServerInterceptor;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
@@ -23,7 +22,6 @@ public class GrpcConfig {
     /**
      * gRPC 서버 메서드 호출 시, 요청 헤더에서 traceparent 헤더를 추출하여 SpanContext를 생성합니다.
      */
-    @Bean
     @GrpcGlobalServerInterceptor
     GrpcMetadataInterceptor grpcMetadataInterceptor() {
         return new GrpcMetadataInterceptor();
@@ -33,7 +31,6 @@ public class GrpcConfig {
     /**
      * gRPC 예외 처리 인터셉터 설정
      */
-    @Bean
     @GrpcGlobalServerInterceptor
     ExceptionHandlingInterceptor exceptionHandlingInterceptor() {
         return new ExceptionHandlingInterceptor();
