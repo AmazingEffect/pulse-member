@@ -13,14 +13,16 @@ import com.pulse.member.entity.MemberRole;
 import com.pulse.member.entity.RefreshToken;
 import com.pulse.member.entity.Role;
 import com.pulse.member.entity.constant.RoleName;
+import com.pulse.member.exception.ErrorCode;
+import com.pulse.member.exception.MemberException;
 import com.pulse.member.listener.spring.event.MemberCreateEvent;
 import com.pulse.member.mapper.MemberMapper;
 import com.pulse.member.repository.MemberRepository;
 import com.pulse.member.repository.MemberRoleRepository;
+import com.pulse.member.repository.RefreshTokenRepository;
 import com.pulse.member.repository.RoleRepository;
 import com.pulse.member.service.usecase.AuthService;
 import com.pulse.member.service.usecase.MemberService;
-import com.pulse.member.service.usecase.RefreshTokenService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -31,12 +33,15 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.UUID;
 
 import static com.pulse.member.util.Constant.REFRESH_TOKEN;
 
 /**
  * 회원 인증 관련 비즈니스 로직을 처리하는 서비스 클래스
+ * 회원 인증, JWT 관련 로직을 처리합니다.
  */
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -44,10 +49,10 @@ import static com.pulse.member.util.Constant.REFRESH_TOKEN;
 public class AuthServiceImpl implements AuthService {
 
     private final MemberService memberService;
-    private final RefreshTokenService refreshTokenService;
     private final MemberMapper memberMapper;
     private final RoleRepository roleRepository;
     private final MemberRepository memberRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
     private final ApplicationEventPublisher eventPublisher;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
@@ -62,7 +67,7 @@ public class AuthServiceImpl implements AuthService {
      */
     @Transactional
     @Override
-    public JwtResponseDTO signIn(LoginRequestDTO loginRequest) {
+    public JwtResponseDTO signInAndMakeJwt(LoginRequestDTO loginRequest) {
         // 1. authentication 객체를 생성하고 SecurityContext에 저장
         Authentication authentication = createAuthenticationFrom(loginRequest);
         SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -74,9 +79,7 @@ public class AuthServiceImpl implements AuthService {
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
         String email = userDetails.getEmail();
         MemberReadResponseDTO memberDTO = memberService.getMemberByEmail(email);
-
-        // todo: 이거 수정해야할듯? 서비스 -> 서비스 로직임..
-        RefreshToken refreshToken = refreshTokenService.createRefreshToken(memberDTO);
+        RefreshToken refreshToken = this.createRefreshToken(memberDTO);
 
         // 4. JWT 토큰 발급 응답 DTO 생성
         JwtResponseDTO jwtResponse = JwtResponseDTO.of(
@@ -112,7 +115,7 @@ public class AuthServiceImpl implements AuthService {
      */
     @Transactional
     @Override
-    public MemberSignUpResponseDTO signUp(MemberSignUpRequestDTO signUpRequestDTO) {
+    public MemberSignUpResponseDTO signUpAndPublishEvent(MemberSignUpRequestDTO signUpRequestDTO) {
         // 1. 비밀번호 암호화
         signUpRequestDTO.setPassword(passwordEncoder.encode(signUpRequestDTO.getPassword()));
         Member member = memberMapper.toEntity(signUpRequestDTO);
@@ -138,13 +141,13 @@ public class AuthServiceImpl implements AuthService {
      */
     @Transactional
     @Override
-    public void signOut(LogoutRequestDTO logoutRequest) {
+    public void signOutAndDeleteJwt(LogoutRequestDTO logoutRequest) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null) {
             UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
             String email = userDetails.getEmail();
             MemberReadResponseDTO memberDTO = memberService.getMemberByEmail(email);
-            refreshTokenService.deleteByMember(memberDTO);
+            this.deleteByMember(memberDTO);
         }
         memberService.logout(logoutRequest);
     }
@@ -158,11 +161,11 @@ public class AuthServiceImpl implements AuthService {
      */
     @Transactional
     @Override
-    public JwtResponseDTO refreshToken(Map<String, String> request) {
+    public JwtResponseDTO reIssueRefreshToken(Map<String, String> request) {
         // 1. refresh 토큰을 조회하고 만료 여부를 확인
         String requestRefreshToken = request.get(REFRESH_TOKEN);
-        RefreshToken refreshToken = refreshTokenService.findByToken(requestRefreshToken);
-        refreshTokenService.verifyExpiration(refreshToken);
+        RefreshToken refreshToken = this.findByToken(requestRefreshToken);
+        this.verifyExpiration(refreshToken);
 
         // 2. access 토큰 재발급
         String email = refreshToken.getMember().getEmail();
@@ -177,6 +180,64 @@ public class AuthServiceImpl implements AuthService {
 
         // 4. 갱신된 access 토큰을 응답
         return jwtResponseDTO;
+    }
+
+
+    /**
+     * RefreshToken 생성
+     *
+     * @param memberReadResponseDTO 회원 조회 DTO
+     * @return 생성된 RefreshToken
+     */
+    @Transactional
+    @Override
+    public RefreshToken createRefreshToken(MemberReadResponseDTO memberReadResponseDTO) {
+        RefreshToken refreshToken = RefreshToken.builder()
+                .member(memberMapper.toEntity(memberReadResponseDTO))
+                .token(UUID.randomUUID().toString())
+                .expiryDate(LocalDateTime.now().plusMinutes(10))
+                .build();
+
+        return refreshTokenRepository.save(refreshToken);
+    }
+
+
+    /**
+     * RefreshToken 조회
+     *
+     * @param token 토큰
+     * @return RefreshToken
+     */
+    @Override
+    public RefreshToken findByToken(String token) {
+        return refreshTokenRepository.findByToken(token)
+                .orElseThrow(() -> new MemberException(ErrorCode.TOKEN_NOT_FOUND));
+    }
+
+
+    /**
+     * RefreshToken 삭제
+     *
+     * @param memberReadResponseDTO 회원 조회 DTO
+     */
+    @Transactional
+    @Override
+    public void deleteByMember(MemberReadResponseDTO memberReadResponseDTO) {
+        refreshTokenRepository.deleteByMember(memberMapper.toEntity(memberReadResponseDTO));
+    }
+
+
+    /**
+     * RefreshToken 만료 여부 확인
+     *
+     * @param token RefreshToken
+     */
+    @Override
+    public void verifyExpiration(RefreshToken token) {
+        if (token.getExpiryDate().isBefore(LocalDateTime.now())) {
+            refreshTokenRepository.delete(token);
+            throw new MemberException(ErrorCode.REFRESH_TOKEN_EXPIRED);
+        }
     }
 
 }

@@ -4,18 +4,28 @@ import com.pulse.member.controller.request.LoginRequestDTO;
 import com.pulse.member.controller.request.LogoutRequestDTO;
 import com.pulse.member.controller.request.MemberSignUpRequestDTO;
 import com.pulse.member.controller.response.JwtResponseDTO;
+import com.pulse.member.controller.response.MemberReadResponseDTO;
 import com.pulse.member.controller.response.MemberSignUpResponseDTO;
+import com.pulse.member.entity.RefreshToken;
 
 import java.util.Map;
 
 public interface AuthService {
 
-    JwtResponseDTO signIn(LoginRequestDTO loginRequest);
+    JwtResponseDTO signInAndMakeJwt(LoginRequestDTO loginRequest);
 
-    MemberSignUpResponseDTO signUp(MemberSignUpRequestDTO signUpRequest);
+    MemberSignUpResponseDTO signUpAndPublishEvent(MemberSignUpRequestDTO signUpRequest);
 
-    void signOut(LogoutRequestDTO logoutRequest);
+    void signOutAndDeleteJwt(LogoutRequestDTO logoutRequest);
 
-    JwtResponseDTO refreshToken(Map<String, String> request);
+    RefreshToken createRefreshToken(MemberReadResponseDTO memberReadResponseDTO);
+
+    JwtResponseDTO reIssueRefreshToken(Map<String, String> request);
+
+    RefreshToken findByToken(String token);
+
+    void deleteByMember(MemberReadResponseDTO memberReadResponseDTO);
+
+    void verifyExpiration(RefreshToken token);
 
 }

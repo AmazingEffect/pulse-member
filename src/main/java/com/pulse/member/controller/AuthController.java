@@ -16,6 +16,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
 
+/**
+ * 회원 인증 관련 API 컨트롤러
+ */
 @RequestMapping("/member/auth")
 @RequiredArgsConstructor
 @RestController
@@ -24,29 +27,37 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/signIn")
-    public ResponseEntity<ApiResponse<JwtResponseDTO>> signIn(@RequestBody LoginRequestDTO loginRequest) {
-        JwtResponseDTO response = authService.signIn(loginRequest);
+    public ResponseEntity<ApiResponse<JwtResponseDTO>> signInAndMakeJwt(
+            @RequestBody LoginRequestDTO loginRequest
+    ) {
+        JwtResponseDTO response = authService.signInAndMakeJwt(loginRequest);
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
 
     @PostMapping("/signUp")
-    public ResponseEntity<ApiResponse<MemberSignUpResponseDTO>> signUp(@RequestBody MemberSignUpRequestDTO signUpRequest) {
-        MemberSignUpResponseDTO dto = authService.signUp(signUpRequest);
+    public ResponseEntity<ApiResponse<MemberSignUpResponseDTO>> signUpAndPublishEvent(
+            @RequestBody MemberSignUpRequestDTO signUpRequest
+    ) {
+        MemberSignUpResponseDTO dto = authService.signUpAndPublishEvent(signUpRequest);
         return ResponseEntity.ok(ApiResponse.success(dto));
     }
 
 
     @PostMapping("/signOut")
-    public ResponseEntity<?> signOut(@RequestBody LogoutRequestDTO logoutRequest) {
-        authService.signOut(logoutRequest);
+    public ResponseEntity<?> signOutAndDeleteJwt(
+            @RequestBody LogoutRequestDTO logoutRequest
+    ) {
+        authService.signOutAndDeleteJwt(logoutRequest);
         return ResponseEntity.ok("User logged out successfully");
     }
 
 
     @PostMapping("/refreshToken")
-    public ResponseEntity<ApiResponse<JwtResponseDTO>> refreshToken(@RequestBody Map<String, String> request) {
-        JwtResponseDTO response = authService.refreshToken(request);
+    public ResponseEntity<ApiResponse<JwtResponseDTO>> reIssueRefreshToken(
+            @RequestBody Map<String, String> request
+    ) {
+        JwtResponseDTO response = authService.reIssueRefreshToken(request);
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
