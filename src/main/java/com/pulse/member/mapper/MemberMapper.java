@@ -4,6 +4,7 @@ package com.pulse.member.mapper;
 import com.pulse.member.controller.request.MemberReadRequestDTO;
 import com.pulse.member.controller.request.MemberSignUpRequestDTO;
 import com.pulse.member.controller.response.MemberReadResponseDTO;
+import com.pulse.member.controller.response.MemberSignUpResponseDTO;
 import com.pulse.member.entity.Member;
 import com.pulse.member.grpc.MemberProto;
 import org.mapstruct.Mapper;
@@ -18,7 +19,7 @@ import org.mapstruct.ReportingPolicy;
 public interface MemberMapper {
 
     // Member 엔티티를 DTO로 변환
-    MemberSignUpRequestDTO toCreateDto(Member member);
+    MemberSignUpResponseDTO toCreateDto(Member member);
 
     // 특정 필드만 MemberRetrieveDTO로 변환
     @Mapping(source = "id", target = "id")

@@ -5,7 +5,8 @@ server:
 # JWT 설정
 jwt:
   jwtSecret: "aVeryLongSecretKeyThatIsAtLeast32BytesLongForSecurity"
-  jwtExpiration: 3600000 # 1시간 (밀리초 단위)
+  jwtExpirationMs: 3600000 # 1시간 (밀리초 단위)
+  jwtRefreshExpirationMs: 86400000 # 24시간 (밀리초 단위)
 
 # 스프링 설정
 spring:

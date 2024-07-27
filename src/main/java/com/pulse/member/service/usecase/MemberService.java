@@ -1,12 +1,9 @@
 package com.pulse.member.service.usecase;
 
 import com.pulse.member.controller.request.LogoutRequestDTO;
-import com.pulse.member.controller.request.MemberSignUpRequestDTO;
 import com.pulse.member.controller.response.MemberReadResponseDTO;
 
 public interface MemberService {
-
-    MemberSignUpRequestDTO register(MemberSignUpRequestDTO signUpRequest);
 
     MemberReadResponseDTO getMemberById(Long id);
 
