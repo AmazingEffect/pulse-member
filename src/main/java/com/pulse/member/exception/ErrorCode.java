@@ -22,7 +22,10 @@ public enum ErrorCode {
     INTERNAL_SERVER_ERROR("MEM500", "Internal server error"),
     UNEXPECTED_ERROR("MEM999", "Unexpected error"),
     REFRESH_TOKEN_EXPIRED("MEM997", "Refresh token expired"),
-    TOKEN_NOT_FOUND("MEM998", "Token not found")
+    TOKEN_NOT_FOUND("MEM998", "Token not found"),
+
+    UNAUTHORIZED("MEM401", "Unauthorized"),
+
 
     ;
 
