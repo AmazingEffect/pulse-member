@@ -15,6 +15,7 @@ import com.pulse.member.entity.Role;
 import com.pulse.member.entity.constant.RoleName;
 import com.pulse.member.exception.ErrorCode;
 import com.pulse.member.exception.MemberException;
+import com.pulse.member.listener.spring.event.ActivityLogEvent;
 import com.pulse.member.listener.spring.event.MemberCreateEvent;
 import com.pulse.member.mapper.MemberMapper;
 import com.pulse.member.repository.MemberRepository;
@@ -37,7 +38,7 @@ import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.UUID;
 
-import static com.pulse.member.util.Constant.REFRESH_TOKEN;
+import static com.pulse.member.util.Constant.*;
 
 /**
  * 회원 인증 관련 비즈니스 로직을 처리하는 서비스 클래스
@@ -82,28 +83,11 @@ public class AuthServiceImpl implements AuthService {
         RefreshToken refreshToken = this.createRefreshToken(memberDTO);
 
         // 4. JWT 토큰 발급 응답 DTO 생성
-        JwtResponseDTO jwtResponse = JwtResponseDTO.of(
-                accessToken,
-                refreshToken.getToken(),
-                email,
-                userDetails.getAuthorities()
-        );
+        JwtResponseDTO jwtResponse = createJwtResponseDTOFrom(accessToken, refreshToken, email, userDetails);
 
+        // 5. 활동 로그 저장 이벤트 발행
+        eventPublisher.publishEvent(ActivityLogEvent.of(memberDTO.getId(), LOGIN));
         return jwtResponse;
-    }
-
-
-    /**
-     * 로그인 요청을 처리하기 위해 Authentication 객체를 생성하는 메서드
-     *
-     * @param loginRequest 로그인 요청 DTO
-     * @return 생성된 Authentication 객체
-     */
-    private Authentication createAuthenticationFrom(LoginRequestDTO loginRequest) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword())
-        );
-        return authentication;
     }
 
 
@@ -135,7 +119,7 @@ public class AuthServiceImpl implements AuthService {
 
 
     /**
-     * 로그아웃 요청을 처리하는 메서드
+     * 로그아웃 + JWT 삭제 + 활동 로그 저장 event 발행
      *
      * @param logoutRequest 로그아웃 요청 DTO
      */
@@ -144,12 +128,20 @@ public class AuthServiceImpl implements AuthService {
     public void signOutAndDeleteJwt(LogoutRequestDTO logoutRequest) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null) {
+            // 1. SecurityContext에서 인증 정보를 가져와서 이메일을 추출
             UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
             String email = userDetails.getEmail();
+
+            // 2. 회원 조회 후 RefreshToken 삭제
             MemberReadResponseDTO memberDTO = memberService.getMemberByEmail(email);
             this.deleteByMember(memberDTO);
+
+            // 3. SecurityContext에서 인증 정보 삭제
+            SecurityContextHolder.clearContext();
+
+            // 활동 로그 저장 이벤트 발행
+            eventPublisher.publishEvent(ActivityLogEvent.of(memberDTO.getId(), LOGOUT));
         }
-        memberService.logout(logoutRequest);
     }
 
 
@@ -178,7 +170,8 @@ public class AuthServiceImpl implements AuthService {
 //        JwtResponseDTO jwtResponseDTO = JwtResponseDTO.of(newAccessToken, requestRefreshToken, email, authenticationToken.getAuthorities());
         JwtResponseDTO jwtResponseDTO = JwtResponseDTO.of(newAccessToken, requestRefreshToken, email);
 
-        // 4. 갱신된 access 토큰을 응답
+        // 4. 활동 로그 저장 이벤트 발행
+        eventPublisher.publishEvent(ActivityLogEvent.of(refreshToken.getMember().getId(), REISSUE_REFRESH_TOKEN));
         return jwtResponseDTO;
     }
 
@@ -238,6 +231,38 @@ public class AuthServiceImpl implements AuthService {
             refreshTokenRepository.delete(token);
             throw new MemberException(ErrorCode.REFRESH_TOKEN_EXPIRED);
         }
+    }
+
+
+    /**
+     * 로그인 요청을 처리하기 위해 Authentication 객체를 생성하는 메서드
+     *
+     * @param loginRequest 로그인 요청 DTO
+     * @return 생성된 Authentication 객체
+     */
+    private Authentication createAuthenticationFrom(LoginRequestDTO loginRequest) {
+        return authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword())
+        );
+    }
+
+
+    /**
+     * JWT 토큰 발급 응답 DTO 생성
+     *
+     * @param accessToken  JWT access 토큰
+     * @param refreshToken  RefreshToken
+     * @param email  이메일
+     * @param userDetails  UserDetailsImpl
+     * @return JWT 토큰 발급 응답 DTO
+     */
+    private static JwtResponseDTO createJwtResponseDTOFrom(String accessToken, RefreshToken refreshToken, String email, UserDetailsImpl userDetails) {
+        return JwtResponseDTO.of(
+                accessToken,
+                refreshToken.getToken(),
+                email,
+                userDetails.getAuthorities()
+        );
     }
 
 }
