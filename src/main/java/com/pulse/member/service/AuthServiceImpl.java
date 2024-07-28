@@ -13,16 +13,14 @@ import com.pulse.member.entity.MemberRole;
 import com.pulse.member.entity.RefreshToken;
 import com.pulse.member.entity.Role;
 import com.pulse.member.entity.constant.RoleName;
-import com.pulse.member.exception.ErrorCode;
-import com.pulse.member.exception.MemberException;
 import com.pulse.member.listener.spring.event.ActivityLogEvent;
 import com.pulse.member.listener.spring.event.MemberCreateEvent;
 import com.pulse.member.mapper.MemberMapper;
 import com.pulse.member.repository.MemberRepository;
 import com.pulse.member.repository.MemberRoleRepository;
-import com.pulse.member.repository.RefreshTokenRepository;
 import com.pulse.member.repository.RoleRepository;
 import com.pulse.member.service.usecase.AuthService;
+import com.pulse.member.service.usecase.JwtService;
 import com.pulse.member.service.usecase.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
@@ -34,9 +32,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.Map;
-import java.util.UUID;
 
 import static com.pulse.member.util.Constant.*;
 
@@ -50,15 +46,17 @@ import static com.pulse.member.util.Constant.*;
 public class AuthServiceImpl implements AuthService {
 
     private final MemberService memberService;
-    private final MemberMapper memberMapper;
+    private final JwtService jwtService;
+
     private final RoleRepository roleRepository;
     private final MemberRepository memberRepository;
-    private final RefreshTokenRepository refreshTokenRepository;
+    private final MemberRoleRepository memberRoleRepository;
+
+    private final MemberMapper memberMapper;
     private final ApplicationEventPublisher eventPublisher;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
     private final AuthenticationManager authenticationManager;
-    private final MemberRoleRepository memberRoleRepository;
 
     /**
      * 로그인 요청을 처리하는 메서드
@@ -80,7 +78,7 @@ public class AuthServiceImpl implements AuthService {
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
         String email = userDetails.getEmail();
         MemberReadResponseDTO memberDTO = memberService.getMemberByEmail(email);
-        RefreshToken refreshToken = this.createRefreshToken(memberDTO);
+        RefreshToken refreshToken = jwtService.createRefreshToken(memberDTO);
 
         // 4. JWT 토큰 발급 응답 DTO 생성
         JwtResponseDTO jwtResponse = createJwtResponseDTOFrom(accessToken, refreshToken, email, userDetails);
@@ -134,7 +132,7 @@ public class AuthServiceImpl implements AuthService {
 
             // 2. 회원 조회 후 RefreshToken 삭제
             MemberReadResponseDTO memberDTO = memberService.getMemberByEmail(email);
-            this.deleteByMember(memberDTO);
+            jwtService.deleteByMember(memberDTO);
 
             // 3. SecurityContext에서 인증 정보 삭제
             SecurityContextHolder.clearContext();
@@ -156,8 +154,8 @@ public class AuthServiceImpl implements AuthService {
     public JwtResponseDTO reIssueRefreshToken(Map<String, String> request) {
         // 1. refresh 토큰을 조회하고 만료 여부를 확인
         String requestRefreshToken = request.get(REFRESH_TOKEN);
-        RefreshToken refreshToken = this.findByToken(requestRefreshToken);
-        this.verifyExpiration(refreshToken);
+        RefreshToken refreshToken = jwtService.findByToken(requestRefreshToken);
+        jwtService.verifyExpiration(refreshToken);
 
         // 2. access 토큰 재발급
         String email = refreshToken.getMember().getEmail();
@@ -173,64 +171,6 @@ public class AuthServiceImpl implements AuthService {
         // 4. 활동 로그 저장 이벤트 발행
         eventPublisher.publishEvent(ActivityLogEvent.of(refreshToken.getMember().getId(), REISSUE_REFRESH_TOKEN));
         return jwtResponseDTO;
-    }
-
-
-    /**
-     * RefreshToken 생성
-     *
-     * @param memberReadResponseDTO 회원 조회 DTO
-     * @return 생성된 RefreshToken
-     */
-    @Transactional
-    @Override
-    public RefreshToken createRefreshToken(MemberReadResponseDTO memberReadResponseDTO) {
-        RefreshToken refreshToken = RefreshToken.builder()
-                .member(memberMapper.toEntity(memberReadResponseDTO))
-                .token(UUID.randomUUID().toString())
-                .expiryDate(LocalDateTime.now().plusMinutes(10))
-                .build();
-
-        return refreshTokenRepository.save(refreshToken);
-    }
-
-
-    /**
-     * RefreshToken 조회
-     *
-     * @param token 토큰
-     * @return RefreshToken
-     */
-    @Override
-    public RefreshToken findByToken(String token) {
-        return refreshTokenRepository.findByToken(token)
-                .orElseThrow(() -> new MemberException(ErrorCode.TOKEN_NOT_FOUND));
-    }
-
-
-    /**
-     * RefreshToken 삭제
-     *
-     * @param memberReadResponseDTO 회원 조회 DTO
-     */
-    @Transactional
-    @Override
-    public void deleteByMember(MemberReadResponseDTO memberReadResponseDTO) {
-        refreshTokenRepository.deleteByMember(memberMapper.toEntity(memberReadResponseDTO));
-    }
-
-
-    /**
-     * RefreshToken 만료 여부 확인
-     *
-     * @param token RefreshToken
-     */
-    @Override
-    public void verifyExpiration(RefreshToken token) {
-        if (token.getExpiryDate().isBefore(LocalDateTime.now())) {
-            refreshTokenRepository.delete(token);
-            throw new MemberException(ErrorCode.REFRESH_TOKEN_EXPIRED);
-        }
     }
 
 
@@ -251,8 +191,8 @@ public class AuthServiceImpl implements AuthService {
      * JWT 토큰 발급 응답 DTO 생성
      *
      * @param accessToken  JWT access 토큰
-     * @param refreshToken  RefreshToken
-     * @param email  이메일
+     * @param refreshToken RefreshToken
+     * @param email        이메일
      * @param userDetails  UserDetailsImpl
      * @return JWT 토큰 발급 응답 DTO
      */
