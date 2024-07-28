@@ -1,6 +1,5 @@
 package com.pulse.member.service;
 
-import com.pulse.member.controller.request.LogoutRequestDTO;
 import com.pulse.member.controller.response.MemberReadResponseDTO;
 import com.pulse.member.entity.Member;
 import com.pulse.member.exception.ErrorCode;
@@ -68,13 +67,6 @@ public class MemberServiceImpl implements MemberService {
         eventPublisher.publishEvent(new NicknameChangeEvent(member.getId()));
 
         return 1L;
-    }
-
-
-    @Transactional
-    @Override
-    public void logout(LogoutRequestDTO logoutRequest) {
-
     }
 
 }
