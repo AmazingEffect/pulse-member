@@ -1,10 +1,7 @@
 package com.pulse.member.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.Objects;
 
@@ -12,7 +9,7 @@ import java.util.Objects;
  * 활동 로그 엔티티
  */
 @Builder
-@AllArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor
 @Getter
 @Entity
@@ -40,6 +37,14 @@ public class ActivityLog extends BaseEntity {
     @Override
     public int hashCode() {
         return Objects.hashCode(getId());
+    }
+
+    // 로그아웃 생성자
+    public static ActivityLog of(Long id, String action) {
+        return ActivityLog.builder()
+                .member(Member.of(id))
+                .action(action)
+                .build();
     }
 
 }

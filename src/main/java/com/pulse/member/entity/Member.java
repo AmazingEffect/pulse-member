@@ -85,6 +85,13 @@ public class Member extends BaseEntity {
         return Objects.hashCode(getId());
     }
 
+    // ID로 Member 객체를 생성하는 정적 팩토리 메서드
+    public static Member of(Long id) {
+        return Member.builder()
+                .id(id)
+                .build();
+    }
+
     /**
      * 닉네임을 변경하는 메서드
      *
