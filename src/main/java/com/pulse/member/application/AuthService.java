@@ -1,27 +1,27 @@
-package com.pulse.member.service;
+package com.pulse.member.application;
 
 import com.pulse.member.config.jwt.JwtTokenProvider;
 import com.pulse.member.config.security.http.user.UserDetailsImpl;
-import com.pulse.member.controller.request.LoginRequestDTO;
-import com.pulse.member.controller.request.LogoutRequestDTO;
-import com.pulse.member.controller.request.MemberSignUpRequestDTO;
-import com.pulse.member.controller.response.JwtResponseDTO;
-import com.pulse.member.controller.response.MemberReadResponseDTO;
-import com.pulse.member.controller.response.MemberSignUpResponseDTO;
-import com.pulse.member.entity.Member;
-import com.pulse.member.entity.MemberRole;
-import com.pulse.member.entity.RefreshToken;
-import com.pulse.member.entity.Role;
-import com.pulse.member.entity.constant.RoleName;
-import com.pulse.member.listener.spring.event.ActivityLogEvent;
-import com.pulse.member.listener.spring.event.MemberCreateEvent;
+import com.pulse.member.adapter.in.web.dto.request.LoginRequestDTO;
+import com.pulse.member.adapter.in.web.dto.request.LogoutRequestDTO;
+import com.pulse.member.adapter.in.web.dto.request.MemberSignUpRequestDTO;
+import com.pulse.member.adapter.in.web.dto.response.JwtResponseDTO;
+import com.pulse.member.adapter.in.web.dto.response.MemberReadResponseDTO;
+import com.pulse.member.adapter.in.web.dto.response.MemberSignUpResponseDTO;
+import com.pulse.member.adapter.out.persistence.entity.Member;
+import com.pulse.member.adapter.out.persistence.entity.MemberRole;
+import com.pulse.member.adapter.out.persistence.entity.RefreshToken;
+import com.pulse.member.adapter.out.persistence.entity.Role;
+import com.pulse.member.adapter.out.persistence.entity.constant.RoleName;
+import com.pulse.member.adapter.out.event.ActivityLogEvent;
+import com.pulse.member.adapter.out.event.MemberCreateEvent;
 import com.pulse.member.mapper.MemberMapper;
-import com.pulse.member.repository.MemberRepository;
-import com.pulse.member.repository.MemberRoleRepository;
-import com.pulse.member.repository.RoleRepository;
-import com.pulse.member.service.usecase.AuthService;
-import com.pulse.member.service.usecase.JwtService;
-import com.pulse.member.service.usecase.MemberService;
+import com.pulse.member.adapter.out.persistence.repository.MemberRepository;
+import com.pulse.member.adapter.out.persistence.repository.MemberRoleRepository;
+import com.pulse.member.adapter.out.persistence.repository.RoleRepository;
+import com.pulse.member.application.port.in.AuthUseCase;
+import com.pulse.member.application.port.in.JwtUseCase;
+import com.pulse.member.application.port.in.MemberUseCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -43,10 +43,10 @@ import static com.pulse.member.util.Constant.*;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 @Service
-public class AuthServiceImpl implements AuthService {
+public class AuthService implements AuthUseCase {
 
-    private final MemberService memberService;
-    private final JwtService jwtService;
+    private final MemberUseCase memberUseCase;
+    private final JwtUseCase jwtUseCase;
 
     private final RoleRepository roleRepository;
     private final MemberRepository memberRepository;
@@ -77,8 +77,8 @@ public class AuthServiceImpl implements AuthService {
         // 3. refresh 토큰 생성
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
         String email = userDetails.getEmail();
-        MemberReadResponseDTO memberDTO = memberService.getMemberByEmail(email);
-        RefreshToken refreshToken = jwtService.createRefreshToken(memberDTO);
+        MemberReadResponseDTO memberDTO = memberUseCase.getMemberByEmail(email);
+        RefreshToken refreshToken = jwtUseCase.createRefreshToken(memberDTO);
 
         // 4. JWT 토큰 발급 응답 DTO 생성
         JwtResponseDTO jwtResponse = createJwtResponseDTOFrom(accessToken, refreshToken, email, userDetails);
@@ -131,8 +131,8 @@ public class AuthServiceImpl implements AuthService {
             String email = userDetails.getEmail();
 
             // 2. 회원 조회 후 RefreshToken 삭제
-            MemberReadResponseDTO memberDTO = memberService.getMemberByEmail(email);
-            jwtService.deleteByMember(memberDTO);
+            MemberReadResponseDTO memberDTO = memberUseCase.getMemberByEmail(email);
+            jwtUseCase.deleteByMember(memberDTO);
 
             // 3. SecurityContext에서 인증 정보 삭제
             SecurityContextHolder.clearContext();
@@ -154,8 +154,8 @@ public class AuthServiceImpl implements AuthService {
     public JwtResponseDTO reIssueRefreshToken(Map<String, String> request) {
         // 1. refresh 토큰을 조회하고 만료 여부를 확인
         String requestRefreshToken = request.get(REFRESH_TOKEN);
-        RefreshToken refreshToken = jwtService.findByToken(requestRefreshToken);
-        jwtService.verifyExpiration(refreshToken);
+        RefreshToken refreshToken = jwtUseCase.findByToken(requestRefreshToken);
+        jwtUseCase.verifyExpiration(refreshToken);
 
         // 2. access 토큰 재발급
         String email = refreshToken.getMember().getEmail();

@@ -1,10 +1,10 @@
-package com.pulse.member.service.event;
+package com.pulse.member.application;
 
 import com.pulse.event_library.event.OutboxEvent;
 import com.pulse.event_library.service.OutboxService;
-import com.pulse.member.entity.MemberOutbox;
-import com.pulse.member.entity.constant.MessageStatus;
-import com.pulse.member.repository.OutboxRepository;
+import com.pulse.member.adapter.out.persistence.entity.MemberOutbox;
+import com.pulse.member.adapter.out.persistence.entity.constant.MessageStatus;
+import com.pulse.member.adapter.out.persistence.repository.OutboxRepository;
 import io.opentelemetry.api.trace.Span;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

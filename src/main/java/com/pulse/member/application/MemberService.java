@@ -1,12 +1,12 @@
-package com.pulse.member.service;
+package com.pulse.member.application;
 
-import com.pulse.member.controller.response.MemberReadResponseDTO;
-import com.pulse.member.entity.Member;
+import com.pulse.member.adapter.in.web.dto.response.MemberReadResponseDTO;
+import com.pulse.member.adapter.out.persistence.entity.Member;
 import com.pulse.member.exception.ErrorCode;
-import com.pulse.member.listener.spring.event.NicknameChangeEvent;
+import com.pulse.member.adapter.out.event.NicknameChangeEvent;
 import com.pulse.member.mapper.MemberMapper;
-import com.pulse.member.repository.MemberRepository;
-import com.pulse.member.service.usecase.MemberService;
+import com.pulse.member.adapter.out.persistence.repository.MemberRepository;
+import com.pulse.member.application.port.in.MemberUseCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -15,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 @Service
-public class MemberServiceImpl implements MemberService {
+public class MemberService implements MemberUseCase {
 
     private final MemberRepository memberRepository;
     private final MemberMapper memberMapper;

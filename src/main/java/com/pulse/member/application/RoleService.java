@@ -1,9 +1,9 @@
-package com.pulse.member.service;
+package com.pulse.member.application;
 
-import com.pulse.member.controller.request.RoleCreateRequestDTO;
-import com.pulse.member.entity.Role;
-import com.pulse.member.repository.RoleRepository;
-import com.pulse.member.service.usecase.RoleService;
+import com.pulse.member.adapter.in.web.dto.request.RoleCreateRequestDTO;
+import com.pulse.member.adapter.out.persistence.entity.Role;
+import com.pulse.member.adapter.out.persistence.repository.RoleRepository;
+import com.pulse.member.application.port.in.RoleUseCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,7 +14,7 @@ import java.util.Optional;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 @Service
-public class RoleServiceImpl implements RoleService {
+public class RoleService implements RoleUseCase {
 
     private final RoleRepository roleRepository;
 

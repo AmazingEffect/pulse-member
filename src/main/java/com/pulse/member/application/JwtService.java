@@ -1,12 +1,12 @@
-package com.pulse.member.service;
+package com.pulse.member.application;
 
-import com.pulse.member.controller.response.MemberReadResponseDTO;
-import com.pulse.member.entity.RefreshToken;
+import com.pulse.member.adapter.in.web.dto.response.MemberReadResponseDTO;
+import com.pulse.member.adapter.out.persistence.entity.RefreshToken;
 import com.pulse.member.exception.ErrorCode;
 import com.pulse.member.exception.MemberException;
 import com.pulse.member.mapper.MemberMapper;
-import com.pulse.member.repository.RefreshTokenRepository;
-import com.pulse.member.service.usecase.JwtService;
+import com.pulse.member.adapter.out.persistence.repository.RefreshTokenRepository;
+import com.pulse.member.application.port.in.JwtUseCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -21,7 +21,7 @@ import java.util.UUID;
  */
 @RequiredArgsConstructor
 @Service
-public class JwtServiceImpl implements JwtService {
+public class JwtService implements JwtUseCase {
 
     @Value("${jwt.refreshTokenDurationMinutes}")
     private long refreshTokenDurationMinutes;

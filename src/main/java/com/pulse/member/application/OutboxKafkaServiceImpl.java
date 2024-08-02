@@ -1,4 +1,4 @@
-package com.pulse.member.service.event;
+package com.pulse.member.application;
 
 import com.pulse.event_library.service.OutboxKafkaService;
 import org.springframework.stereotype.Service;
