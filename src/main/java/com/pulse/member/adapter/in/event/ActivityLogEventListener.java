@@ -1,8 +1,8 @@
-package com.pulse.member.listener.spring;
+package com.pulse.member.adapter.in.event;
 
-import com.pulse.member.entity.ActivityLog;
-import com.pulse.member.listener.spring.event.ActivityLogEvent;
-import com.pulse.member.repository.ActivityLogRepository;
+import com.pulse.member.adapter.out.event.ActivityLogEvent;
+import com.pulse.member.adapter.out.persistence.entity.ActivityLog;
+import com.pulse.member.adapter.out.persistence.repository.ActivityLogRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -12,7 +12,7 @@ import org.springframework.transaction.event.TransactionalEventListener;
 @Slf4j
 @RequiredArgsConstructor
 @Component
-public class SpringEventListener {
+public class ActivityLogEventListener {
 
     private final ActivityLogRepository activityLogRepository;
 
