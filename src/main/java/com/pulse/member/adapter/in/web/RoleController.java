@@ -1,7 +1,7 @@
-package com.pulse.member.controller;
+package com.pulse.member.adapter.in.web;
 
-import com.pulse.member.controller.request.RoleCreateRequestDTO;
-import com.pulse.member.service.usecase.RoleService;
+import com.pulse.member.adapter.in.web.dto.request.RoleCreateRequestDTO;
+import com.pulse.member.application.port.in.RoleUseCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class RoleController {
 
-    private final RoleService roleService;
+    private final RoleUseCase roleUseCase;
 
     /**
      * 권한 생성
@@ -24,7 +24,7 @@ public class RoleController {
      */
     @PostMapping("/create")
     public ResponseEntity<?> createRole(@RequestBody String roleName) {
-        return ResponseEntity.ok(roleService.createRole(roleName));
+        return ResponseEntity.ok(roleUseCase.createRole(roleName));
     }
 
 
@@ -36,7 +36,7 @@ public class RoleController {
      */
     @PostMapping("/createRoles")
     public ResponseEntity<?> createRoles(@RequestBody RoleCreateRequestDTO dto) {
-        return ResponseEntity.ok(roleService.createRoles(dto));
+        return ResponseEntity.ok(roleUseCase.createRoles(dto));
     }
 
 }

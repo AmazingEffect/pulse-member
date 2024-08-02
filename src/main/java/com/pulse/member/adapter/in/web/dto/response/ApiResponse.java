@@ -1,4 +1,4 @@
-package com.pulse.member.controller.response;
+package com.pulse.member.adapter.in.web.dto.response;
 
 import com.pulse.member.exception.ErrorCode;
 import lombok.AllArgsConstructor;

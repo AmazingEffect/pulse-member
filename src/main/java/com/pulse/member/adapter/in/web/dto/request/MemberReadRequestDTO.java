@@ -1,4 +1,4 @@
-package com.pulse.member.controller.request;
+package com.pulse.member.adapter.in.web.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
