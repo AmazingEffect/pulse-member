@@ -1,11 +1,11 @@
-package com.pulse.member.listener.kafka.outbox.member;
+package com.pulse.member.adapter.in.kafka;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pulse.event_library.event.OutboxEvent;
 import com.pulse.event_library.service.OutboxService;
+import com.pulse.member.adapter.out.event.MemberCreateEvent;
 import com.pulse.member.config.trace.annotation.TraceOutboxKafka;
-import com.pulse.member.listener.spring.event.MemberCreateEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;

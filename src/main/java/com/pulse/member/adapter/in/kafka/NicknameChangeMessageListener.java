@@ -1,11 +1,10 @@
-package com.pulse.member.listener.kafka.outbox.member;
+package com.pulse.member.adapter.in.kafka;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pulse.event_library.event.OutboxEvent;
 import com.pulse.event_library.service.OutboxService;
-import com.pulse.member.listener.spring.event.MemberCreateEvent;
-import com.pulse.member.listener.spring.event.ProfileImageChangeEvent;
+import com.pulse.member.adapter.out.event.ProfileImageChangeEvent;
 import com.pulse.member.util.TraceUtil;
 import io.opentelemetry.api.GlobalOpenTelemetry;
 import io.opentelemetry.api.trace.Span;
