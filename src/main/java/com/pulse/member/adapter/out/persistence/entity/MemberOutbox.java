@@ -1,12 +1,11 @@
-package com.pulse.member.entity;
+package com.pulse.member.adapter.out.persistence.entity;
 
-import com.pulse.member.entity.constant.MessageStatus;
+import com.pulse.member.adapter.out.persistence.entity.constant.MessageStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.checkerframework.checker.units.qual.C;
 
 import java.time.LocalDateTime;
 import java.util.Objects;

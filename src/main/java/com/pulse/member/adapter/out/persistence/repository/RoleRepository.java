@@ -1,6 +1,6 @@
-package com.pulse.member.repository;
+package com.pulse.member.adapter.out.persistence.repository;
 
-import com.pulse.member.entity.Role;
+import com.pulse.member.adapter.out.persistence.entity.Role;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

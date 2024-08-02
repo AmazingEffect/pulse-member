@@ -1,4 +1,4 @@
-package com.pulse.member.entity;
+package com.pulse.member.adapter.out.persistence.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;

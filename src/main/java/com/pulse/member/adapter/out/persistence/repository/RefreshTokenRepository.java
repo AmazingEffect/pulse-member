@@ -1,7 +1,7 @@
-package com.pulse.member.repository;
+package com.pulse.member.adapter.out.persistence.repository;
 
-import com.pulse.member.entity.Member;
-import com.pulse.member.entity.RefreshToken;
+import com.pulse.member.adapter.out.persistence.entity.Member;
+import com.pulse.member.adapter.out.persistence.entity.RefreshToken;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

@@ -1,4 +1,4 @@
-package com.pulse.member.entity.constant;
+package com.pulse.member.adapter.out.persistence.entity.constant;
 
 public enum MessageStatus {
 
