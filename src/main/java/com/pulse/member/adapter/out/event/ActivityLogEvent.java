@@ -1,4 +1,4 @@
-package com.pulse.member.listener.spring.event;
+package com.pulse.member.adapter.out.event;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
