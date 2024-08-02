@@ -1,7 +1,7 @@
 package com.pulse.member.config.security.http.user;
 
-import com.pulse.member.entity.Member;
-import com.pulse.member.repository.MemberRepository;
+import com.pulse.member.adapter.out.persistence.entity.Member;
+import com.pulse.member.adapter.out.persistence.repository.MemberRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;

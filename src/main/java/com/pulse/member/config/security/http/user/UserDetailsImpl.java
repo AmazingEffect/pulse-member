@@ -1,7 +1,7 @@
 package com.pulse.member.config.security.http.user;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.pulse.member.entity.Member;
+import com.pulse.member.adapter.out.persistence.entity.Member;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;

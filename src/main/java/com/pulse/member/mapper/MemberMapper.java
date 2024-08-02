@@ -1,11 +1,10 @@
 package com.pulse.member.mapper;
 
 
-import com.pulse.member.controller.request.MemberReadRequestDTO;
-import com.pulse.member.controller.request.MemberSignUpRequestDTO;
-import com.pulse.member.controller.response.MemberReadResponseDTO;
-import com.pulse.member.controller.response.MemberSignUpResponseDTO;
-import com.pulse.member.entity.Member;
+import com.pulse.member.adapter.in.web.dto.request.MemberSignUpRequestDTO;
+import com.pulse.member.adapter.in.web.dto.response.MemberReadResponseDTO;
+import com.pulse.member.adapter.in.web.dto.response.MemberSignUpResponseDTO;
+import com.pulse.member.adapter.out.persistence.entity.Member;
 import com.pulse.member.grpc.MemberProto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

@@ -1,6 +1,6 @@
 package com.pulse.member.exception;
 
-import com.pulse.member.controller.response.ApiResponse;
+import com.pulse.member.adapter.in.web.dto.response.ApiResponse;
 import jakarta.validation.ConstraintViolationException;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.exception.ExceptionUtils;
