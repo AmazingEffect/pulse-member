@@ -1,9 +1,9 @@
-package com.pulse.member.service.usecase;
+package com.pulse.member.application.port.in;
 
-import com.pulse.member.controller.response.MemberReadResponseDTO;
-import com.pulse.member.entity.RefreshToken;
+import com.pulse.member.adapter.in.web.dto.response.MemberReadResponseDTO;
+import com.pulse.member.adapter.out.persistence.entity.RefreshToken;
 
-public interface JwtService {
+public interface JwtUseCase {
 
     RefreshToken createRefreshToken(MemberReadResponseDTO memberReadResponseDTO);
 

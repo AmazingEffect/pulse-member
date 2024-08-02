@@ -1,8 +1,8 @@
-package com.pulse.member.service.usecase;
+package com.pulse.member.application.port.in;
 
-import com.pulse.member.controller.response.MemberReadResponseDTO;
+import com.pulse.member.adapter.in.web.dto.response.MemberReadResponseDTO;
 
-public interface MemberService {
+public interface MemberUseCase {
 
     MemberReadResponseDTO getMemberById(Long id);
 
