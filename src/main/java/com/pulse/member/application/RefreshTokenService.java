@@ -1,12 +1,12 @@
 package com.pulse.member.application;
 
 import com.pulse.member.adapter.in.web.dto.response.MemberReadResponseDTO;
-import com.pulse.member.adapter.out.persistence.entity.RefreshToken;
+import com.pulse.member.adapter.out.persistence.entity.RefreshTokenEntity;
+import com.pulse.member.adapter.out.persistence.repository.RefreshTokenRepository;
+import com.pulse.member.application.port.in.JwtUseCase;
 import com.pulse.member.exception.ErrorCode;
 import com.pulse.member.exception.MemberException;
 import com.pulse.member.mapper.MemberMapper;
-import com.pulse.member.adapter.out.persistence.repository.RefreshTokenRepository;
-import com.pulse.member.application.port.in.JwtUseCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -21,7 +21,7 @@ import java.util.UUID;
  */
 @RequiredArgsConstructor
 @Service
-public class JwtService implements JwtUseCase {
+public class RefreshTokenService implements JwtUseCase {
 
     @Value("${jwt.refreshTokenDurationMinutes}")
     private long refreshTokenDurationMinutes;
@@ -39,14 +39,14 @@ public class JwtService implements JwtUseCase {
      */
     @Transactional
     @Override
-    public RefreshToken createRefreshToken(MemberReadResponseDTO memberReadResponseDTO) {
-        RefreshToken refreshToken = RefreshToken.builder()
-                .member(memberMapper.toEntity(memberReadResponseDTO))
+    public RefreshTokenEntity createRefreshToken(MemberReadResponseDTO memberReadResponseDTO) {
+        RefreshTokenEntity refreshTokenEntity = RefreshTokenEntity.builder()
+                .memberEntity(memberMapper.toEntity(memberReadResponseDTO))
                 .token(UUID.randomUUID().toString())
                 .expiryDate(LocalDateTime.now().plusMinutes(refreshTokenDurationMinutes))
                 .build();
 
-        return refreshTokenRepository.save(refreshToken);
+        return refreshTokenRepository.save(refreshTokenEntity);
     }
 
 
@@ -57,7 +57,7 @@ public class JwtService implements JwtUseCase {
      * @return RefreshToken
      */
     @Override
-    public RefreshToken findByToken(String token) {
+    public RefreshTokenEntity findByToken(String token) {
         return refreshTokenRepository.findByToken(token)
                 .orElseThrow(() -> new MemberException(ErrorCode.TOKEN_NOT_FOUND));
     }
@@ -81,7 +81,7 @@ public class JwtService implements JwtUseCase {
      * @param token RefreshToken
      */
     @Override
-    public void verifyExpiration(RefreshToken token) {
+    public void verifyExpiration(RefreshTokenEntity token) {
         if (token.getExpiryDate().isBefore(LocalDateTime.now())) {
             refreshTokenRepository.delete(token);
             throw new MemberException(ErrorCode.REFRESH_TOKEN_EXPIRED);
