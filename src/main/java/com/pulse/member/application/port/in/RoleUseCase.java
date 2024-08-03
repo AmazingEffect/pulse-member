@@ -1,7 +1,7 @@
 package com.pulse.member.application.port.in;
 
 import com.pulse.member.adapter.in.web.dto.request.RoleCreateRequestDTO;
-import com.pulse.member.adapter.out.persistence.entity.Role;
+import com.pulse.member.adapter.out.persistence.entity.RoleEntity;
 
 import java.util.List;
 
@@ -10,8 +10,8 @@ import java.util.List;
  */
 public interface RoleUseCase {
 
-    Role createRole(String roleName);
+    RoleEntity createRole(String roleName);
 
-    List<Role> createRoles(RoleCreateRequestDTO dto);
+    List<RoleEntity> createRoles(RoleCreateRequestDTO dto);
 
 }
