@@ -1,7 +1,7 @@
 package com.pulse.member.application;
 
 import com.pulse.member.adapter.in.web.dto.response.MemberReadResponseDTO;
-import com.pulse.member.adapter.out.persistence.entity.Member;
+import com.pulse.member.adapter.out.persistence.entity.MemberEntity;
 import com.pulse.member.exception.ErrorCode;
 import com.pulse.member.adapter.out.event.NicknameChangeEvent;
 import com.pulse.member.mapper.MemberMapper;
@@ -59,12 +59,12 @@ public class MemberService implements MemberUseCase {
     @Transactional
     @Override
     public Long changeNickname(Long id, String newNickname) {
-        Member member = memberRepository.findById(id).orElseThrow(() -> new RuntimeException("Member not found"));
-        member.changeNickname(newNickname);
-        memberRepository.save(member);
+        MemberEntity memberEntity = memberRepository.findById(id).orElseThrow(() -> new RuntimeException("MemberEntity not found"));
+        memberEntity.changeNickname(newNickname);
+        memberRepository.save(memberEntity);
 
         // NicknameChangeEvent 발행
-        eventPublisher.publishEvent(new NicknameChangeEvent(member.getId()));
+        eventPublisher.publishEvent(new NicknameChangeEvent(memberEntity.getId()));
 
         return 1L;
     }

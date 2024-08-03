@@ -1,5 +1,7 @@
 package com.pulse.member.application;
 
+import com.pulse.member.adapter.out.persistence.entity.MemberEntity;
+import com.pulse.member.adapter.out.persistence.entity.RoleEntity;
 import com.pulse.member.config.jwt.JwtTokenProvider;
 import com.pulse.member.config.security.http.user.UserDetailsImpl;
 import com.pulse.member.adapter.in.web.dto.request.LoginRequestDTO;
@@ -8,10 +10,8 @@ import com.pulse.member.adapter.in.web.dto.request.MemberSignUpRequestDTO;
 import com.pulse.member.adapter.in.web.dto.response.JwtResponseDTO;
 import com.pulse.member.adapter.in.web.dto.response.MemberReadResponseDTO;
 import com.pulse.member.adapter.in.web.dto.response.MemberSignUpResponseDTO;
-import com.pulse.member.adapter.out.persistence.entity.Member;
-import com.pulse.member.adapter.out.persistence.entity.MemberRole;
-import com.pulse.member.adapter.out.persistence.entity.RefreshToken;
-import com.pulse.member.adapter.out.persistence.entity.Role;
+import com.pulse.member.adapter.out.persistence.entity.MemberRoleEntity;
+import com.pulse.member.adapter.out.persistence.entity.RefreshTokenEntity;
 import com.pulse.member.adapter.out.persistence.entity.constant.RoleName;
 import com.pulse.member.adapter.out.event.ActivityLogEvent;
 import com.pulse.member.adapter.out.event.MemberCreateEvent;
@@ -78,10 +78,10 @@ public class AuthService implements AuthUseCase {
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
         String email = userDetails.getEmail();
         MemberReadResponseDTO memberDTO = memberUseCase.getMemberByEmail(email);
-        RefreshToken refreshToken = jwtUseCase.createRefreshToken(memberDTO);
+        RefreshTokenEntity refreshTokenEntity = jwtUseCase.createRefreshToken(memberDTO);
 
         // 4. JWT 토큰 발급 응답 DTO 생성
-        JwtResponseDTO jwtResponse = createJwtResponseDTOFrom(accessToken, refreshToken, email, userDetails);
+        JwtResponseDTO jwtResponse = createJwtResponseDTOFrom(accessToken, refreshTokenEntity, email, userDetails);
 
         // 5. 활동 로그 저장 이벤트 발행
         eventPublisher.publishEvent(ActivityLogEvent.of(memberDTO.getId(), LOGIN));
@@ -100,19 +100,19 @@ public class AuthService implements AuthUseCase {
     public MemberSignUpResponseDTO signUpAndPublishEvent(MemberSignUpRequestDTO signUpRequestDTO) {
         // 1. 비밀번호 암호화
         signUpRequestDTO.setPassword(passwordEncoder.encode(signUpRequestDTO.getPassword()));
-        Member member = memberMapper.toEntity(signUpRequestDTO);
+        MemberEntity memberEntity = memberMapper.toEntity(signUpRequestDTO);
 
         // 2. 회원 저장
-        Member savedMember = memberRepository.saveAndFlush(member);
+        MemberEntity savedMemberEntity = memberRepository.saveAndFlush(memberEntity);
 
         // 3. 회원 권한을 찾아와서 저장
-        Role role = roleRepository.findByName(RoleName.MEMBER.getRoleName())
-                .orElseThrow(() -> new RuntimeException("Role not found"));
-        memberRoleRepository.save(MemberRole.of(savedMember, role));
+        RoleEntity roleEntity = roleRepository.findByName(RoleName.MEMBER.getRoleName())
+                .orElseThrow(() -> new RuntimeException("RoleEntity not found"));
+        memberRoleRepository.save(MemberRoleEntity.of(savedMemberEntity, roleEntity));
 
         // 4. MemberCreateEvent 발행
-        eventPublisher.publishEvent(new MemberCreateEvent(savedMember.getId()));
-        return memberMapper.toCreateDto(savedMember);
+        eventPublisher.publishEvent(new MemberCreateEvent(savedMemberEntity.getId()));
+        return memberMapper.toCreateDto(savedMemberEntity);
     }
 
 
@@ -154,11 +154,11 @@ public class AuthService implements AuthUseCase {
     public JwtResponseDTO reIssueRefreshToken(Map<String, String> request) {
         // 1. refresh 토큰을 조회하고 만료 여부를 확인
         String requestRefreshToken = request.get(REFRESH_TOKEN);
-        RefreshToken refreshToken = jwtUseCase.findByToken(requestRefreshToken);
-        jwtUseCase.verifyExpiration(refreshToken);
+        RefreshTokenEntity refreshTokenEntity = jwtUseCase.findByToken(requestRefreshToken);
+        jwtUseCase.verifyExpiration(refreshTokenEntity);
 
         // 2. access 토큰 재발급
-        String email = refreshToken.getMember().getEmail();
+        String email = refreshTokenEntity.getMemberEntity().getEmail();
         Authentication authenticationToken = new UsernamePasswordAuthenticationToken(email, null, null);
         String newAccessToken = jwtTokenProvider.generateAccessToken(authenticationToken);
 
@@ -169,7 +169,7 @@ public class AuthService implements AuthUseCase {
         JwtResponseDTO jwtResponseDTO = JwtResponseDTO.of(newAccessToken, requestRefreshToken, email);
 
         // 4. 활동 로그 저장 이벤트 발행
-        eventPublisher.publishEvent(ActivityLogEvent.of(refreshToken.getMember().getId(), REISSUE_REFRESH_TOKEN));
+        eventPublisher.publishEvent(ActivityLogEvent.of(refreshTokenEntity.getMemberEntity().getId(), REISSUE_REFRESH_TOKEN));
         return jwtResponseDTO;
     }
 
@@ -191,15 +191,15 @@ public class AuthService implements AuthUseCase {
      * JWT 토큰 발급 응답 DTO 생성
      *
      * @param accessToken  JWT access 토큰
-     * @param refreshToken RefreshToken
+     * @param refreshTokenEntity RefreshToken
      * @param email        이메일
      * @param userDetails  UserDetailsImpl
      * @return JWT 토큰 발급 응답 DTO
      */
-    private static JwtResponseDTO createJwtResponseDTOFrom(String accessToken, RefreshToken refreshToken, String email, UserDetailsImpl userDetails) {
+    private static JwtResponseDTO createJwtResponseDTOFrom(String accessToken, RefreshTokenEntity refreshTokenEntity, String email, UserDetailsImpl userDetails) {
         return JwtResponseDTO.of(
                 accessToken,
-                refreshToken.getToken(),
+                refreshTokenEntity.getToken(),
                 email,
                 userDetails.getAuthorities()
         );

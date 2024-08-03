@@ -1,6 +1,6 @@
 package com.pulse.member.config.security.http.user;
 
-import com.pulse.member.adapter.out.persistence.entity.Member;
+import com.pulse.member.adapter.out.persistence.entity.MemberEntity;
 import com.pulse.member.adapter.out.persistence.repository.MemberRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,11 +24,11 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         log.info("UserDetailsServiceImpl.loadUserByUsername() - email: {}", email);
 
         // 1. 이메일을 기반으로 사용자 로드
-        Member member = memberRepository.findByEmailWithRoles(email)
+        MemberEntity memberEntity = memberRepository.findByEmailWithRoles(email)
                 .orElseThrow(() -> new UsernameNotFoundException("회원의 이메일을 찾을 수 없습니다. : " + email));
 
         // 2. UserDetailsImpl 객체 반환
-        return UserDetailsImpl.build(member);
+        return UserDetailsImpl.build(memberEntity);
     }
 
 }

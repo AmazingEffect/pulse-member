@@ -4,7 +4,7 @@ package com.pulse.member.mapper;
 import com.pulse.member.adapter.in.web.dto.request.MemberSignUpRequestDTO;
 import com.pulse.member.adapter.in.web.dto.response.MemberReadResponseDTO;
 import com.pulse.member.adapter.in.web.dto.response.MemberSignUpResponseDTO;
-import com.pulse.member.adapter.out.persistence.entity.Member;
+import com.pulse.member.adapter.out.persistence.entity.MemberEntity;
 import com.pulse.member.grpc.MemberProto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -17,8 +17,8 @@ import org.mapstruct.ReportingPolicy;
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface MemberMapper {
 
-    // Member 엔티티를 DTO로 변환
-    MemberSignUpResponseDTO toCreateDto(Member member);
+    // MemberEntity 엔티티를 DTO로 변환
+    MemberSignUpResponseDTO toCreateDto(MemberEntity memberEntity);
 
     // 특정 필드만 MemberRetrieveDTO로 변환
     @Mapping(source = "id", target = "id")
@@ -27,13 +27,13 @@ public interface MemberMapper {
     @Mapping(source = "nickname", target = "nickname")
     @Mapping(source = "profilePictureUrl", target = "profilePictureUrl")
     @Mapping(source = "statusMessage", target = "statusMessage")
-    MemberReadResponseDTO toReadDto(Member member);
+    MemberReadResponseDTO toReadDto(MemberEntity memberEntity);
 
     // DTO를 엔티티로 변환
-    Member toEntity(MemberSignUpRequestDTO signUpRequestDTO);
+    MemberEntity toEntity(MemberSignUpRequestDTO signUpRequestDTO);
 
     // DTO를 엔티티로 변환
-    Member toEntity(MemberReadResponseDTO memberReadResponseDTO);
+    MemberEntity toEntity(MemberReadResponseDTO memberReadResponseDTO);
 
     // gRPC 요청을 위한 매핑
     @Mapping(target = "id", ignore = true) // id는 생략 가능, 자동 생성되는 경우

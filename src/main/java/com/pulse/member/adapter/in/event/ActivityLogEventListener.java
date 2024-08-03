@@ -1,7 +1,7 @@
 package com.pulse.member.adapter.in.event;
 
 import com.pulse.member.adapter.out.event.ActivityLogEvent;
-import com.pulse.member.adapter.out.persistence.entity.ActivityLog;
+import com.pulse.member.adapter.out.persistence.entity.ActivityLogEntity;
 import com.pulse.member.adapter.out.persistence.repository.ActivityLogRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,8 +25,8 @@ public class ActivityLogEventListener {
     @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
     public void activityLogCreate(ActivityLogEvent event) {
         log.info("log save - memberId: {}, action: {}", event.getId(), event.getAction());
-        ActivityLog activityLog = ActivityLog.of(event.getId(), event.getAction());
-        activityLogRepository.save(activityLog);
+        ActivityLogEntity activityLogEntity = ActivityLogEntity.of(event.getId(), event.getAction());
+        activityLogRepository.save(activityLogEntity);
     }
 
 }
