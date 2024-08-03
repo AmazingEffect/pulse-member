@@ -14,7 +14,7 @@ public class ProfileImageChangeEvent implements OutboxEvent {
 
     @Override
     public String getEventType() {
-        return "MemberProfileImageChangeOutboxEvent";
+        return ExternalEventType.MEMBER_PROFILE_IMAGE_CHANGE_OUTBOX.getEventType();
     }
 
 }

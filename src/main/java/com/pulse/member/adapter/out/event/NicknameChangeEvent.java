@@ -14,7 +14,7 @@ public class NicknameChangeEvent implements OutboxEvent {
 
     @Override
     public String getEventType() {
-        return "MemberNicknameChangeOutboxEvent";
+        return ExternalEventType.MEMBER_NICKNAME_CHANGE_OUTBOX.getEventType();
     }
 
 }

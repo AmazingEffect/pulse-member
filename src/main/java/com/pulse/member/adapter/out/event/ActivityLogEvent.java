@@ -17,4 +17,8 @@ public class ActivityLogEvent {
         return new ActivityLogEvent(id, action);
     }
 
+    public String getEventType() {
+        return InternalEventType.ACTIVITY_LOG.getEventType();
+    }
+
 }
