@@ -106,7 +106,7 @@ public class AuthService implements AuthUseCase {
         MemberEntity savedMemberEntity = memberRepository.saveAndFlush(memberEntity);
 
         // 3. 회원 권한을 찾아와서 저장
-        RoleEntity roleEntity = roleRepository.findByName(RoleName.MEMBER.getRoleName())
+        RoleEntity roleEntity = roleRepository.findByName(RoleName.MEMBER.getRoleCode())
                 .orElseThrow(() -> new RuntimeException("RoleEntity not found"));
         memberRoleRepository.save(MemberRoleEntity.of(savedMemberEntity, roleEntity));
 

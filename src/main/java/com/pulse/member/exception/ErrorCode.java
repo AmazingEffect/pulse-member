@@ -26,8 +26,9 @@ public enum ErrorCode {
 
     UNAUTHORIZED("MEM401", "Unauthorized"),
 
-
-    ;
+    // ENUM errors
+    INVALID_MESSAGE_STATUS("MEM555", "Invalid MessageStatus code"),
+    INVALID_ROLE_NAME("MEM556", "Invalid RoleName code");
 
     private final String code;
     private final String message;
