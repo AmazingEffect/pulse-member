@@ -15,7 +15,7 @@ import java.util.Objects;
 @Getter
 @Entity
 @Table(name = "role")
-public class Role extends BaseEntity {
+public class RoleEntity extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,8 +25,8 @@ public class Role extends BaseEntity {
     private String name;
 
     // factory method
-    public static Role of(String roleName) {
-        return Role.builder()
+    public static RoleEntity of(String roleName) {
+        return RoleEntity.builder()
                 .name(roleName)
                 .build();
     }
@@ -34,8 +34,8 @@ public class Role extends BaseEntity {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Role role)) return false;
-        return id != null && Objects.equals(getId(), role.getId());
+        if (!(o instanceof RoleEntity roleEntity)) return false;
+        return id != null && Objects.equals(getId(), roleEntity.getId());
     }
 
     @Override

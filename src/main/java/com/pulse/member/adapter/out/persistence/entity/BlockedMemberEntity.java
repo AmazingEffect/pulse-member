@@ -1,20 +1,23 @@
 package com.pulse.member.adapter.out.persistence.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.util.Objects;
 
 /**
- * 활동 로그 엔티티
+ * 차단된 회원
  */
 @Builder
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Entity
-@Table(name = "activity_log")
-public class ActivityLog extends BaseEntity {
+@Table(name = "blocked_member")
+public class BlockedMemberEntity extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,15 +25,14 @@ public class ActivityLog extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
-    private Member member;
+    private MemberEntity memberEntity;
 
-    @Column(name = "action")
-    private String action;
+    private String reason;
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof ActivityLog that)) return false;
+        if (!(o instanceof BlockedMemberEntity that)) return false;
         return id != null && Objects.equals(getId(), that.getId());
     }
 
@@ -38,13 +40,4 @@ public class ActivityLog extends BaseEntity {
     public int hashCode() {
         return Objects.hashCode(getId());
     }
-
-    // 로그아웃 생성자
-    public static ActivityLog of(Long id, String action) {
-        return ActivityLog.builder()
-                .member(Member.of(id))
-                .action(action)
-                .build();
-    }
-
 }

@@ -19,7 +19,7 @@ import java.util.Objects;
 @Getter
 @Entity
 @Table(name = "member_outbox")
-public class MemberOutbox extends BaseEntity {
+public class MemberOutboxEntity extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -44,7 +44,7 @@ public class MemberOutbox extends BaseEntity {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof MemberOutbox that)) return false;
+        if (!(o instanceof MemberOutboxEntity that)) return false;
         return id != null && Objects.equals(getId(), that.getId());
     }
 

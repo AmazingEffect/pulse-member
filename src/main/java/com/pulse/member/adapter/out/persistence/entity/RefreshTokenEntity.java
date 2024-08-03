@@ -19,7 +19,7 @@ import java.util.Objects;
 @Getter
 @Entity
 @Table(name = "refresh_token")
-public class RefreshToken {
+public class RefreshTokenEntity extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,7 +27,7 @@ public class RefreshToken {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
-    private Member member;
+    private MemberEntity memberEntity;
 
     @Column(name = "token", nullable = false, unique = true)
     private String token;
@@ -40,7 +40,7 @@ public class RefreshToken {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof RefreshToken that)) return false;
+        if (!(o instanceof RefreshTokenEntity that)) return false;
         return id != null && Objects.equals(getId(), that.getId());
     }
 

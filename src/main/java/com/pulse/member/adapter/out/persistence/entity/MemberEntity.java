@@ -19,7 +19,7 @@ import java.util.Set;
 @Getter
 @Entity
 @Table(name = "member")
-public class Member extends BaseEntity {
+public class MemberEntity extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -70,14 +70,14 @@ public class Member extends BaseEntity {
     @Column(name = "last_login")
     private LocalDateTime lastLogin;  // 마지막 로그인 시간
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "member", orphanRemoval = true, cascade = CascadeType.ALL)
-    private Set<MemberRole> roles;    // 회원 역할
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "memberEntity", orphanRemoval = true, cascade = CascadeType.ALL)
+    private Set<MemberRoleEntity> roles;    // 회원 역할
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Member member)) return false;
-        return id != null && Objects.equals(getId(), member.getId());
+        if (!(o instanceof MemberEntity memberEntity)) return false;
+        return id != null && Objects.equals(getId(), memberEntity.getId());
     }
 
     @Override
@@ -85,9 +85,9 @@ public class Member extends BaseEntity {
         return Objects.hashCode(getId());
     }
 
-    // ID로 Member 객체를 생성하는 정적 팩토리 메서드
-    public static Member of(Long id) {
-        return Member.builder()
+    // ID로 MemberEntity 객체를 생성하는 정적 팩토리 메서드
+    public static MemberEntity of(Long id) {
+        return MemberEntity.builder()
                 .id(id)
                 .build();
     }

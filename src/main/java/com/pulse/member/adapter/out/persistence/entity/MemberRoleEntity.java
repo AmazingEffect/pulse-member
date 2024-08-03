@@ -14,7 +14,7 @@ import java.util.Objects;
 @Getter
 @Entity
 @Table(name = "member_role")
-public class MemberRole {
+public class MemberRoleEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,16 +22,16 @@ public class MemberRole {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
-    private Member member;
+    private MemberEntity memberEntity;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "role_id", nullable = false)
-    private Role role;
+    private RoleEntity roleEntity;
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof MemberRole that)) return false;
+        if (!(o instanceof MemberRoleEntity that)) return false;
         return id != null && Objects.equals(getId(), that.getId());
     }
 
@@ -41,10 +41,10 @@ public class MemberRole {
     }
 
     // factory method
-    public static MemberRole of(Member member, Role role) {
-        return MemberRole.builder()
-                .member(member)
-                .role(role)
+    public static MemberRoleEntity of(MemberEntity memberEntity, RoleEntity roleEntity) {
+        return MemberRoleEntity.builder()
+                .memberEntity(memberEntity)
+                .roleEntity(roleEntity)
                 .build();
     }
 

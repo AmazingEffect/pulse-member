@@ -17,7 +17,7 @@ import java.util.Objects;
 @Getter
 @Entity
 @Table(name = "oauth_info")
-public class OauthInfo {
+public class OauthInfoEntity extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,7 +25,7 @@ public class OauthInfo {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
-    private Member member;
+    private MemberEntity memberEntity;
 
     @Column(name = "oauth_provider", nullable = false)
     private String oauthProvider; // 소셜 로그인 제공자 정보 (google, kakao, naver 등)
@@ -36,8 +36,8 @@ public class OauthInfo {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof OauthInfo oauthInfo)) return false;
-        return id != null && Objects.equals(getId(), oauthInfo.getId());
+        if (!(o instanceof OauthInfoEntity oauthInfoEntity)) return false;
+        return id != null && Objects.equals(getId(), oauthInfoEntity.getId());
     }
 
     @Override

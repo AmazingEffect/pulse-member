@@ -21,7 +21,7 @@ import java.util.Objects;
 @Getter
 @Entity
 @Table(name = "preference")
-public class Preference extends BaseEntity {
+public class PreferenceEntity extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,7 +29,7 @@ public class Preference extends BaseEntity {
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
-    private Member member;
+    private MemberEntity memberEntity;
 
     @Column(name = "email_notifications", nullable = false)
     private boolean emailNotifications; // 이메일 알림 설정
@@ -55,7 +55,7 @@ public class Preference extends BaseEntity {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Preference that)) return false;
+        if (!(o instanceof PreferenceEntity that)) return false;
         return id != null && Objects.equals(getId(), that.getId());
     }
 
