@@ -2,6 +2,7 @@ package com.pulse.member.application;
 
 import com.pulse.event_library.event.OutboxEvent;
 import com.pulse.event_library.service.OutboxService;
+import com.pulse.member.adapter.out.event.ExternalEventType;
 import com.pulse.member.adapter.out.persistence.entity.MemberOutboxEntity;
 import com.pulse.member.adapter.out.persistence.entity.constant.MessageStatus;
 import com.pulse.member.adapter.out.persistence.repository.OutboxRepository;
@@ -100,24 +101,15 @@ public class OutboxServiceImpl implements OutboxService {
         }
     }
 
+
     /**
-     * OutboxEvent의 Kafka 토픽을 반환
-     * getType() 메서드로 꺼낸 이벤트 타입에 따라 적절한 토픽 이름을 반환한다.
-     *
+     * OutboxEvent의 이벤트 타입(ENUM)에 따라 적절한 토픽 이름을 반환한다. (kafka topic 으로 사용)
      * @param event OutboxEvent
-     * @return Kafka 토픽 이름
+     * @return String
      */
     @Override
     public String getKafkaTopic(OutboxEvent event) {
-        // 이벤트 타입이나 기타 조건에 따라 적절한 토픽 이름을 반환
-        return switch (event.getEventType()) {
-            case "MemberCreatedOutboxEvent" -> "member-created-outbox";
-            case "MemberUpdatedOutboxEvent" -> "member-updated-outbox";
-            case "MemberDeletedOutboxEvent" -> "member-deleted-outbox";
-            case "MemberNicknameChangeOutboxEvent" -> "member-nickname-change-outbox";
-            case "MemberProfileImageChangeOutboxEvent" -> "member-profile-image-change-outbox";
-            default -> "default-topic";
-        };
+        return event.getEventType();
     }
 
 }
