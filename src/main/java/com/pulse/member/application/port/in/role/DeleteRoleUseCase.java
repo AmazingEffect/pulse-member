@@ -4,8 +4,8 @@ import com.pulse.member.domain.Role;
 
 public interface DeleteRoleUseCase {
 
-    Boolean deleteRoleById(Role role);
+//    Boolean deleteRoleById(Role role);
 
-    Boolean deleteRoleByName(Role role);
+//    Boolean deleteRoleByName(Role role);
 
 }

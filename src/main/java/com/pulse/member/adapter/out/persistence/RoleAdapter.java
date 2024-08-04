@@ -32,7 +32,9 @@ public class RoleAdapter implements CreateRolePort, FindRolePort, DeleteRolePort
      */
     @Override
     public Role createRole(Role role) {
-        return null;
+        RoleEntity roleEntity = roleMapper.toEntity(role);
+        RoleEntity savedRoleEntity = roleRepository.save(roleEntity);
+        return roleMapper.toDomain(savedRoleEntity);
     }
 
 
@@ -83,7 +85,7 @@ public class RoleAdapter implements CreateRolePort, FindRolePort, DeleteRolePort
         RoleEntity roleEntity = roleRepository.findByName(role.getName())
                 .orElseThrow(() -> new MemberException(ErrorCode.INVALID_ROLE_NAME));
 
-        return roleMapper.entityToDto(roleEntity);
+        return roleMapper.entityToDTO(roleEntity);
     }
 
 
