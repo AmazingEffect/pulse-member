@@ -4,7 +4,6 @@ package com.pulse.member.mapper;
 import com.pulse.member.adapter.in.web.dto.request.LoginRequestDTO;
 import com.pulse.member.adapter.in.web.dto.request.LogoutRequestDTO;
 import com.pulse.member.adapter.in.web.dto.request.MemberSignUpRequestDTO;
-import com.pulse.member.adapter.in.web.dto.response.MemberReadResponseDTO;
 import com.pulse.member.adapter.in.web.dto.response.MemberSignUpResponseDTO;
 import com.pulse.member.adapter.out.persistence.entity.MemberEntity;
 import com.pulse.member.domain.Member;
@@ -19,7 +18,7 @@ import org.mapstruct.ReportingPolicy;
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface MemberMapper {
 
-    MemberProto.MemberRetrieveResponse toProto(MemberReadResponseDTO memberReadResponseDTO);
+    MemberProto.MemberRetrieveResponse toProto(Member member);
 
     // 로그인 요청 DTO를 도메인으로 변환
     Member toDomain(LoginRequestDTO loginRequest);

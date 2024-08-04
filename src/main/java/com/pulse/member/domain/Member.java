@@ -33,6 +33,12 @@ public class Member {
     private Set<MemberRole> roles;    // 회원 역할
     private Jwt jwt;                  // JWT Object 객체
 
+    // factory method
+    public static Member of(long id) {
+        return Member.builder()
+                .id(id)
+                .build();
+    }
 
     public void changeEmail(String email) {
         this.email = email;

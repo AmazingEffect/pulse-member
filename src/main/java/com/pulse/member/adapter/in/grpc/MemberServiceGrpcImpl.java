@@ -1,13 +1,13 @@
 package com.pulse.member.adapter.in.grpc;
 
 import com.pulse.event_library.service.OutboxService;
+import com.pulse.member.adapter.out.event.MemberCreateEvent;
+import com.pulse.member.application.port.in.member.FindMemberUseCase;
 import com.pulse.member.config.trace.annotation.TraceGrpcServer;
-import com.pulse.member.adapter.in.web.dto.response.MemberReadResponseDTO;
+import com.pulse.member.domain.Member;
 import com.pulse.member.grpc.MemberProto;
 import com.pulse.member.grpc.MemberServiceGrpc;
-import com.pulse.member.adapter.out.event.MemberCreateEvent;
 import com.pulse.member.mapper.MemberMapper;
-import com.pulse.member.application.port.in.MemberUseCase;
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +26,7 @@ import net.devh.boot.grpc.server.service.GrpcService;
 @GrpcService
 public class MemberServiceGrpcImpl extends MemberServiceGrpc.MemberServiceImplBase {
 
-    private final MemberUseCase memberUseCase;
+    private final FindMemberUseCase memberUseCase;
     private final MemberMapper memberMapper;
     private final OutboxService outboxService;
 
@@ -46,8 +46,9 @@ public class MemberServiceGrpcImpl extends MemberServiceGrpc.MemberServiceImplBa
     ) {
         MemberCreateEvent event = new MemberCreateEvent(request.getId());
         try {
-            MemberReadResponseDTO memberReadResponseDTO = memberUseCase.getMemberById(request.getId());
-            MemberProto.MemberRetrieveResponse response = memberMapper.toProto(memberReadResponseDTO);
+            Member member = Member.of(request.getId());
+            Member findMember = memberUseCase.findMemberById(member);
+            MemberProto.MemberRetrieveResponse response = memberMapper.toProto(findMember);
 
             responseObserver.onNext(response);
             responseObserver.onCompleted();
