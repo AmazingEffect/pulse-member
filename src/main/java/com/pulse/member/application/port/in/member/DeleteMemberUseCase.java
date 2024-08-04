@@ -6,6 +6,4 @@ public interface DeleteMemberUseCase {
 
     Boolean deleteMemberById(Member member);
 
-    Boolean deleteMemberByEmail(Member member);
-
 }
