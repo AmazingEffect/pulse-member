@@ -6,7 +6,10 @@ import com.pulse.member.adapter.in.web.dto.request.MemberSignUpRequestDTO;
 import com.pulse.member.adapter.in.web.dto.response.ApiResponse;
 import com.pulse.member.adapter.in.web.dto.response.JwtResponseDTO;
 import com.pulse.member.adapter.in.web.dto.response.MemberSignUpResponseDTO;
-import com.pulse.member.application.port.in.AuthUseCase;
+import com.pulse.member.application.port.in.auth.AuthUseCase;
+import com.pulse.member.domain.Member;
+import com.pulse.member.mapper.JwtMapper;
+import com.pulse.member.mapper.MemberMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,6 +28,8 @@ import java.util.Map;
 public class AuthController {
 
     private final AuthUseCase authUseCase;
+    private final JwtMapper jwtMapper;
+    private final MemberMapper memberMapper;
 
     /**
      * 로그인 요청을 받아 JWT 토큰을 발급합니다.
@@ -36,8 +41,11 @@ public class AuthController {
     public ResponseEntity<ApiResponse<JwtResponseDTO>> signInAndMakeJwt(
             @RequestBody LoginRequestDTO loginRequest
     ) {
-        JwtResponseDTO response = authUseCase.signInAndMakeJwt(loginRequest);
-        return ResponseEntity.ok(ApiResponse.success(response));
+        Member member = memberMapper.toDomain(loginRequest);
+        Member responseMember = authUseCase.signIn(member);
+        JwtResponseDTO jwtResponseDTO = jwtMapper.toResponseDTO(responseMember.getJwt());
+
+        return ResponseEntity.ok(ApiResponse.success(jwtResponseDTO));
     }
 
 
@@ -51,8 +59,11 @@ public class AuthController {
     public ResponseEntity<ApiResponse<MemberSignUpResponseDTO>> signUpAndPublishEvent(
             @RequestBody MemberSignUpRequestDTO signUpRequest
     ) {
-        MemberSignUpResponseDTO dto = authUseCase.signUpAndPublishEvent(signUpRequest);
-        return ResponseEntity.ok(ApiResponse.success(dto));
+        Member member = memberMapper.toDomain(signUpRequest);
+        Member savedMember = authUseCase.signUp(member);
+        MemberSignUpResponseDTO responseDTO = memberMapper.toResponseDTO(savedMember);
+
+        return ResponseEntity.ok(ApiResponse.success(responseDTO));
     }
 
 
@@ -66,7 +77,8 @@ public class AuthController {
     public ResponseEntity<?> signOutAndDeleteJwt(
             @RequestBody LogoutRequestDTO logoutRequest
     ) {
-        authUseCase.signOutAndDeleteJwt(logoutRequest);
+        Member member = memberMapper.toDomain(logoutRequest);
+        authUseCase.signOut(member);
         return ResponseEntity.ok("User logged out successfully");
     }
 
