@@ -31,5 +31,20 @@ public class Member {
     private LocalDateTime joinedDate; // 가입일
     private LocalDateTime lastLogin;  // 마지막 로그인 시간
     private Set<MemberRole> roles;    // 회원 역할
+    private Jwt jwt;                  // JWT Object 객체
+
+
+    public void changeEmail(String email) {
+        this.email = email;
+    }
+
+
+    public void changeJwt(Jwt jwt) {
+        this.jwt = jwt;
+    }
+
+    public void changePassword(String encode) {
+        this.password = encode;
+    }
 
 }

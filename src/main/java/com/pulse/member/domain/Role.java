@@ -14,4 +14,10 @@ public class Role {
     private Long id;
     private String name;
 
+    public static Role of(String name) {
+        return Role.builder()
+                .name(name)
+                .build();
+    }
+
 }
