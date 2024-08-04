@@ -1,7 +1,7 @@
 package com.pulse.member.config.security.http.user;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.pulse.member.entity.Member;
+import com.pulse.member.adapter.out.persistence.entity.MemberEntity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
@@ -32,18 +32,18 @@ public class UserDetailsImpl implements UserDetails {
 
     private final Collection<? extends GrantedAuthority> authorities;
 
-    public static UserDetailsImpl build(Member member) {
-        List<GrantedAuthority> authorities = member
+    public static UserDetailsImpl build(MemberEntity memberEntity) {
+        List<GrantedAuthority> authorities = memberEntity
                 .getRoles()
                 .stream()
-                .map(roleMap -> new SimpleGrantedAuthority(roleMap.getRole().getName()))
+                .map(roleMap -> new SimpleGrantedAuthority(roleMap.getRoleEntity().getName()))
                 .collect(Collectors.toList());
 
         return new UserDetailsImpl(
-                member.getId(),
-                member.getEmail(),
-                member.getNickname(),
-                member.getPassword(),
+                memberEntity.getId(),
+                memberEntity.getEmail(),
+                memberEntity.getNickname(),
+                memberEntity.getPassword(),
                 authorities
         );
     }
