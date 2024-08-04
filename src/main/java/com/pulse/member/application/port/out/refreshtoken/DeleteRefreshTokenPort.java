@@ -1,9 +1,9 @@
 package com.pulse.member.application.port.out.refreshtoken;
 
-import com.pulse.member.domain.RefreshToken;
+import com.pulse.member.domain.Member;
 
 public interface DeleteRefreshTokenPort {
 
-    Boolean deleteRefreshToken(RefreshToken refreshToken);
+    Boolean deleteRefreshToken(Member member);
 
 }
