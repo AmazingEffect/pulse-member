@@ -24,26 +24,41 @@ public class MemberAdapter implements CreateMemberPort, FindMemberPort, DeleteMe
     private final MemberMapper memberMapper;
 
 
+    /**
+     * 회원 생성
+     *
+     * @param member 회원 도메인
+     * @return 생성된 회원
+     */
     @Override
     public Member createMember(Member member) {
-        return null;
+        MemberEntity memberEntity = memberMapper.toEntity(member);
+        MemberEntity savedMember = memberRepository.save(memberEntity);
+        return memberMapper.toDomain(savedMember);
     }
 
-    @Override
-    public Boolean deleteMemberById(Member member) {
-        return null;
-    }
 
-    @Override
-    public Boolean deleteMemberByEmail(Member member) {
-        return null;
-    }
-
+    /**
+     * ID로 회원 조회
+     *
+     * @param member 회원 도메인
+     * @return 조회된 회원
+     */
     @Override
     public Member findMemberById(Member member) {
-        return null;
+        MemberEntity memberEntity = memberRepository.findById(member.getId())
+                .orElseThrow(() -> new MemberException(ErrorCode.MEMBER_NOT_FOUND));
+
+        return memberMapper.toDomain(memberEntity);
     }
 
+
+    /**
+     * Email로 회원 조회
+     *
+     * @param member 회원 도메인
+     * @return 조회된 회원
+     */
     @Override
     public Member findMemberByEmail(Member member) {
         MemberEntity memberEntity = memberRepository.findByEmail(member.getEmail())
@@ -52,14 +67,31 @@ public class MemberAdapter implements CreateMemberPort, FindMemberPort, DeleteMe
         return memberMapper.toDomain(memberEntity);
     }
 
+
+    /**
+     * 회원 수정
+     *
+     * @param member 회원 도메인
+     * @return 수정된 회원
+     */
     @Override
-    public Member updateMemberById(Member member) {
-        return null;
+    public Member updateMember(Member member) {
+        MemberEntity memberEntity = memberMapper.toEntity(member);
+        MemberEntity updatedMember = memberRepository.save(memberEntity);
+        return memberMapper.toDomain(updatedMember);
     }
 
+
+    /**
+     * 회원 삭제
+     *
+     * @param member 회원 도메인
+     * @return 삭제 여부
+     */
     @Override
-    public Member updateMemberByEmail(Member member) {
-        return null;
+    public Boolean deleteMemberById(Member member) {
+        memberRepository.deleteById(member.getId());
+        return true;
     }
 
 }

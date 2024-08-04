@@ -6,6 +6,4 @@ public interface DeleteMemberPort {
 
     Boolean deleteMemberById(Member member);
 
-    Boolean deleteMemberByEmail(Member member);
-
 }

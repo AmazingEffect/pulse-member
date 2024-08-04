@@ -4,6 +4,8 @@ import com.pulse.member.domain.Role;
 
 public interface UpdateRoleUseCase {
 
+    Role updateRole(Role role);
+
 //    Role updateRoleById(Role role);
 
 //    Role updateRoleByName(Role role);

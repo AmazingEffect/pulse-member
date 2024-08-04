@@ -40,17 +40,44 @@ public class Member {
                 .build();
     }
 
+
+    /**
+     * 이메일을 변경합니다.
+     *
+     * @param email 이메일
+     */
     public void changeEmail(String email) {
         this.email = email;
     }
 
 
+    /**
+     * JWT 객체를 변경합니다.
+     *
+     * @param jwt JWT 객체
+     */
     public void changeJwt(Jwt jwt) {
         this.jwt = jwt;
     }
 
+
+    /**
+     * 비밀번호를 변경합니다.
+     *
+     * @param encode 암호화된 비밀번호
+     */
     public void changePassword(String encode) {
         this.password = encode;
+    }
+
+    /**
+     * 회원 가입시 필수 값 체크
+     */
+    public void validMember() {
+        // 회원 가입시 필수 값 체크
+        if (email == null || password == null || name == null) {
+            throw new IllegalArgumentException("회원 가입시 필수 값이 누락되었습니다.");
+        }
     }
 
 }

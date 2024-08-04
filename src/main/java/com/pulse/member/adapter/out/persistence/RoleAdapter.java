@@ -97,7 +97,9 @@ public class RoleAdapter implements CreateRolePort, FindRolePort, DeleteRolePort
      */
     @Override
     public Role updateRole(Role role) {
-        return null;
+        RoleEntity roleEntity = roleMapper.toEntity(role);
+        RoleEntity savedRoleEntity = roleRepository.save(roleEntity);
+        return roleMapper.toDomain(savedRoleEntity);
     }
 
 }
