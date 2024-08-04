@@ -1,12 +1,14 @@
 package com.pulse.member.application;
 
-import com.pulse.member.adapter.in.web.dto.response.MemberReadResponseDTO;
-import com.pulse.member.adapter.out.persistence.entity.MemberEntity;
-import com.pulse.member.exception.ErrorCode;
-import com.pulse.member.adapter.out.event.NicknameChangeEvent;
-import com.pulse.member.mapper.MemberMapper;
-import com.pulse.member.adapter.out.persistence.repository.MemberRepository;
-import com.pulse.member.application.port.in.MemberUseCase;
+import com.pulse.member.application.port.in.member.CreateMemberUseCase;
+import com.pulse.member.application.port.in.member.DeleteMemberUseCase;
+import com.pulse.member.application.port.in.member.FindMemberUseCase;
+import com.pulse.member.application.port.in.member.UpdateMemberUseCase;
+import com.pulse.member.application.port.out.member.CreateMemberPort;
+import com.pulse.member.application.port.out.member.DeleteMemberPort;
+import com.pulse.member.application.port.out.member.FindMemberPort;
+import com.pulse.member.application.port.out.member.UpdateMemberPort;
+import com.pulse.member.domain.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -15,58 +17,61 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 @Service
-public class MemberService implements MemberUseCase {
+public class MemberService implements CreateMemberUseCase, FindMemberUseCase, UpdateMemberUseCase, DeleteMemberUseCase {
 
-    private final MemberRepository memberRepository;
-    private final MemberMapper memberMapper;
+    private final CreateMemberPort createMemberPort;
+    private final FindMemberPort findMemberPort;
+    private final UpdateMemberPort updateMemberPort;
+    private final DeleteMemberPort deleteMemberPort;
+
     private final ApplicationEventPublisher eventPublisher;
+
+
+    /**
+     * 회원 생성
+     *
+     * @param member 회원
+     * @return 생성된 회원
+     */
+    @Override
+    public Member createMember(Member member) {
+        return createMemberPort.createMember(member);
+    }
 
 
     /**
      * ID로 회원 조회
      *
-     * @param id 회원 ID
-     * @return 회원 조회 DTO
+     * @param member 회원
+     * @return 조회된 회원
      */
     @Override
-    public MemberReadResponseDTO getMemberById(Long id) {
-        return memberRepository.findById(id)
-                .map(memberMapper::toReadDto)
-                .orElseThrow(() -> new RuntimeException(ErrorCode.MEMBER_NOT_FOUND.getMessage()));
+    public Member findMemberById(Member member) {
+        return findMemberPort.findMemberById(member);
     }
 
 
     /**
-     * 이메일로 회원 조회
+     * Email로 회원 조회
      *
-     * @param email 이메일
-     * @return 회원 조회 DTO
+     * @param member 회원
+     * @return 조회된 회원
      */
     @Override
-    public MemberReadResponseDTO getMemberByEmail(String email) {
-        return memberRepository.findByEmail(email)
-                .map(memberMapper::toReadDto)
-                .orElseThrow(() -> new RuntimeException(ErrorCode.MEMBER_NOT_FOUND.getMessage()));
+    public Member findMemberByEmail(Member member) {
+        return findMemberPort.findMemberByEmail(member);
     }
 
 
     /**
-     * 닉네임 변경
+     * 회원 삭제
      *
-     * @param id          회원 ID
-     * @param newNickname 변경할 닉네임
+     * @param member 회원
+     * @return 삭제 여부
      */
-    @Transactional
     @Override
-    public Long changeNickname(Long id, String newNickname) {
-        MemberEntity memberEntity = memberRepository.findById(id).orElseThrow(() -> new RuntimeException("MemberEntity not found"));
-        memberEntity.changeNickname(newNickname);
-        memberRepository.save(memberEntity);
-
-        // NicknameChangeEvent 발행
-        eventPublisher.publishEvent(new NicknameChangeEvent(memberEntity.getId()));
-
-        return 1L;
+    public Boolean deleteMemberById(Member member) {
+        return deleteMemberPort.deleteMemberById(member);
     }
 
 }

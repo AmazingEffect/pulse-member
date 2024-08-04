@@ -1,19 +1,21 @@
 package com.pulse.member.application;
 
-import com.pulse.member.adapter.in.web.dto.response.MemberReadResponseDTO;
-import com.pulse.member.adapter.out.persistence.entity.RefreshTokenEntity;
-import com.pulse.member.adapter.out.persistence.repository.RefreshTokenRepository;
-import com.pulse.member.application.port.in.JwtUseCase;
-import com.pulse.member.exception.ErrorCode;
-import com.pulse.member.exception.MemberException;
+import com.pulse.member.application.port.in.refreshtoken.CreateRefreshTokenUseCase;
+import com.pulse.member.application.port.in.refreshtoken.DeleteRefreshTokenUseCase;
+import com.pulse.member.application.port.in.refreshtoken.FindRefreshTokenUseCase;
+import com.pulse.member.application.port.in.refreshtoken.UpdateRefreshTokenUseCase;
+import com.pulse.member.application.port.out.refreshtoken.CreateRefreshTokenPort;
+import com.pulse.member.application.port.out.refreshtoken.DeleteRefreshTokenPort;
+import com.pulse.member.application.port.out.refreshtoken.FindRefreshTokenPort;
+import com.pulse.member.application.port.out.refreshtoken.UpdateRefreshTokenPort;
+import com.pulse.member.domain.Member;
+import com.pulse.member.domain.RefreshToken;
 import com.pulse.member.mapper.MemberMapper;
+import com.pulse.member.mapper.RefreshTokenMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDateTime;
-import java.util.UUID;
 
 /**
  * JWT 관련 비즈니스 로직을 처리하는 서비스 클래스
@@ -21,71 +23,67 @@ import java.util.UUID;
  */
 @RequiredArgsConstructor
 @Service
-public class RefreshTokenService implements JwtUseCase {
+public class RefreshTokenService implements CreateRefreshTokenUseCase, FindRefreshTokenUseCase, UpdateRefreshTokenUseCase, DeleteRefreshTokenUseCase {
 
     @Value("${jwt.refreshTokenDurationMinutes}")
     private long refreshTokenDurationMinutes;
 
     private final MemberMapper memberMapper;
-    private final RefreshTokenRepository refreshTokenRepository;
+    private final RefreshTokenMapper refreshTokenMapper;
+
+    private final CreateRefreshTokenPort createRefreshTokenPort;
+    private final FindRefreshTokenPort findRefreshTokenPort;
+    private final UpdateRefreshTokenPort updateRefreshTokenPort;
+    private final DeleteRefreshTokenPort deleteRefreshTokenPort;
+
 
     /**
      * RefreshToken 생성
      *
-     * @param memberReadResponseDTO 회원 조회 DTO
      * @return 생성된 RefreshToken
      * @apiNote Refresh Token을 단순히 UUID 같은 고유한 식별자로 생성하고, 이를 데이터베이스에 저장하여 관리합니다.
      * 유효기간도 데이터베이스에 함께 저장합니다.
      */
     @Transactional
     @Override
-    public RefreshTokenEntity createRefreshToken(MemberReadResponseDTO memberReadResponseDTO) {
-        RefreshTokenEntity refreshTokenEntity = RefreshTokenEntity.builder()
-                .memberEntity(memberMapper.toEntity(memberReadResponseDTO))
-                .token(UUID.randomUUID().toString())
-                .expiryDate(LocalDateTime.now().plusMinutes(refreshTokenDurationMinutes))
-                .build();
-
-        return refreshTokenRepository.save(refreshTokenEntity);
+    public RefreshToken createRefreshToken(Member member) {
+        RefreshToken refreshToken = RefreshToken.of(member, refreshTokenDurationMinutes);
+        return createRefreshTokenPort.createRefreshToken(refreshToken);
     }
-
-
-    /**
-     * RefreshToken 조회
-     *
-     * @param token 토큰
-     * @return RefreshToken
-     */
-    @Override
-    public RefreshTokenEntity findByToken(String token) {
-        return refreshTokenRepository.findByToken(token)
-                .orElseThrow(() -> new MemberException(ErrorCode.TOKEN_NOT_FOUND));
-    }
-
 
     /**
      * RefreshToken 삭제
      *
-     * @param memberReadResponseDTO 회원 조회 DTO
+     * @param member 회원
      */
     @Transactional
     @Override
-    public void deleteByMember(MemberReadResponseDTO memberReadResponseDTO) {
-        refreshTokenRepository.deleteByMember(memberMapper.toEntity(memberReadResponseDTO));
+    public Boolean deleteRefreshToken(Member member) {
+        return deleteRefreshTokenPort.deleteRefreshToken(member);
+    }
+
+    /**
+     * RefreshToken 조회
+     *
+     * @param refreshToken RefreshToken
+     * @return RefreshToken
+     */
+    @Override
+    public RefreshToken findRefreshToken(RefreshToken refreshToken) {
+        return findRefreshTokenPort.findRefreshToken(refreshToken);
     }
 
 
     /**
-     * RefreshToken 만료 여부 확인
+     * RefreshToken 업데이트
      *
-     * @param token RefreshToken
+     * @param refreshToken RefreshToken
+     * @return 업데이트된 RefreshToken
      */
+    @Transactional
     @Override
-    public void verifyExpiration(RefreshTokenEntity token) {
-        if (token.getExpiryDate().isBefore(LocalDateTime.now())) {
-            refreshTokenRepository.delete(token);
-            throw new MemberException(ErrorCode.REFRESH_TOKEN_EXPIRED);
-        }
+    public RefreshToken updateRefreshToken(RefreshToken refreshToken) {
+        return null;
     }
 
 }
