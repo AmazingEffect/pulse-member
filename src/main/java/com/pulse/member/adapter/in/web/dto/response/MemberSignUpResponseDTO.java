@@ -1,9 +1,6 @@
 package com.pulse.member.adapter.in.web.dto.response;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
@@ -13,7 +10,7 @@ import java.time.LocalDateTime;
 @Builder
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class MemberSignUpResponseDTO {
 
     private Long id;                 // PK

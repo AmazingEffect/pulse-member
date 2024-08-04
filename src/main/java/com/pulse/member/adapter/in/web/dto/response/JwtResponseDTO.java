@@ -1,8 +1,6 @@
 package com.pulse.member.adapter.in.web.dto.response;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 
 import java.util.Collection;
@@ -10,7 +8,9 @@ import java.util.Collection;
 /**
  * JWT 토큰 발급 응답 DTO
  */
+@Builder
 @Data
+@NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class JwtResponseDTO {
 

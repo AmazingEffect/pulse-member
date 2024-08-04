@@ -1,9 +1,6 @@
 package com.pulse.member.adapter.in.web.dto.request;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 /**
  * 회원 조회 DTO
@@ -11,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class MemberReadRequestDTO {
 
     private Long id;                 // PK

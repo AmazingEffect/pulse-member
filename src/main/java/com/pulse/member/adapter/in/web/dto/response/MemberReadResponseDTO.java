@@ -1,8 +1,11 @@
 package com.pulse.member.adapter.in.web.dto.response;
 
-import lombok.Data;
+import lombok.*;
 
+@Builder
 @Data
+@NoArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class MemberReadResponseDTO {
 
     private Long id;                 // PK
