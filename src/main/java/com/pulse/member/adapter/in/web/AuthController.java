@@ -8,6 +8,7 @@ import com.pulse.member.adapter.in.web.dto.response.JwtResponseDTO;
 import com.pulse.member.adapter.in.web.dto.response.MemberSignUpResponseDTO;
 import com.pulse.member.application.port.in.auth.AuthUseCase;
 import com.pulse.member.domain.Member;
+import com.pulse.member.exception.ErrorCode;
 import com.pulse.member.mapper.JwtMapper;
 import com.pulse.member.mapper.MemberMapper;
 import lombok.RequiredArgsConstructor;
@@ -45,6 +46,7 @@ public class AuthController {
         Member responseMember = authUseCase.signIn(member);
         JwtResponseDTO jwtResponseDTO = jwtMapper.toResponseDTO(responseMember.getJwt());
 
+        if (jwtResponseDTO == null) ResponseEntity.ok(ApiResponse.fail(ErrorCode.DATA_NOT_FOUND));
         return ResponseEntity.ok(ApiResponse.success(jwtResponseDTO));
     }
 
@@ -63,6 +65,7 @@ public class AuthController {
         Member savedMember = authUseCase.signUp(member);
         MemberSignUpResponseDTO responseDTO = memberMapper.toResponseDTO(savedMember);
 
+        if (responseDTO == null) ResponseEntity.ok(ApiResponse.fail(ErrorCode.DATA_NOT_FOUND));
         return ResponseEntity.ok(ApiResponse.success(responseDTO));
     }
 
@@ -93,8 +96,10 @@ public class AuthController {
     public ResponseEntity<ApiResponse<JwtResponseDTO>> reIssueRefreshToken(
             @RequestBody Map<String, String> request
     ) {
-        JwtResponseDTO response = authUseCase.reIssueRefreshToken(request);
-        return ResponseEntity.ok(ApiResponse.success(response));
+        JwtResponseDTO responseDTO = authUseCase.reIssueRefreshToken(request);
+
+        if (responseDTO == null) ResponseEntity.ok(ApiResponse.fail(ErrorCode.DATA_NOT_FOUND));
+        return ResponseEntity.ok(ApiResponse.success(responseDTO));
     }
 
 }

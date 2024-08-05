@@ -5,6 +5,7 @@ import com.pulse.member.adapter.in.web.dto.response.ApiResponse;
 import com.pulse.member.adapter.in.web.dto.response.ResponseRoleDTO;
 import com.pulse.member.application.port.in.role.CreateRoleUseCase;
 import com.pulse.member.domain.Role;
+import com.pulse.member.exception.ErrorCode;
 import com.pulse.member.mapper.RoleMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -34,9 +35,10 @@ public class RoleController {
     ) {
         Role role = roleMapper.toDomain(requestDTO);
         Role savedRole = createRoleUseCase.createRole(role);
-        ResponseRoleDTO responseRoleDTO = roleMapper.toResponseDTO(savedRole);
+        ResponseRoleDTO responseDTO = roleMapper.toResponseDTO(savedRole);
 
-        return ApiResponse.success(ResponseEntity.ok(responseRoleDTO));
+        if (responseDTO == null) ResponseEntity.ok(ApiResponse.fail(ErrorCode.DATA_NOT_FOUND));
+        return ApiResponse.success(ResponseEntity.ok(responseDTO));
     }
 
 }
