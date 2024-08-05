@@ -37,6 +37,19 @@ public class ApiResponse<T> {
     }
 
 
+    // stack trace 없는 fail
+    public static <T> ApiResponse<T> fail(ErrorCode errorCode) {
+        ErrorResponse errorResponse = ErrorResponse.of(errorCode.getCode(), errorCode.getMessage(), null, null);
+
+        return new ApiResponse<>(
+                ResponseStatus.FAIL,
+                errorCode.getMessage(),
+                null,
+                errorResponse
+        );
+    }
+
+
     // 커스텀 예외 fail
     public static <T> ApiResponse<T> fail(ErrorCode errorCode, String stackTrace) {
         ErrorResponse errorResponse = ErrorResponse.of(errorCode.getCode(), errorCode.getMessage(), null, stackTrace);
