@@ -20,7 +20,7 @@ import org.springframework.util.ObjectUtils;
  */
 @RequiredArgsConstructor
 @Component
-public class RefreshTokenAdapter implements CreateRefreshTokenPort, FindRefreshTokenPort, DeleteRefreshTokenPort, UpdateRefreshTokenPort {
+public class RefreshTokenPersistenceAdapter implements CreateRefreshTokenPort, FindRefreshTokenPort, DeleteRefreshTokenPort, UpdateRefreshTokenPort {
 
     private final RefreshTokenRepository refreshTokenRepository;
     private final MemberMapper memberMapper;

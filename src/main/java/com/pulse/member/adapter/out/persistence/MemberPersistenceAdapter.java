@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
  */
 @RequiredArgsConstructor
 @Component
-public class MemberAdapter implements CreateMemberPort, FindMemberPort, DeleteMemberPort, UpdateMemberPort {
+public class MemberPersistenceAdapter implements CreateMemberPort, FindMemberPort, DeleteMemberPort, UpdateMemberPort {
 
     private final MemberRepository memberRepository;
     private final MemberMapper memberMapper;

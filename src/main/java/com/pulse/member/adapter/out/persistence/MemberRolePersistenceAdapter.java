@@ -19,7 +19,7 @@ import org.springframework.stereotype.Component;
  */
 @RequiredArgsConstructor
 @Component
-public class MemberRoleAdapter implements CreateMemberRolePort {
+public class MemberRolePersistenceAdapter implements CreateMemberRolePort {
 
     private final MemberRoleRepository memberRoleRepository;
 

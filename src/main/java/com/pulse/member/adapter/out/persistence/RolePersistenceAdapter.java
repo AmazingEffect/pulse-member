@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
  */
 @RequiredArgsConstructor
 @Component
-public class RoleAdapter implements CreateRolePort, FindRolePort, DeleteRolePort, UpdateRolePort {
+public class RolePersistenceAdapter implements CreateRolePort, FindRolePort, DeleteRolePort, UpdateRolePort {
 
     private final RoleRepository roleRepository;
     private final RoleMapper roleMapper;
