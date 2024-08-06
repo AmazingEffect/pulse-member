@@ -1,4 +1,4 @@
-package com.pulse.member.application;
+package com.pulse.member.application.service;
 
 import com.pulse.member.adapter.in.web.dto.response.JwtResponseDTO;
 import com.pulse.member.adapter.out.event.ActivityLogEvent;

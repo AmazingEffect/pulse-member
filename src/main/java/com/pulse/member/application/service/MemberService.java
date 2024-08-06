@@ -1,4 +1,4 @@
-package com.pulse.member.application;
+package com.pulse.member.application.service;
 
 import com.pulse.member.application.port.in.member.CreateMemberUseCase;
 import com.pulse.member.application.port.in.member.DeleteMemberUseCase;

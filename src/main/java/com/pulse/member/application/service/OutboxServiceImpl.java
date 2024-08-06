@@ -1,8 +1,7 @@
-package com.pulse.member.application;
+package com.pulse.member.application.service;
 
 import com.pulse.event_library.event.OutboxEvent;
 import com.pulse.event_library.service.OutboxService;
-import com.pulse.member.adapter.out.event.ExternalEventType;
 import com.pulse.member.adapter.out.persistence.entity.MemberOutboxEntity;
 import com.pulse.member.adapter.out.persistence.entity.constant.MessageStatus;
 import com.pulse.member.adapter.out.persistence.repository.OutboxRepository;
