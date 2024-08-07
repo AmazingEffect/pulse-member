@@ -1,5 +1,7 @@
 package com.pulse.member.domain;
 
+import com.pulse.member.exception.ErrorCode;
+import com.pulse.member.exception.MemberException;
 import lombok.*;
 import org.springframework.util.ObjectUtils;
 
@@ -28,7 +30,7 @@ public class Role {
      */
     public void validRole() {
         if (ObjectUtils.isEmpty(name)) {
-            throw new IllegalArgumentException("Role name is empty");
+            throw new MemberException(ErrorCode.INVALID_INPUT_VALUE);
         }
     }
 
