@@ -22,7 +22,7 @@ public interface MemberMapper {
     MemberProto.MemberRetrieveResponse toProto(Member member);
 
     // 응답 도메인을 회원가입 응답 DTO로 변환
-    MemberSignUpResponseDTO toResponseDTO(Member member);
+    MemberSignUpResponseDTO domainToResponseDTO(Member member);
 
     // 도메인을 엔티티로 변환
     MemberEntity toEntity(Member savedMember);

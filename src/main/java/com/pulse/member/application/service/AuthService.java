@@ -1,6 +1,7 @@
 package com.pulse.member.application.service;
 
 import com.pulse.member.adapter.in.web.dto.response.JwtResponseDTO;
+import com.pulse.member.adapter.in.web.dto.response.MemberSignUpResponseDTO;
 import com.pulse.member.adapter.out.event.ActivityLogEvent;
 import com.pulse.member.adapter.out.event.MemberCreateEvent;
 import com.pulse.member.adapter.out.persistence.entity.constant.RoleName;
@@ -15,6 +16,7 @@ import com.pulse.member.application.port.out.role.map.CreateMemberRolePort;
 import com.pulse.member.config.jwt.JwtTokenProvider;
 import com.pulse.member.config.security.http.user.UserDetailsImpl;
 import com.pulse.member.domain.*;
+import com.pulse.member.mapper.JwtMapper;
 import com.pulse.member.mapper.MemberMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
@@ -53,6 +55,7 @@ public class AuthService implements AuthUseCase {
     private final AuthenticationManager authenticationManager;
 
     private final MemberMapper memberMapper;
+    private final JwtMapper jwtMapper;
 
 
     /**
@@ -63,7 +66,7 @@ public class AuthService implements AuthUseCase {
      */
     @Transactional
     @Override
-    public Member signInAndPublishJwt(SignInCommand signInCommand) {
+    public JwtResponseDTO signInAndPublishJwt(SignInCommand signInCommand) {
         // 1. 로그인 요청 도메인을 생성
         Member member = memberMapper.commandToDomain(signInCommand);
 
@@ -86,9 +89,9 @@ public class AuthService implements AuthUseCase {
         Jwt jwt = createJwtResponseDomain(accessToken, refreshToken, email, userDetails);
         findMember.changeJwt(jwt);
 
-        // 6. 활동 로그 저장 이벤트 발행
+        // 6. 활동 로그 저장 이벤트를 발행하고 JWT 토큰 발급 응답 DTO 반환
         eventPublisher.publishEvent(ActivityLogEvent.of(member.getId(), LOGIN));
-        return findMember;
+        return jwtMapper.domainToResponseDTO(jwt);
     }
 
 
@@ -99,7 +102,7 @@ public class AuthService implements AuthUseCase {
      */
     @Transactional
     @Override
-    public Member signUp(SignUpCommand signUpCommand) {
+    public MemberSignUpResponseDTO signUp(SignUpCommand signUpCommand) {
         // 1. 회원가입 요청 도메인을 생성
         Member member = memberMapper.commandToDomain(signUpCommand);
 
@@ -116,9 +119,9 @@ public class AuthService implements AuthUseCase {
         // 5. 회원 권한을 저장한다. (회원과 역할의 map 테이블에 저장)
         MemberRole memberRole = createMemberRolePort.createMemberRole(savedMember, findRole);
 
-        // 6. MemberCreateEvent 발행
+        // 6. MemberCreateEvent 발행하고 회원가입 응답 DTO 반환
         eventPublisher.publishEvent(new MemberCreateEvent(savedMember.getId()));
-        return savedMember;
+        return memberMapper.domainToResponseDTO(savedMember);
     }
 
 
@@ -182,6 +185,8 @@ public class AuthService implements AuthUseCase {
 
         // 4. 활동 로그 저장 이벤트 발행
         eventPublisher.publishEvent(ActivityLogEvent.of(findRefreshToken.getMember().getId(), REISSUE_REFRESH_TOKEN));
+
+        // todo: 반환을 DTO로 했지만 로직 리팩터링이 필요하다.
         return jwtResponseDTO;
     }
 

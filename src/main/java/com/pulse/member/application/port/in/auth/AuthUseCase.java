@@ -1,10 +1,10 @@
 package com.pulse.member.application.port.in.auth;
 
 import com.pulse.member.adapter.in.web.dto.response.JwtResponseDTO;
-import com.pulse.member.application.command.SignOutCommand;
+import com.pulse.member.adapter.in.web.dto.response.MemberSignUpResponseDTO;
 import com.pulse.member.application.command.SignInCommand;
+import com.pulse.member.application.command.SignOutCommand;
 import com.pulse.member.application.command.SignUpCommand;
-import com.pulse.member.domain.Member;
 
 import java.util.Map;
 
@@ -13,9 +13,9 @@ import java.util.Map;
  */
 public interface AuthUseCase {
 
-    Member signInAndPublishJwt(SignInCommand signInCommand);
+    JwtResponseDTO signInAndPublishJwt(SignInCommand signInCommand);
 
-    Member signUp(SignUpCommand signUpCommand);
+    MemberSignUpResponseDTO signUp(SignUpCommand signUpCommand);
 
     Long signOut(SignOutCommand signOutCommand);
 
