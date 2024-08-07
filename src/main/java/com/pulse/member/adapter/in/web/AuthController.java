@@ -1,11 +1,14 @@
 package com.pulse.member.adapter.in.web;
 
-import com.pulse.member.adapter.in.web.dto.request.LoginRequestDTO;
-import com.pulse.member.adapter.in.web.dto.request.LogoutRequestDTO;
 import com.pulse.member.adapter.in.web.dto.request.MemberSignUpRequestDTO;
+import com.pulse.member.adapter.in.web.dto.request.SignInRequestDTO;
+import com.pulse.member.adapter.in.web.dto.request.SignOutRequestDTO;
 import com.pulse.member.adapter.in.web.dto.response.ApiResponse;
 import com.pulse.member.adapter.in.web.dto.response.JwtResponseDTO;
 import com.pulse.member.adapter.in.web.dto.response.MemberSignUpResponseDTO;
+import com.pulse.member.application.command.SignInCommand;
+import com.pulse.member.application.command.SignOutCommand;
+import com.pulse.member.application.command.SignUpCommand;
 import com.pulse.member.application.port.in.auth.AuthUseCase;
 import com.pulse.member.domain.Member;
 import com.pulse.member.exception.ErrorCode;
@@ -40,10 +43,13 @@ public class AuthController {
      */
     @PostMapping("/signIn")
     public ResponseEntity<ApiResponse<JwtResponseDTO>> signInAndMakeJwt(
-            @RequestBody LoginRequestDTO loginRequest
+            @RequestBody SignInRequestDTO signInRequestDTO
     ) {
-        Member member = memberMapper.toDomain(loginRequest);
-        Member responseMember = authUseCase.signIn(member);
+        // requestDTO를 command로 변환
+        SignInCommand signInCommand = SignInCommand.of(signInRequestDTO);
+
+        // useCase는 command를 받아서 responseDTO를 반환
+        Member responseMember = authUseCase.signInAndPublishJwt(signInCommand);
         JwtResponseDTO jwtResponseDTO = jwtMapper.toResponseDTO(responseMember.getJwt());
 
         if (jwtResponseDTO == null) ResponseEntity.ok(ApiResponse.fail(ErrorCode.DATA_NOT_FOUND));
@@ -59,11 +65,14 @@ public class AuthController {
      */
     @PostMapping("/signUp")
     public ResponseEntity<ApiResponse<MemberSignUpResponseDTO>> signUpAndPublishEvent(
-            @RequestBody MemberSignUpRequestDTO signUpRequest
+            @RequestBody MemberSignUpRequestDTO signUpRequestDTO
     ) {
-        Member member = memberMapper.toDomain(signUpRequest);
-        Member savedMember = authUseCase.signUp(member);
-        MemberSignUpResponseDTO responseDTO = memberMapper.toResponseDTO(savedMember);
+        // requestDTO를 command로 변환
+        SignUpCommand signUpCommand = SignUpCommand.of(signUpRequestDTO);
+
+        // useCase는 command를 받아서 responseDTO를 반환
+        Member responseMember = authUseCase.signUp(signUpCommand);
+        MemberSignUpResponseDTO responseDTO = memberMapper.toResponseDTO(responseMember);
 
         if (responseDTO == null) ResponseEntity.ok(ApiResponse.fail(ErrorCode.DATA_NOT_FOUND));
         return ResponseEntity.ok(ApiResponse.success(responseDTO));
@@ -78,10 +87,15 @@ public class AuthController {
      */
     @PostMapping("/signOut")
     public ResponseEntity<?> signOutAndDeleteJwt(
-            @RequestBody LogoutRequestDTO logoutRequest
+            @RequestBody SignOutRequestDTO signOutRequestDTO
     ) {
-        Member member = memberMapper.toDomain(logoutRequest);
-        authUseCase.signOut(member);
+        // requestDTO를 command로 변환
+        SignOutCommand signOutCommand = SignOutCommand.of(signOutRequestDTO);
+
+        // useCase는 command를 받아서 responseDTO를 반환
+        Long signOutResponse = authUseCase.signOut(signOutCommand);
+
+        if (signOutResponse == null) ResponseEntity.ok(ApiResponse.fail(ErrorCode.DATA_NOT_FOUND));
         return ResponseEntity.ok("User logged out successfully");
     }
 

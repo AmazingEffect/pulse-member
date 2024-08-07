@@ -1,11 +1,12 @@
 package com.pulse.member.mapper;
 
 
-import com.pulse.member.adapter.in.web.dto.request.LoginRequestDTO;
-import com.pulse.member.adapter.in.web.dto.request.LogoutRequestDTO;
-import com.pulse.member.adapter.in.web.dto.request.MemberSignUpRequestDTO;
+import com.pulse.member.adapter.in.web.dto.request.SignOutRequestDTO;
 import com.pulse.member.adapter.in.web.dto.response.MemberSignUpResponseDTO;
 import com.pulse.member.adapter.out.persistence.entity.MemberEntity;
+import com.pulse.member.application.command.SignOutCommand;
+import com.pulse.member.application.command.SignInCommand;
+import com.pulse.member.application.command.SignUpCommand;
 import com.pulse.member.domain.Member;
 import com.pulse.member.grpc.MemberProto;
 import org.mapstruct.Mapper;
@@ -20,12 +21,6 @@ public interface MemberMapper {
 
     MemberProto.MemberRetrieveResponse toProto(Member member);
 
-    // 로그인 요청 DTO를 도메인으로 변환
-    Member toDomain(LoginRequestDTO loginRequest);
-
-    // 회원가입 요청 DTO를 도메인으로 변환
-    Member toDomain(MemberSignUpRequestDTO signUpRequest);
-
     // 응답 도메인을 회원가입 응답 DTO로 변환
     MemberSignUpResponseDTO toResponseDTO(Member member);
 
@@ -33,9 +28,18 @@ public interface MemberMapper {
     MemberEntity toEntity(Member savedMember);
 
     // 로그아웃 요청 DTO를 엔티티로 변환
-    Member toDomain(LogoutRequestDTO logoutRequest);
+    Member toDomain(SignOutRequestDTO logoutRequest);
 
     // MemberEntity 엔티티를 DTO로 변환
     Member toDomain(MemberEntity memberEntity);
+
+    // 로그인 요청 Command를 도메인으로 변환
+    Member commandToDomain(SignInCommand signInCommand);
+
+    // 회원가입 요청 Command를 도메인으로 변환
+    Member commandToDomain(SignUpCommand signUpCommand);
+
+    // 로그아웃 요청 Command를 도메인으로 변환
+    Member commandToDomain(SignOutCommand signOutCommand);
 
 }

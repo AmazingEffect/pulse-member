@@ -4,6 +4,9 @@ import com.pulse.member.adapter.in.web.dto.response.JwtResponseDTO;
 import com.pulse.member.adapter.out.event.ActivityLogEvent;
 import com.pulse.member.adapter.out.event.MemberCreateEvent;
 import com.pulse.member.adapter.out.persistence.entity.constant.RoleName;
+import com.pulse.member.application.command.SignInCommand;
+import com.pulse.member.application.command.SignOutCommand;
+import com.pulse.member.application.command.SignUpCommand;
 import com.pulse.member.application.port.in.auth.AuthUseCase;
 import com.pulse.member.application.port.out.member.CreateMemberPort;
 import com.pulse.member.application.port.out.member.FindMemberPort;
@@ -12,6 +15,7 @@ import com.pulse.member.application.port.out.role.map.CreateMemberRolePort;
 import com.pulse.member.config.jwt.JwtTokenProvider;
 import com.pulse.member.config.security.http.user.UserDetailsImpl;
 import com.pulse.member.domain.*;
+import com.pulse.member.mapper.MemberMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -37,6 +41,7 @@ public class AuthService implements AuthUseCase {
 
     private final MemberService memberService;
     private final RefreshTokenService refreshTokenService;
+
     private final CreateMemberPort createMemberPort;
     private final FindRolePort findRolePort;
     private final CreateMemberRolePort createMemberRolePort;
@@ -47,100 +52,114 @@ public class AuthService implements AuthUseCase {
     private final JwtTokenProvider jwtTokenProvider;
     private final AuthenticationManager authenticationManager;
 
+    private final MemberMapper memberMapper;
+
+
     /**
-     * 로그인 요청을 처리하는 메서드
-     *
-     * @param member 로그인 요청 도메인
+     * @param signInCommand 로그인 요청 도메인
      * @return JWT 토큰 발급 응답 DTO
+     * @apiNote 로그인 요청을 처리하는 메서드
+     * todo: 이 한가지 메서드가 가진 역할과 책임이 좀 많은것같은데 어떻게 할까 고민이다.
      */
     @Transactional
     @Override
-    public Member signIn(Member member) {
-        // 1. authentication 객체를 생성하고 SecurityContext에 저장
-        Authentication authentication = createAuthenticationFrom(member);
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+    public Member signInAndPublishJwt(SignInCommand signInCommand) {
+        // 1. 로그인 요청 도메인을 생성
+        Member member = memberMapper.commandToDomain(signInCommand);
 
-        // 2. JWT access 토큰 생성
+        // 2. authentication 객체를 생성하고 SecurityContext에 저장
+        Authentication authentication = getAuthentication(member);
+
+        // 3. JWT access 토큰 생성
         String accessToken = jwtTokenProvider.generateAccessToken(authentication);
 
-        // 3. refresh 토큰 생성
+        // 3. 유저 도메인에 이메일을 저장하고 DB에서 조회
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
         String email = userDetails.getEmail();
         member.changeEmail(email);
         Member findMember = memberService.findMemberByEmail(member);
+
+        // 4. JWT refresh 토큰을 생성하고 저장
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(findMember);
 
-        // 4. JWT 토큰 발급 응답 DTO 생성
+        // 5. JWT 도메인을 생성하고 회원 도메인에 저장
         Jwt jwt = createJwtResponseDomain(accessToken, refreshToken, email, userDetails);
         findMember.changeJwt(jwt);
 
-        // 5. 활동 로그 저장 이벤트 발행
+        // 6. 활동 로그 저장 이벤트 발행
         eventPublisher.publishEvent(ActivityLogEvent.of(member.getId(), LOGIN));
         return findMember;
     }
 
 
     /**
-     * 회원 생성 + (이벤트 발행)
-     *
-     * @param member 회원 생성 요청 도메인
      * @return 가입한 회원의 이메일
+     * @Param signUpCommand 회원가입 요청 도메인
+     * @apiNote 회원 생성 + (이벤트 발행)
      */
     @Transactional
     @Override
-    public Member signUp(Member member) {
-        // 1. 비밀번호 암호화
+    public Member signUp(SignUpCommand signUpCommand) {
+        // 1. 회원가입 요청 도메인을 생성
+        Member member = memberMapper.commandToDomain(signUpCommand);
+
+        // 2. 비밀번호 암호화
         member.changePassword(passwordEncoder.encode(member.getPassword()));
 
-        // 2. 회원 저장
+        // 3. 회원 저장
         Member savedMember = createMemberPort.createMember(member);
 
-        // 3. 회원 권한을 지정하고 DB에 존재하는게 맞는지 조회한다. (여기서 내가 원하는 권한을 지정해서 저장한다.)
+        // 4. 회원 권한을 지정하고 DB에 존재하는게 맞는지 조회한다. (여기서 내가 원하는 권한을 지정해서 저장한다.)
         Role role = Role.of(RoleName.MEMBER.getRoleCode());
         Role findRole = findRolePort.findRoleByName(role);
 
-        // 4. 회원 권한을 저장한다. (회원과 역할의 map 테이블에 저장)
+        // 5. 회원 권한을 저장한다. (회원과 역할의 map 테이블에 저장)
         MemberRole memberRole = createMemberRolePort.createMemberRole(savedMember, findRole);
 
-        // 4. MemberCreateEvent 발행
+        // 6. MemberCreateEvent 발행
         eventPublisher.publishEvent(new MemberCreateEvent(savedMember.getId()));
         return savedMember;
     }
 
 
     /**
-     * 로그아웃 + JWT 삭제 + 활동 로그 저장 event 발행
-     *
-     * @param member 로그아웃 요청 도메인
+     * @param signOutCommand 로그아웃 요청 도메인
+     * @apiNote 로그아웃 + JWT 삭제 + 활동 로그 저장 event 발행
      */
     @Transactional
     @Override
-    public void signOut(Member member) {
+    public Long signOut(SignOutCommand signOutCommand) {
+        // 1. 로그아웃 요청 도메인을 생성
+        Member member = memberMapper.commandToDomain(signOutCommand);
+
+        // 2. 로그아웃 처리
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null) {
-            // 1. SecurityContext에서 인증 정보를 가져와서 이메일을 추출
+            // 2-1. SecurityContext에서 인증 정보를 가져와서 이메일을 추출
             UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
             String email = userDetails.getEmail();
             member.changeEmail(email);
 
-            // 2. 회원 조회 후 RefreshToken 삭제
+            // 2-2. 회원 조회 후 RefreshToken 삭제
             Member findMember = findMemberPort.findMemberByEmail(member);
             refreshTokenService.deleteRefreshToken(findMember);
 
-            // 3. SecurityContext에서 인증 정보 삭제
+            // 2-3. SecurityContext에서 인증 정보 삭제
             SecurityContextHolder.clearContext();
 
-            // 활동 로그 저장 이벤트 발행
+            // 2-4활동 로그 저장 이벤트 발행
             eventPublisher.publishEvent(ActivityLogEvent.of(member.getId(), LOGOUT));
         }
+
+        // 3. 로그아웃한 회원 ID 반환 (예외가 없으면 로그아웃 성공이라 이 객체의 id를 반환)
+        return member.getId();
     }
 
 
     /**
-     * JWT 토큰 갱신 요청을 처리하는 메서드
-     *
      * @param request 요청 파라미터
      * @return 갱신된 JWT 토큰
+     * @apiNote JWT 토큰 갱신 요청을 처리하는 메서드
      */
     @Transactional
     @Override
@@ -168,10 +187,9 @@ public class AuthService implements AuthUseCase {
 
 
     /**
-     * 로그인 요청을 처리하기 위해 Authentication 객체를 생성하는 메서드
-     *
      * @param member 로그인 요청 도메인
      * @return 생성된 Authentication 객체
+     * @apiNote 로그인 요청을 처리하기 위해 Authentication 객체를 생성하는 메서드
      */
     private Authentication createAuthenticationFrom(Member member) {
         return authenticationManager.authenticate(
@@ -181,16 +199,27 @@ public class AuthService implements AuthUseCase {
 
 
     /**
-     * JWT 토큰 발급 응답 DTO 생성
-     *
      * @param accessToken  JWT access 토큰
      * @param refreshToken JWT refresh 토큰
      * @param email        이메일
      * @param userDetails  UserDetailsImpl
      * @return JWT 토큰 발급 응답 DTO
+     * @apiNote JWT 토큰 발급 응답 DTO 생성
      */
     private Jwt createJwtResponseDomain(String accessToken, RefreshToken refreshToken, String email, UserDetailsImpl userDetails) {
         return Jwt.of(accessToken, refreshToken.getToken(), email, userDetails.getAuthorities());
+    }
+
+
+    /**
+     * @param member 로그인 요청 도메인
+     * @return 생성된 Authentication 객체
+     * @apiNote 로그인 요청을 처리하기 위해 Authentication 객체를 생성하고 SecurityContext에 저장하는 메서드
+     */
+    private Authentication getAuthentication(Member member) {
+        Authentication authentication = createAuthenticationFrom(member);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        return authentication;
     }
 
 }
