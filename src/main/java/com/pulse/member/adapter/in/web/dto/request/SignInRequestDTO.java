@@ -6,7 +6,7 @@ import lombok.*;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class LoginRequestDTO {
+public class SignInRequestDTO {
 
     private String email;
     private String password;
