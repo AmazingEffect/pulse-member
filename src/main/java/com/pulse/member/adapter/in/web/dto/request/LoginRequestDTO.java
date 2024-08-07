@@ -3,10 +3,12 @@ package com.pulse.member.adapter.in.web.dto.request;
 import lombok.*;
 
 @Builder
-@Data
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class LoginRequestDTO {
+
     private String email;
     private String password;
+
 }

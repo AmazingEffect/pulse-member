@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
  * 회원 생성 DTO
  */
 @Builder
-@Data
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class MemberSignUpRequestDTO {

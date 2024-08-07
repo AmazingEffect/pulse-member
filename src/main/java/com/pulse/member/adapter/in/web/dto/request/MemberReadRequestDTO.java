@@ -6,7 +6,7 @@ import lombok.*;
  * 회원 조회 DTO
  */
 @Builder
-@Data
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class MemberReadRequestDTO {
