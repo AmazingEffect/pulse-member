@@ -3,7 +3,6 @@ package com.pulse.member.exception;
 import com.pulse.member.adapter.in.web.dto.response.ApiResponse;
 import jakarta.validation.ConstraintViolationException;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -19,15 +18,12 @@ import java.util.stream.Collectors;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    private final AppProperties appProperties;
-
     /**
      * 커스텀 예외인 MemberException을 처리하기 위해 사용됩니다.
      */
     @ExceptionHandler(MemberException.class)
     public ResponseEntity<ApiResponse<String>> handleMemberException(MemberException e) {
-        String stackTrace = appProperties.isIncludeStackTrace() ? ExceptionUtils.getStackTrace(e) : null;
-        ApiResponse<String> response = ApiResponse.fail(e.getErrorCode(), stackTrace);
+        ApiResponse<String> response = ApiResponse.fail(e.getErrorCode());
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
@@ -37,8 +33,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<String>> handleException(Exception e) {
-        String stackTrace = appProperties.isIncludeStackTrace() ? ExceptionUtils.getStackTrace(e) : null;
-        ApiResponse<String> response = ApiResponse.fail(ErrorCode.UNEXPECTED_ERROR, e.getMessage(), stackTrace);
+        ApiResponse<String> response = ApiResponse.fail(ErrorCode.UNEXPECTED_ERROR, e.getMessage());
         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
@@ -49,11 +44,13 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<ApiResponse<String>> handleConstraintViolationException(ConstraintViolationException e) {
+        // 제약 조건 위반 예외에서 발생한 에러 메시지를 수집합니다.
         List<String> errors = e.getConstraintViolations()
                 .stream()
                 .map(violation -> violation.getPropertyPath() + ": " + violation.getMessage())
                 .collect(Collectors.toList());
-        ApiResponse<String> response = ApiResponse.fail(ErrorCode.VALIDATION_FAILED, errors, null);
+        // 유효성 검사 실패 시, 클라이언트에게 에러 메시지를 반환합니다.
+        ApiResponse<String> response = ApiResponse.fail(ErrorCode.VALIDATION_FAILED, errors);
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
