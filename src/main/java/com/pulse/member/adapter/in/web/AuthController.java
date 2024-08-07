@@ -35,11 +35,11 @@ public class AuthController {
     private final JwtMapper jwtMapper;
     private final MemberMapper memberMapper;
 
+
     /**
-     * 로그인 요청을 받아 JWT 토큰을 발급합니다.
-     *
      * @param loginRequest 로그인 요청 DTO
      * @return JWT 토큰 응답 DTO
+     * @apiNote 로그인 요청을 받아 JWT 토큰을 발급합니다.
      */
     @PostMapping("/signIn")
     public ResponseEntity<ApiResponse<JwtResponseDTO>> signInAndMakeJwt(
@@ -58,10 +58,9 @@ public class AuthController {
 
 
     /**
-     * 회원가입 요청을 받아 회원가입을 진행합니다.
-     *
      * @param signUpRequest 회원가입 요청 DTO
      * @return 회원가입 응답 DTO
+     * @apiNote 회원가입 요청을 받아 회원가입을 진행합니다.
      */
     @PostMapping("/signUp")
     public ResponseEntity<ApiResponse<MemberSignUpResponseDTO>> signUpAndPublishEvent(
@@ -80,10 +79,9 @@ public class AuthController {
 
 
     /**
-     * 로그아웃 요청을 받아 JWT 토큰을 삭제합니다.
-     *
      * @param logoutRequest 로그아웃 요청 DTO
      * @return 로그아웃 성공 메시지
+     * @apiNote 로그아웃 요청을 받아 JWT 토큰을 삭제합니다.
      */
     @PostMapping("/signOut")
     public ResponseEntity<?> signOutAndDeleteJwt(
@@ -101,10 +99,9 @@ public class AuthController {
 
 
     /**
-     * Refresh Token을 이용하여 새로운 JWT 토큰을 발급합니다.
-     *
      * @param request Refresh Token 요청 DTO
      * @return JWT 토큰 응답 DTO
+     * @apiNote Refresh Token을 이용하여 새로운 JWT 토큰을 발급합니다.
      */
     @PostMapping("/refreshToken")
     public ResponseEntity<ApiResponse<JwtResponseDTO>> reIssueRefreshToken(
