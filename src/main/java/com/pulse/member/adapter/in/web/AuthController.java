@@ -3,12 +3,12 @@ package com.pulse.member.adapter.in.web;
 import com.pulse.member.adapter.in.web.dto.request.MemberSignUpRequestDTO;
 import com.pulse.member.adapter.in.web.dto.request.SignInRequestDTO;
 import com.pulse.member.adapter.in.web.dto.request.SignOutRequestDTO;
-import com.pulse.member.adapter.in.web.dto.response.ApiResponse;
+import com.pulse.member.adapter.in.web.dto.response.api.ApiResponse;
 import com.pulse.member.adapter.in.web.dto.response.JwtResponseDTO;
-import com.pulse.member.adapter.in.web.dto.response.MemberSignUpResponseDTO;
-import com.pulse.member.application.command.SignInCommand;
-import com.pulse.member.application.command.SignOutCommand;
-import com.pulse.member.application.command.SignUpCommand;
+import com.pulse.member.adapter.in.web.dto.response.MemberResponseDTO;
+import com.pulse.member.application.command.auth.SignInCommand;
+import com.pulse.member.application.command.auth.SignOutCommand;
+import com.pulse.member.application.command.auth.SignUpCommand;
 import com.pulse.member.application.port.in.auth.AuthUseCase;
 import com.pulse.member.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -40,13 +40,8 @@ public class AuthController {
     public ResponseEntity<ApiResponse<JwtResponseDTO>> signInAndMakeJwt(
             @RequestBody SignInRequestDTO signInRequestDTO
     ) {
-        // requestDTO를 command로 변환
         SignInCommand signInCommand = SignInCommand.of(signInRequestDTO);
-
-        // useCase는 command를 받아서 responseDTO를 반환
         JwtResponseDTO responseDTO = authUseCase.signInAndPublishJwt(signInCommand);
-
-        if (responseDTO == null) ResponseEntity.ok(ApiResponse.fail(ErrorCode.DATA_NOT_FOUND));
         return ResponseEntity.ok(ApiResponse.success(responseDTO));
     }
 
@@ -57,16 +52,11 @@ public class AuthController {
      * @apiNote 회원가입 요청을 받아 회원가입을 진행합니다.
      */
     @PostMapping("/signUp")
-    public ResponseEntity<ApiResponse<MemberSignUpResponseDTO>> signUpAndPublishEvent(
+    public ResponseEntity<ApiResponse<MemberResponseDTO>> signUpAndPublishEvent(
             @RequestBody MemberSignUpRequestDTO signUpRequestDTO
     ) {
-        // requestDTO를 command로 변환
         SignUpCommand signUpCommand = SignUpCommand.of(signUpRequestDTO);
-
-        // useCase는 command를 받아서 responseDTO를 반환
-        MemberSignUpResponseDTO responseDTO = authUseCase.signUp(signUpCommand);
-
-        if (responseDTO == null) ResponseEntity.ok(ApiResponse.fail(ErrorCode.DATA_NOT_FOUND));
+        MemberResponseDTO responseDTO = authUseCase.signUp(signUpCommand);
         return ResponseEntity.ok(ApiResponse.success(responseDTO));
     }
 
@@ -80,13 +70,8 @@ public class AuthController {
     public ResponseEntity<ApiResponse<Long>> signOutAndDeleteJwt(
             @RequestBody SignOutRequestDTO signOutRequestDTO
     ) {
-        // requestDTO를 command로 변환
         SignOutCommand signOutCommand = SignOutCommand.of(signOutRequestDTO);
-
-        // useCase는 command를 받아서 responseDTO를 반환
         Long response = authUseCase.signOut(signOutCommand);
-
-        if (response == null) ResponseEntity.ok(ApiResponse.fail(ErrorCode.DATA_NOT_FOUND));
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
@@ -101,8 +86,6 @@ public class AuthController {
             @RequestBody Map<String, String> request
     ) {
         JwtResponseDTO responseDTO = authUseCase.reIssueRefreshToken(request);
-
-        if (responseDTO == null) ResponseEntity.ok(ApiResponse.fail(ErrorCode.DATA_NOT_FOUND));
         return ResponseEntity.ok(ApiResponse.success(responseDTO));
     }
 
