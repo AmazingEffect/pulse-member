@@ -22,7 +22,7 @@ public enum ExternalEventType {
     ;
 
     // event type은 kafka topic 이름으로 사용된다.
-    private final String eventType;
-    private final String eventDescription;
+    private final String type;
+    private final String description;
 
 }
