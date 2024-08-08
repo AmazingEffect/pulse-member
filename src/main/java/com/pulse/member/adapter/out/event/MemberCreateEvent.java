@@ -16,17 +16,26 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class MemberCreateEvent implements OutboxEvent {
 
-    private Long id;
+    private Long payload;
 
 
+    /**
+     * @return Long
+     * @apiNote 이벤트의 페이로드를 반환한다.
+     */
     @Override
     public Long getPayload() {
-        return id;
+        return payload;
     }
 
+
+    /**
+     * @return String
+     * @apiNote 이벤트의 타입을 반환한다.
+     */
     @Override
     public String getEventType() {
-        return ExternalEventType.MEMBER_CREATE_OUTBOX.getEventType();
+        return ExternalEventType.MEMBER_CREATE_OUTBOX.getType();
     }
 
 }

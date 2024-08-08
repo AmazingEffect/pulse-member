@@ -2,8 +2,8 @@ package com.pulse.member.application.port.out.outbox;
 
 import com.pulse.member.domain.MemberOutbox;
 
-public interface CreateOutboxPort {
+public interface CreateMemberOutboxPort {
 
-    void saveOutboxEvent(MemberOutbox outbox);
+    Long saveMemberOutboxEvent(MemberOutbox outbox);
 
 }

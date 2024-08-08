@@ -69,6 +69,19 @@ public class MemberPersistenceAdapter implements CreateMemberPort, FindMemberPor
 
 
     /**
+     * @param memberId 회원 ID
+     * @return ID로 조회된 회원
+     * @apiNote ID로 회원 조회
+     */
+    @Override
+    public Member findMemberById(Long memberId) {
+        MemberEntity memberEntity = memberRepository.findById(memberId)
+                .orElseThrow(() -> new MemberException(ErrorCode.MEMBER_NOT_FOUND));
+        return memberMapper.toDomain(memberEntity);
+    }
+
+
+    /**
      * 회원 수정
      *
      * @param member 회원 도메인

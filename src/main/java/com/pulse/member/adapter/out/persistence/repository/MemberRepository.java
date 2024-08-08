@@ -13,7 +13,7 @@ public interface MemberRepository extends JpaRepository<MemberEntity, Long> {
 
     @Query("SELECT m FROM MemberEntity m " +
             "JOIN FETCH m.roles mr " +
-            "JOIN FETCH mr.role r " +
+            "JOIN FETCH mr.roleEntity r " +
             "WHERE m.email = :email")
     Optional<MemberEntity> findByEmailWithRoles(@Param("email") String email);
 

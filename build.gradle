@@ -30,9 +30,6 @@ configurations {
 
 repositories {
     mavenCentral()
-    maven { url 'https://repo.spring.io/milestone' }
-    maven { url 'https://repo.spring.io/release' }
-    mavenLocal()  // 이 부분을 추가하여 로컬 Maven 리포지토리를 참조합니다.
 }
 
 
@@ -94,11 +91,6 @@ dependencies {
     // mapstruct 설정
     implementation 'org.mapstruct:mapstruct:1.5.5.Final'
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
-
-    // 라이브러리 추가
-    implementation 'com.pulse.common:event-library:1.0.0'
-    annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
-    annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
 
     // test 설정
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
