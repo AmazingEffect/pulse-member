@@ -2,9 +2,9 @@ package com.pulse.member.application.service;
 
 import com.pulse.member.adapter.out.event.outbox.OutboxEvent;
 import com.pulse.member.adapter.out.persistence.entity.constant.MessageStatus;
-import com.pulse.member.application.port.in.outbox.OutboxUseCase;
-import com.pulse.member.application.port.out.outbox.CreateOutboxPort;
-import com.pulse.member.application.port.out.outbox.FindOutboxPort;
+import com.pulse.member.application.port.in.outbox.MemberOutboxUseCase;
+import com.pulse.member.application.port.out.outbox.CreateMemberOutboxPort;
+import com.pulse.member.application.port.out.outbox.FindMemberOutboxPort;
 import com.pulse.member.domain.MemberOutbox;
 import io.opentelemetry.api.trace.Span;
 import lombok.RequiredArgsConstructor;
@@ -19,10 +19,10 @@ import java.time.LocalDateTime;
 @Transactional
 @RequiredArgsConstructor
 @Service
-public class OutboxService implements OutboxUseCase {
+public class MemberOutboxService implements MemberOutboxUseCase {
 
-    private final CreateOutboxPort createOutboxPort;
-    private final FindOutboxPort findOutboxPort;
+    private final CreateMemberOutboxPort createMemberOutboxPort;
+    private final FindMemberOutboxPort findMemberOutboxPort;
 
 
     /**
@@ -30,7 +30,7 @@ public class OutboxService implements OutboxUseCase {
      * @apiNote OutboxEvent를 저장한다. 상태는 PENDING(대기)으로 저장
      */
     @Override
-    public void saveOutboxEvent(OutboxEvent event) {
+    public Long saveOutboxEvent(OutboxEvent event) {
         // 1. 현재 Span에서 Trace ID를 가져옵니다.
         Span currentSpan = Span.current();
         String nowTraceId = currentSpan.getSpanContext().getTraceId();
@@ -42,26 +42,26 @@ public class OutboxService implements OutboxUseCase {
         MemberOutbox memberOutbox = MemberOutbox.of(eventType, event.getPayload(), nowTraceId, MessageStatus.PENDING);
 
         // 4. MemberOutbox 도메인을 저장합니다.
-        createOutboxPort.saveOutboxEvent(memberOutbox);
+        return createMemberOutboxPort.saveMemberOutboxEvent(memberOutbox);
     }
 
 
     /**
      * @param event OutboxEvent
-     * @apiNote OutboxEvent를 처리완료(PROCESSED)로 변경
+     * @apiNote OutboxEvent를 처리대기(PENDING)로 변경
      */
     @Override
-    public void markOutboxEventProcessed(OutboxEvent event) {
+    public void markOutboxEventPending(OutboxEvent event) {
         // 1. 이벤트 타입에 따라 적절한 토픽 이름을 반환합니다.
         String eventType = getKafkaTopic(event);
 
         // 2. 영속화를 위해 OutboxEvent를 찾습니다.
-        MemberOutbox memberOutbox = findOutboxPort.findOutboxBy(event.getPayload(), eventType);
+        MemberOutbox memberOutbox = findMemberOutboxPort.findMemberOutboxBy(event.getPayload(), eventType);
 
-        // 3. OutboxEvent의 상태를 PROCESSED로 변경합니다.
-        memberOutbox.changeStatus(MessageStatus.PROCESSED);
+        // 3. OutboxEvent의 상태를 PENDING로 변경합니다.
+        memberOutbox.changeStatus(MessageStatus.PENDING);
         memberOutbox.changeProcessedAt(LocalDateTime.now());
-        createOutboxPort.saveOutboxEvent(memberOutbox);
+        createMemberOutboxPort.saveMemberOutboxEvent(memberOutbox);
     }
 
 
@@ -76,12 +76,12 @@ public class OutboxService implements OutboxUseCase {
         String eventType = getKafkaTopic(event);
 
         // 2. 영속화를 위해 OutboxEvent를 찾습니다.
-        MemberOutbox memberOutbox = findOutboxPort.findOutboxBy(event.getPayload(), eventType);
+        MemberOutbox memberOutbox = findMemberOutboxPort.findMemberOutboxBy(event.getPayload(), eventType);
 
         // 3. OutboxEvent의 상태를 SUCCESS로 변경합니다.
         memberOutbox.changeStatus(MessageStatus.PROCESSED);
         memberOutbox.changeProcessedAt(LocalDateTime.now());
-        createOutboxPort.saveOutboxEvent(memberOutbox);
+        createMemberOutboxPort.saveMemberOutboxEvent(memberOutbox);
     }
 
 
@@ -95,12 +95,12 @@ public class OutboxService implements OutboxUseCase {
         String eventType = getKafkaTopic(event);
 
         // 2. 영속화를 위해 OutboxEvent를 찾습니다.
-        MemberOutbox memberOutbox = findOutboxPort.findOutboxBy(event.getPayload(), eventType);
+        MemberOutbox memberOutbox = findMemberOutboxPort.findMemberOutboxBy(event.getPayload(), eventType);
 
         // 3. OutboxEvent의 상태를 FAIL로 변경합니다.
         memberOutbox.changeStatus(MessageStatus.FAIL);
         memberOutbox.changeProcessedAt(LocalDateTime.now());
-        createOutboxPort.saveOutboxEvent(memberOutbox);
+        createMemberOutboxPort.saveMemberOutboxEvent(memberOutbox);
     }
 
 
@@ -112,6 +112,25 @@ public class OutboxService implements OutboxUseCase {
     @Override
     public String getKafkaTopic(OutboxEvent event) {
         return event.getEventType();
+    }
+
+
+    /**
+     * @param event OutboxEvent
+     * @apiNote OutboxEvent를 처리완료(PROCESSED)로 변경
+     */
+    @Override
+    public void markOutboxEventProcessed(OutboxEvent event) {
+        // 1. 이벤트 타입에 따라 적절한 토픽 이름을 반환합니다.
+        String eventType = getKafkaTopic(event);
+
+        // 2. 영속화를 위해 OutboxEvent를 찾습니다.
+        MemberOutbox memberOutbox = findMemberOutboxPort.findMemberOutboxBy(event.getPayload(), eventType);
+
+        // 3. OutboxEvent의 상태를 PROCESSED로 변경합니다.
+        memberOutbox.changeStatus(MessageStatus.PROCESSED);
+        memberOutbox.changeProcessedAt(LocalDateTime.now());
+        createMemberOutboxPort.saveMemberOutboxEvent(memberOutbox);
     }
 
 }
