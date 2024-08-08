@@ -31,8 +31,8 @@ public enum ErrorCode {
     INVALID_ROLE_NAME("MEM556", "Invalid RoleName code"),
     DATA_NOT_FOUND("MEM557", "Data not found"),
     REFRESH_TOKEN_NOT_HAVE_MEMBER("MEM998", "Refresh token does not have a member"),
-
     INVALID_INPUT_VALUE("MEM400", "Invalid input value"),
+    MEMBER_ID_NOT_FOUND("MEM001", "Member ID not found")
 
     ;
 

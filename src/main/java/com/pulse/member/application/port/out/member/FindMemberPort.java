@@ -8,4 +8,6 @@ public interface FindMemberPort {
 
     Member findMemberByEmail(Member member);
 
+    Member findMemberById(Long memberId);
+
 }
