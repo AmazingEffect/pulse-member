@@ -1,8 +1,8 @@
 package com.pulse.member.adapter.in.grpc;
 
-import com.pulse.event_library.service.OutboxService;
 import com.pulse.member.adapter.out.event.MemberCreateEvent;
 import com.pulse.member.application.port.in.member.FindMemberUseCase;
+import com.pulse.member.application.port.in.outbox.MemberOutboxUseCase;
 import com.pulse.member.config.trace.annotation.TraceGrpcServer;
 import com.pulse.member.domain.Member;
 import com.pulse.member.grpc.MemberProto;
@@ -28,15 +28,15 @@ public class MemberServiceGrpcImpl extends MemberServiceGrpc.MemberServiceImplBa
 
     private final FindMemberUseCase memberUseCase;
     private final MemberMapper memberMapper;
-    private final OutboxService outboxService;
+    private final MemberOutboxUseCase memberOutboxUseCase;
+
 
     /**
-     * id로 회원 조회
-     * 요청 예시:
-     * grpcurl -plaintext -d '{"id": 1}' localhost:50051 MemberService/GetMemberById
-     *
      * @param request          - 요청
      * @param responseObserver - 응답
+     * @apiNote id로 회원 조회
+     * 요청 예시:
+     * grpcurl -plaintext -d '{"id": 1}' localhost:50051 MemberService/GetMemberById
      */
     @TraceGrpcServer
     @Override
@@ -54,10 +54,10 @@ public class MemberServiceGrpcImpl extends MemberServiceGrpc.MemberServiceImplBa
             responseObserver.onCompleted();
 
             // outbox 이벤트 성공 처리
-            outboxService.markOutboxEventSuccess(event);
+            memberOutboxUseCase.markOutboxEventSuccess(event);
         } catch (Exception e) {
             // 예외 발생 시 outbox 이벤트 실패 처리
-            outboxService.markOutboxEventFailed(event);
+            memberOutboxUseCase.markOutboxEventFailed(event);
             responseObserver.onError(e);
             throw e; // 예외를 다시 던져 AOP에서 처리되도록 함
         }
