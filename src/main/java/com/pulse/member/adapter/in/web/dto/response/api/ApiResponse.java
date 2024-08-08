@@ -1,4 +1,4 @@
-package com.pulse.member.adapter.in.web.dto.response;
+package com.pulse.member.adapter.in.web.dto.response.api;
 
 import com.pulse.member.exception.ErrorCode;
 import lombok.AccessLevel;
@@ -9,17 +9,17 @@ import lombok.NoArgsConstructor;
 import java.util.List;
 
 /**
- * API 응답 DTO (stack trace도 포함시키는 것을 시도해 보았으나, stack trace를 포함시키는 것은 보안상의 이유로 권장되지 않음)
+ * API 공통 응답 객체
  */
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor
 public class ApiResponse<T> {
 
-    private ResponseStatus success;
-    private String message;
-    private T data;
-    private ErrorResponse error;
+    private ResponseStatus success; // api 응답 상태
+    private String message;         // api 응답 메시지
+    private T data;                 // api 응답 데이터
+    private ErrorResponse error;    // api 응답 에러
 
 
     // 메시지를 받지 않는 성공 응답

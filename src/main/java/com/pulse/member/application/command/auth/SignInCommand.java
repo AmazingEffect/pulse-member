@@ -1,4 +1,4 @@
-package com.pulse.member.application.command;
+package com.pulse.member.application.command.auth;
 
 import com.pulse.member.adapter.in.web.dto.request.SignInRequestDTO;
 import lombok.*;

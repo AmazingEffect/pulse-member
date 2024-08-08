@@ -4,14 +4,11 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
-/**
- * 회원 생성 DTO
- */
 @Builder
 @Data
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class MemberSignUpResponseDTO {
+public class MemberResponseDTO {
 
     private Long id;                 // PK
     private String email;            // 이메일

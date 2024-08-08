@@ -2,11 +2,11 @@ package com.pulse.member.mapper;
 
 
 import com.pulse.member.adapter.in.web.dto.request.SignOutRequestDTO;
-import com.pulse.member.adapter.in.web.dto.response.MemberSignUpResponseDTO;
+import com.pulse.member.adapter.in.web.dto.response.MemberResponseDTO;
 import com.pulse.member.adapter.out.persistence.entity.MemberEntity;
-import com.pulse.member.application.command.SignOutCommand;
-import com.pulse.member.application.command.SignInCommand;
-import com.pulse.member.application.command.SignUpCommand;
+import com.pulse.member.application.command.auth.SignOutCommand;
+import com.pulse.member.application.command.auth.SignInCommand;
+import com.pulse.member.application.command.auth.SignUpCommand;
 import com.pulse.member.domain.Member;
 import com.pulse.member.grpc.MemberProto;
 import org.mapstruct.Mapper;
@@ -22,7 +22,7 @@ public interface MemberMapper {
     MemberProto.MemberRetrieveResponse toProto(Member member);
 
     // 응답 도메인을 회원가입 응답 DTO로 변환
-    MemberSignUpResponseDTO domainToResponseDTO(Member member);
+    MemberResponseDTO domainToResponseDTO(Member member);
 
     // 도메인을 엔티티로 변환
     MemberEntity toEntity(Member savedMember);

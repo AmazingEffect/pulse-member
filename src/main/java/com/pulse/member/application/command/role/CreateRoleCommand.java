@@ -1,4 +1,4 @@
-package com.pulse.member.application.command;
+package com.pulse.member.application.command.role;
 
 import com.pulse.member.adapter.in.web.dto.request.RoleCreateRequestDTO;
 import com.pulse.member.adapter.out.persistence.entity.constant.RoleName;

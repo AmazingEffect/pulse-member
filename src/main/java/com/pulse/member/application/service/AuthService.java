@@ -1,13 +1,13 @@
 package com.pulse.member.application.service;
 
 import com.pulse.member.adapter.in.web.dto.response.JwtResponseDTO;
-import com.pulse.member.adapter.in.web.dto.response.MemberSignUpResponseDTO;
+import com.pulse.member.adapter.in.web.dto.response.MemberResponseDTO;
 import com.pulse.member.adapter.out.event.ActivityLogEvent;
 import com.pulse.member.adapter.out.event.MemberCreateEvent;
 import com.pulse.member.adapter.out.persistence.entity.constant.RoleName;
-import com.pulse.member.application.command.SignInCommand;
-import com.pulse.member.application.command.SignOutCommand;
-import com.pulse.member.application.command.SignUpCommand;
+import com.pulse.member.application.command.auth.SignInCommand;
+import com.pulse.member.application.command.auth.SignOutCommand;
+import com.pulse.member.application.command.auth.SignUpCommand;
 import com.pulse.member.application.port.in.auth.AuthUseCase;
 import com.pulse.member.application.port.out.member.CreateMemberPort;
 import com.pulse.member.application.port.out.member.FindMemberPort;
@@ -102,7 +102,7 @@ public class AuthService implements AuthUseCase {
      */
     @Transactional
     @Override
-    public MemberSignUpResponseDTO signUp(SignUpCommand signUpCommand) {
+    public MemberResponseDTO signUp(SignUpCommand signUpCommand) {
         // 1. 회원가입 요청 도메인을 생성
         Member member = memberMapper.commandToDomain(signUpCommand);
 

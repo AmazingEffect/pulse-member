@@ -9,7 +9,7 @@ import lombok.*;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class ResponseRoleDTO {
+public class RoleResponseDTO {
 
     private Long id;
     private String name;

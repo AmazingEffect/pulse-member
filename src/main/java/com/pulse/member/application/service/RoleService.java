@@ -1,7 +1,7 @@
 package com.pulse.member.application.service;
 
-import com.pulse.member.adapter.in.web.dto.response.ResponseRoleDTO;
-import com.pulse.member.application.command.CreateRoleCommand;
+import com.pulse.member.adapter.in.web.dto.response.RoleResponseDTO;
+import com.pulse.member.application.command.role.CreateRoleCommand;
 import com.pulse.member.application.port.in.role.CreateRoleUseCase;
 import com.pulse.member.application.port.in.role.DeleteRoleUseCase;
 import com.pulse.member.application.port.in.role.FindRoleUseCase;
@@ -33,7 +33,7 @@ public class RoleService implements CreateRoleUseCase, FindRoleUseCase, UpdateRo
      */
     @Transactional
     @Override
-    public ResponseRoleDTO createRole(CreateRoleCommand createRoleCommand) {
+    public RoleResponseDTO createRole(CreateRoleCommand createRoleCommand) {
         // 1. command를 도메인으로 변환
         Role role = roleMapper.commandToDomain(createRoleCommand);
 

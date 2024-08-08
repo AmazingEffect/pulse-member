@@ -1,6 +1,6 @@
 package com.pulse.member.exception;
 
-import com.pulse.member.adapter.in.web.dto.response.ApiResponse;
+import com.pulse.member.adapter.in.web.dto.response.api.ApiResponse;
 import jakarta.validation.ConstraintViolationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

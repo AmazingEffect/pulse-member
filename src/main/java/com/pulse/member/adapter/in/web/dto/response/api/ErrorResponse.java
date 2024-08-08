@@ -1,4 +1,4 @@
-package com.pulse.member.adapter.in.web.dto.response;
+package com.pulse.member.adapter.in.web.dto.response.api;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AccessLevel;

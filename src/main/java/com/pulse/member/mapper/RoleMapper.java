@@ -1,8 +1,8 @@
 package com.pulse.member.mapper;
 
-import com.pulse.member.adapter.in.web.dto.response.ResponseRoleDTO;
+import com.pulse.member.adapter.in.web.dto.response.RoleResponseDTO;
 import com.pulse.member.adapter.out.persistence.entity.RoleEntity;
-import com.pulse.member.application.command.CreateRoleCommand;
+import com.pulse.member.application.command.role.CreateRoleCommand;
 import com.pulse.member.domain.Role;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
@@ -20,6 +20,6 @@ public interface RoleMapper {
     Role commandToDomain(CreateRoleCommand createRoleCommand);
 
     // 도메인을 responseDTO로 변환
-    ResponseRoleDTO domainToResponseDTO(Role savedRole);
+    RoleResponseDTO domainToResponseDTO(Role savedRole);
 
 }
