@@ -21,4 +21,33 @@ public class MemberOutbox {
     private MessageStatus status;      // Kafka 메시지 처리 상태 (예: PENDING, PROCESSED, SUCCESS, FAIL)
     private LocalDateTime processedAt; // Kafka 메시지 처리 시간 (처리된 경우)
 
+
+    // factory method
+    public static MemberOutbox of(String eventType, Long payload, String nowTraceId, MessageStatus messageStatus) {
+        return MemberOutbox.builder()
+                .eventType(eventType)
+                .payload(payload)
+                .traceId(nowTraceId)
+                .status(messageStatus)
+                .build();
+    }
+
+
+    /**
+     * @param messageStatus 메시지 상태
+     * @apiNote OutboxEvent의 상태를 변경
+     */
+    public void changeStatus(MessageStatus messageStatus) {
+        this.status = messageStatus;
+    }
+
+
+    /**
+     * @param now LocalDateTime
+     * @apiNote OutboxEvent를 처리완료(PROCESSED)로 변경
+     */
+    public void changeProcessedAt(LocalDateTime now) {
+        this.processedAt = now;
+    }
+
 }
