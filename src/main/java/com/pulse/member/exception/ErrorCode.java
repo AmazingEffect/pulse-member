@@ -41,9 +41,11 @@ public enum ErrorCode {
     MEMBER_REQUIRED_VALUE("MEM001", "Member required value"),
     Not_FOUND_MEMBER_OUTBOX("MEM001", "Not found member outbox"),
     CHANGE_EMAIL_VALUE_NOT_FOUND("MEM001", "Change email value is empty"),
-    MEMBER_JWT_ALREADY_EXIST("MEM001", "Member JWT already exist")
+    MEMBER_JWT_ALREADY_EXIST("MEM001", "Member JWT already exist"),
 
-    ;
+    // outbox errors
+    OUTBOX_STATUS_NOT_FOUND("MEM001", "Outbox status not found"),
+    OUTBOX_PROCESSED_AT_NOT_FOUND("MEM001", "Outbox processedAt not found");
 
     private final String code;
     private final String message;

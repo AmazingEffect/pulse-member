@@ -1,7 +1,10 @@
 package com.pulse.member.domain;
 
 import com.pulse.member.adapter.out.persistence.entity.constant.MessageStatus;
+import com.pulse.member.exception.ErrorCode;
+import com.pulse.member.exception.MemberException;
 import lombok.*;
+import org.springframework.util.ObjectUtils;
 
 import java.time.LocalDateTime;
 
@@ -38,6 +41,9 @@ public class MemberOutbox {
      * @apiNote OutboxEvent의 상태를 변경
      */
     public void changeStatus(MessageStatus messageStatus) {
+        if (ObjectUtils.isEmpty(messageStatus)) {
+            throw new MemberException(ErrorCode.OUTBOX_STATUS_NOT_FOUND);
+        }
         this.status = messageStatus;
     }
 
@@ -47,6 +53,9 @@ public class MemberOutbox {
      * @apiNote OutboxEvent를 처리완료(PROCESSED)로 변경
      */
     public void changeProcessedAt(LocalDateTime now) {
+        if (ObjectUtils.isEmpty(now)) {
+            throw new MemberException(ErrorCode.OUTBOX_PROCESSED_AT_NOT_FOUND);
+        }
         this.processedAt = now;
     }
 
