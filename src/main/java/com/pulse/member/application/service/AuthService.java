@@ -19,6 +19,8 @@ import com.pulse.member.application.port.out.role.map.CreateMemberRolePort;
 import com.pulse.member.config.jwt.JwtTokenProvider;
 import com.pulse.member.config.security.http.user.UserDetailsImpl;
 import com.pulse.member.domain.*;
+import com.pulse.member.exception.ErrorCode;
+import com.pulse.member.exception.MemberException;
 import com.pulse.member.mapper.JwtMapper;
 import com.pulse.member.mapper.MemberMapper;
 import lombok.RequiredArgsConstructor;
@@ -177,26 +179,26 @@ public class AuthService implements AuthUseCase {
     @Transactional
     @Override
     public JwtResponseDTO reIssueRefreshToken(Map<String, String> request) {
-        // 1. refresh 토큰을 조회하고 만료 여부를 확인
+        // 1. refresh 토큰을 조회
         String requestRefreshToken = request.get(REFRESH_TOKEN);
         RefreshToken findRefreshToken = findRefreshTokenPort.findRefreshToken(RefreshToken.of(requestRefreshToken));
-        findRefreshToken.verifyTokenExpiration();
 
-        // 2. access 토큰 재발급
+        // 2. refresh 토큰의 유효성 검증 (회원 정보, 만료 날짜 존재여부, 만료 기간 확인)
+        findRefreshToken.validRefreshToken();
+
+        // 3. refresh 토큰의 유효성이 통과되었다면 새로운 access 토큰을 생성
         String email = findRefreshToken.getMember().getEmail();
         Authentication authenticationToken = new UsernamePasswordAuthenticationToken(email, null, null);
         String newAccessToken = jwtTokenProvider.generateAccessToken(authenticationToken);
 
-        // 3. SecurityContextHolder에 새로운 인증 정보를 설정합니다.
+        // 4. SecurityContextHolder에 새로운 인증 정보를 설정
         // todo: 여기서 authorities가 null일것같은데 get하면 NPE 발생하지 않나?
         SecurityContextHolder.getContext().setAuthentication(authenticationToken);
         JwtResponseDTO jwtResponseDTO = JwtResponseDTO.of(newAccessToken, requestRefreshToken, email);
 //        JwtResponseDTO jwtResponseDTO = JwtResponseDTO.of(newAccessToken, requestRefreshToken, email, authenticationToken.getAuthorities());
 
-        // 4. 활동 로그 저장 이벤트 발행
+        // 5. 활동 로그 저장 이벤트 발행
         eventPublisher.publishEvent(ActivityLogEvent.of(findRefreshToken.getMember().getId(), REISSUE_REFRESH_TOKEN));
-
-        // todo: 반환을 DTO로 했지만 로직 리팩터링이 필요하다.
         return jwtResponseDTO;
     }
 
