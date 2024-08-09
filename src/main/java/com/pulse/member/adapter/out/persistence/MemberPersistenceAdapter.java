@@ -54,17 +54,16 @@ public class MemberPersistenceAdapter implements CreateMemberPort, FindMemberPor
 
 
     /**
-     * Email로 회원 조회
-     *
-     * @param member 회원 도메인
+     * @param email 회원 이메일
      * @return 조회된 회원
+     * @apiNote Email로 회원 조회
      */
     @Override
-    public Member findMemberByEmail(Member member) {
-        MemberEntity memberEntity = memberRepository.findByEmail(member.getEmail())
+    public Member findMemberByEmail(String email) {
+        MemberEntity memberEntity = memberRepository.findMemberEntityByEmail(email)
                 .orElseThrow(() -> new MemberException(ErrorCode.MEMBER_NOT_FOUND));
 
-        return memberMapper.toDomain(memberEntity);
+        return Member.of(memberEntity.getId(), memberEntity.getEmail(), memberEntity.getName(), memberEntity.getLastLogin());
     }
 
 

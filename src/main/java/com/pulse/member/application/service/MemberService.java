@@ -61,7 +61,7 @@ public class MemberService implements CreateMemberUseCase, FindMemberUseCase, Up
      */
     @Override
     public Member findMemberByEmail(Member member) {
-        return findMemberPort.findMemberByEmail(member);
+        return findMemberPort.findMemberByEmail(member.getEmail());
     }
 
 

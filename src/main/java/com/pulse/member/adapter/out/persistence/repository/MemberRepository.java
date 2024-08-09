@@ -9,7 +9,7 @@ import java.util.Optional;
 
 public interface MemberRepository extends JpaRepository<MemberEntity, Long> {
 
-    Optional<MemberEntity> findByEmail(String email);
+    Optional<MemberEntity> findMemberEntityByEmail(String email);
 
     @Query("SELECT m FROM MemberEntity m " +
             "JOIN FETCH m.roles mr " +

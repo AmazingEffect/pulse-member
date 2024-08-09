@@ -10,6 +10,7 @@ import com.pulse.member.application.command.auth.SignUpCommand;
 import com.pulse.member.domain.Member;
 import com.pulse.member.grpc.MemberProto;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 
 /**
@@ -25,12 +26,15 @@ public interface MemberMapper {
     MemberResponseDTO domainToResponseDTO(Member member);
 
     // 도메인을 엔티티로 변환
-    MemberEntity toEntity(Member savedMember);
+    MemberEntity toEntity(Member member);
 
     // 로그아웃 요청 DTO를 엔티티로 변환
     Member toDomain(SignOutRequestDTO logoutRequest);
 
     // MemberEntity 엔티티를 DTO로 변환
+    @Mapping(target = "email", source = "email")
+    @Mapping(target = "name", source = "name")
+    @Mapping(target = "lastLogin", source = "lastLogin")
     Member toDomain(MemberEntity memberEntity);
 
     // 로그인 요청 Command를 도메인으로 변환

@@ -41,6 +41,17 @@ public class Member {
     }
 
 
+    // factory method
+    public static Member of(Long id, String email, String name, LocalDateTime lastLogin) {
+        return Member.builder()
+                .id(id)
+                .email(email)
+                .name(name)
+                .lastLogin(lastLogin)
+                .build();
+    }
+
+
     /**
      * 이메일을 변경합니다.
      *

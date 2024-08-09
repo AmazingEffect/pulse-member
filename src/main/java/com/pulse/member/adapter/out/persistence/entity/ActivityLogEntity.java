@@ -39,7 +39,7 @@ public class ActivityLogEntity extends BaseEntity {
         return Objects.hashCode(getId());
     }
 
-    // 로그아웃 생성자
+    // factory method
     public static ActivityLogEntity of(Long id, String action) {
         return ActivityLogEntity.builder()
                 .memberEntity(MemberEntity.of(id))

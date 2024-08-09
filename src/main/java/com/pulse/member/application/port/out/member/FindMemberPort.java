@@ -6,7 +6,7 @@ public interface FindMemberPort {
 
     Member findMemberById(Member member);
 
-    Member findMemberByEmail(Member member);
+    Member findMemberByEmail(String email);
 
     Member findMemberById(Long memberId);
 

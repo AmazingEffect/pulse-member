@@ -88,10 +88,11 @@ public class AuthService implements AuthUseCase {
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
         String email = userDetails.getEmail();
         member.changeEmail(email);
-        Member findMember = findMemberPort.findMemberByEmail(member);
+        // todo: 여기서 stackOverflow 에러
+        Member findMember = findMemberPort.findMemberByEmail(email);
 
         // 4. JWT refresh 토큰을 생성하고 저장
-        RefreshToken refreshToken = RefreshToken.of(member, refreshTokenDurationMinutes);
+        RefreshToken refreshToken = RefreshToken.of(findMember, refreshTokenDurationMinutes);
         RefreshToken savedRefreshToken = createRefreshTokenPort.createRefreshToken(refreshToken);
 
         // 5. JWT 도메인을 생성하고 조회해온 회원 도메인에 저장
@@ -99,7 +100,7 @@ public class AuthService implements AuthUseCase {
         findMember.changeMemberInsideJwt(jwt);
 
         // 6. 활동 로그 저장 이벤트를 발행하고 JWT 토큰 발급 응답 DTO 반환
-        eventPublisher.publishEvent(ActivityLogEvent.of(member.getId(), LOGIN));
+        eventPublisher.publishEvent(ActivityLogEvent.of(findMember.getId(), LOGIN));
         return jwtMapper.domainToResponseDTO(jwt);
     }
 
@@ -153,7 +154,7 @@ public class AuthService implements AuthUseCase {
             member.changeEmail(email);
 
             // 2-2. 회원 조회 후 RefreshToken 삭제
-            Member findMember = findMemberPort.findMemberByEmail(member);
+            Member findMember = findMemberPort.findMemberByEmail(member.getEmail());
             deleteRefreshTokenPort.deleteRefreshToken(findMember);
 
             // 2-3. SecurityContext에서 인증 정보 삭제
