@@ -1,8 +1,8 @@
 package com.pulse.member.adapter.in.event;
 
 import com.pulse.member.adapter.out.event.outbox.OutboxEvent;
+import com.pulse.member.application.port.in.kafka.KafkaProducerUseCase;
 import com.pulse.member.application.port.in.outbox.MemberOutboxUseCase;
-import com.pulse.member.application.service.KafkaProducerService;
 import io.opentelemetry.api.GlobalOpenTelemetry;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.Tracer;
@@ -21,7 +21,7 @@ import org.springframework.transaction.event.TransactionalEventListener;
 public class MemberOutboxEventListener {
 
     private final MemberOutboxUseCase memberOutboxUseCase;
-    private final KafkaProducerService kafkaProducerService;
+    private final KafkaProducerUseCase kafkaProducerUseCase;
     private final Tracer tracer = GlobalOpenTelemetry.getTracer("outbox-event-listener");
 
 
@@ -68,7 +68,7 @@ public class MemberOutboxEventListener {
                 String topic = memberOutboxUseCase.getKafkaTopic(event);
 
                 // 2-2. 추출한 토픽에 Kafka 메시지를 전송합니다.
-                kafkaProducerService.sendWithRetry(topic, String.valueOf(message), context);
+                kafkaProducerUseCase.sendWithRetry(topic, String.valueOf(message), context);
 
                 // 2-3. Outbox 이벤트를 처리 대기 상태로 변경합니다.
                 memberOutboxUseCase.markOutboxEventPending(event);

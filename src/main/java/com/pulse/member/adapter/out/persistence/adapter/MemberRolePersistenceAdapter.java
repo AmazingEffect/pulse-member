@@ -1,4 +1,4 @@
-package com.pulse.member.adapter.out.persistence;
+package com.pulse.member.adapter.out.persistence.adapter;
 
 import com.pulse.member.adapter.out.persistence.entity.MemberEntity;
 import com.pulse.member.adapter.out.persistence.entity.MemberRoleEntity;
