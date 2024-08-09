@@ -45,7 +45,11 @@ public enum ErrorCode {
 
     // outbox errors
     OUTBOX_STATUS_NOT_FOUND("MEM001", "Outbox status not found"),
-    OUTBOX_PROCESSED_AT_NOT_FOUND("MEM001", "Outbox processedAt not found");
+    OUTBOX_PROCESSED_AT_NOT_FOUND("MEM001", "Outbox processedAt not found"),
+    REFRESH_TOKEN_EXPIRATION_DATE_NOT_FOUND("MEM001", "Refresh token expiration date not found"),
+    REFRESH_TOKEN_NOT_EXIST("MEM001", "Refresh token not exist"),
+
+    ;
 
     private final String code;
     private final String message;
