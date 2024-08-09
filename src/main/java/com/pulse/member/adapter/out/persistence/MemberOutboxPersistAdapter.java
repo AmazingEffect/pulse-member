@@ -5,6 +5,8 @@ import com.pulse.member.adapter.out.persistence.repository.MemberOutboxRepositor
 import com.pulse.member.application.port.out.outbox.CreateMemberOutboxPort;
 import com.pulse.member.application.port.out.outbox.FindMemberOutboxPort;
 import com.pulse.member.domain.MemberOutbox;
+import com.pulse.member.exception.ErrorCode;
+import com.pulse.member.exception.MemberException;
 import com.pulse.member.mapper.MemberOutboxMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -39,7 +41,7 @@ public class MemberOutboxPersistAdapter implements FindMemberOutboxPort, CreateM
     @Override
     public MemberOutbox findMemberOutboxBy(Long payload, String eventType) {
         MemberOutboxEntity entity = memberOutboxRepository.findByPayloadAndEventType(payload, eventType)
-                .orElseThrow(() -> new IllegalArgumentException("MemberOutbox not found"));
+                .orElseThrow(() -> new MemberException(ErrorCode.Not_FOUND_MEMBER_OUTBOX));
         return memberOutboxMapper.entityToDomain(entity);
     }
 

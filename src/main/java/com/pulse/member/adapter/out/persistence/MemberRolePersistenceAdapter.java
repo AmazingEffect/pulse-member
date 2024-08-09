@@ -6,7 +6,6 @@ import com.pulse.member.adapter.out.persistence.entity.RoleEntity;
 import com.pulse.member.adapter.out.persistence.repository.MemberRoleRepository;
 import com.pulse.member.application.port.out.role.map.CreateMemberRolePort;
 import com.pulse.member.domain.Member;
-import com.pulse.member.domain.MemberRole;
 import com.pulse.member.domain.Role;
 import com.pulse.member.exception.ErrorCode;
 import com.pulse.member.exception.MemberException;
@@ -38,7 +37,7 @@ public class MemberRolePersistenceAdapter implements CreateMemberRolePort {
      * @apiNote MemberRole 생성
      */
     @Override
-    public MemberRole createMemberRole(Member savedMember, Role findRole) {
+    public Long createMemberRole(Member savedMember, Role findRole) {
         // 1. 도메인을 엔티티로 변환
         MemberEntity memberEntity = memberMapper.toEntity(savedMember);
         RoleEntity roleEntity = roleMapper.toEntity(findRole);
@@ -51,7 +50,9 @@ public class MemberRolePersistenceAdapter implements CreateMemberRolePort {
         MemberRoleEntity memberRoleEntity = MemberRoleEntity.of(memberEntity, roleEntity);
 
         // 4. MemberRole 엔티티를 저장하고 저장된 엔티티를 도메인으로 변환하여 반환
-        return memberRoleMapper.entityToDto(memberRoleRepository.save(memberRoleEntity));
+        MemberRoleEntity savedMemberRoleEntity = memberRoleRepository.save(memberRoleEntity);
+
+        return savedMemberRoleEntity.getId();
     }
 
 

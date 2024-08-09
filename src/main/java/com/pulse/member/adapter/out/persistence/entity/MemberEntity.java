@@ -67,9 +67,6 @@ public class MemberEntity extends BaseEntity {
     @Column(name = "last_login")
     private LocalDateTime lastLogin;  // 마지막 로그인 시간
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "memberEntity", orphanRemoval = true, cascade = CascadeType.ALL)
-    private Set<MemberRoleEntity> roles;    // 회원 역할
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

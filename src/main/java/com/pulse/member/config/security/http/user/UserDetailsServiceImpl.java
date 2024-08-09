@@ -24,7 +24,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         log.info("UserDetailsServiceImpl.loadUserByUsername() - email: {}", email);
 
         // 1. 이메일을 기반으로 사용자 로드
-        MemberEntity memberEntity = memberRepository.findByEmailWithRoles(email)
+        MemberEntity memberEntity = memberRepository.findMemberEntityByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("회원의 이메일을 찾을 수 없습니다. : " + email));
 
         // 2. UserDetailsImpl 객체 반환

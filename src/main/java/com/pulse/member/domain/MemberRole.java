@@ -12,7 +12,7 @@ import lombok.*;
 public class MemberRole {
 
     private Long id;
-    private Member memberEntity;
+    private Member member;
     private Role role;
 
 }

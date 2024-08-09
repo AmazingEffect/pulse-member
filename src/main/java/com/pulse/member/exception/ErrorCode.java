@@ -36,9 +36,10 @@ public enum ErrorCode {
 
     // adapter entity errors
     MEMBER_ENTITY_NOT_FOUND("MEM001", "Member entity not found"),
-    ROLE_ENTITY_NOT_FOUND("MEM002", "Role entity not found")
+    ROLE_ENTITY_NOT_FOUND("MEM002", "Role entity not found"),
 
-    ;
+    MEMBER_REQUIRED_VALUE("MEM001", "Member required value"),
+    Not_FOUND_MEMBER_OUTBOX("MEM001", "Not found member outbox");
 
     private final String code;
     private final String message;

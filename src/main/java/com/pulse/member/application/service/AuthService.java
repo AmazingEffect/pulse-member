@@ -127,7 +127,7 @@ public class AuthService implements AuthUseCase {
         Role findRole = findRolePort.findRoleByName(role);
 
         // 5. 회원 권한을 저장한다. (회원과 역할의 map 테이블에 저장)
-        MemberRole memberRole = createMemberRolePort.createMemberRole(savedMember, findRole);
+        Long savedMemberRoleId = createMemberRolePort.createMemberRole(savedMember, findRole);
 
         // 6. MemberCreateEvent 발행하고 회원가입 응답 DTO 반환
         eventPublisher.publishEvent(new MemberCreateEvent(savedMember.getId()));

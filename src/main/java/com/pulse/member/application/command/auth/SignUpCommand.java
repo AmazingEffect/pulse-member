@@ -22,6 +22,7 @@ public class SignUpCommand {
     private String phoneNumber;      // 전화번호
     private LocalDateTime birthDate; // 생년월일
     private String gender;           // 성별
+    private String statusMessage;    // 상태 메시지
 
 
     // factory method
@@ -35,6 +36,7 @@ public class SignUpCommand {
                 .phoneNumber(requestDTO.getPhoneNumber())
                 .birthDate(requestDTO.getBirthDate())
                 .gender(requestDTO.getGender())
+                .statusMessage(requestDTO.getStatusMessage())
                 .build();
     }
 

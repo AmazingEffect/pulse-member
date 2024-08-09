@@ -34,7 +34,7 @@ public class RolePersistenceAdapter implements CreateRolePort, FindRolePort, Del
     public Role createRole(String roleCode) {
         RoleEntity roleEntity = RoleEntity.of(roleCode);
         RoleEntity savedRoleEntity = roleRepository.save(roleEntity);
-        return roleMapper.toDomain(savedRoleEntity);
+        return roleMapper.entityToDomain(savedRoleEntity);
     }
 
 
@@ -85,7 +85,7 @@ public class RolePersistenceAdapter implements CreateRolePort, FindRolePort, Del
         RoleEntity roleEntity = roleRepository.findByName(role.getName())
                 .orElseThrow(() -> new MemberException(ErrorCode.INVALID_ROLE_NAME));
 
-        return roleMapper.entityToDTO(roleEntity);
+        return roleMapper.entityToDomain(roleEntity);
     }
 
 
@@ -99,7 +99,7 @@ public class RolePersistenceAdapter implements CreateRolePort, FindRolePort, Del
     public Role updateRole(Role role) {
         RoleEntity roleEntity = roleMapper.toEntity(role);
         RoleEntity savedRoleEntity = roleRepository.save(roleEntity);
-        return roleMapper.toDomain(savedRoleEntity);
+        return roleMapper.entityToDomain(savedRoleEntity);
     }
 
 }

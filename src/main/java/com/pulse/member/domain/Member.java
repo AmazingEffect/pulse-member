@@ -1,5 +1,7 @@
 package com.pulse.member.domain;
 
+import com.pulse.member.exception.ErrorCode;
+import com.pulse.member.exception.MemberException;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -30,7 +32,6 @@ public class Member {
     private String accountStatus;  // 계정 상태 (예: 활성화, 비활성화, 정지 등)
     private LocalDateTime joinedDate; // 가입일
     private LocalDateTime lastLogin;  // 마지막 로그인 시간
-    private Set<MemberRole> roles;    // 회원 역할
     private Jwt jwt;                  // JWT Object 객체
 
     // factory method
@@ -87,7 +88,7 @@ public class Member {
     public void validMember() {
         // 회원 가입시 필수 값 체크
         if (email == null || password == null || name == null) {
-            throw new IllegalArgumentException("회원 가입시 필수 값이 누락되었습니다.");
+            throw new MemberException(ErrorCode.MEMBER_REQUIRED_VALUE);
         }
     }
 

@@ -1,6 +1,5 @@
 package com.pulse.member.mapper;
 
-
 import com.pulse.member.adapter.in.web.dto.request.SignOutRequestDTO;
 import com.pulse.member.adapter.in.web.dto.response.MemberResponseDTO;
 import com.pulse.member.adapter.out.persistence.entity.MemberEntity;
@@ -17,7 +16,11 @@ import org.mapstruct.ReportingPolicy;
  * componentModel="spring"을 통해서 spring container에 Bean으로 등록 해 준다. (외부에서 주입받아서 사용하면 된다.)
  * unmappedTargetPolicy IGNORE 만약, target class에 매핑되지 않는 필드가 있으면, null로 넣게 되고, 따로 report하지 않는다.
  */
-@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
+@Mapper(
+        componentModel = "spring",
+        unmappedTargetPolicy = ReportingPolicy.IGNORE,
+        uses = {MemberRoleMapper.class} // MemberRoleMapper를 사용한다.
+)
 public interface MemberMapper {
 
     MemberProto.MemberRetrieveResponse toProto(Member member);
@@ -32,9 +35,6 @@ public interface MemberMapper {
     Member toDomain(SignOutRequestDTO logoutRequest);
 
     // MemberEntity 엔티티를 DTO로 변환
-    @Mapping(target = "email", source = "email")
-    @Mapping(target = "name", source = "name")
-    @Mapping(target = "lastLogin", source = "lastLogin")
     Member toDomain(MemberEntity memberEntity);
 
     // 로그인 요청 Command를 도메인으로 변환
