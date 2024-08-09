@@ -28,9 +28,6 @@ public class RefreshTokenService implements CreateRefreshTokenUseCase, FindRefre
     @Value("${jwt.refreshTokenDurationMinutes}")
     private long refreshTokenDurationMinutes;
 
-    private final MemberMapper memberMapper;
-    private final RefreshTokenMapper refreshTokenMapper;
-
     private final CreateRefreshTokenPort createRefreshTokenPort;
     private final FindRefreshTokenPort findRefreshTokenPort;
     private final UpdateRefreshTokenPort updateRefreshTokenPort;

@@ -11,6 +11,9 @@ import com.pulse.member.application.command.auth.SignUpCommand;
 import com.pulse.member.application.port.in.auth.AuthUseCase;
 import com.pulse.member.application.port.out.member.CreateMemberPort;
 import com.pulse.member.application.port.out.member.FindMemberPort;
+import com.pulse.member.application.port.out.refreshtoken.CreateRefreshTokenPort;
+import com.pulse.member.application.port.out.refreshtoken.DeleteRefreshTokenPort;
+import com.pulse.member.application.port.out.refreshtoken.FindRefreshTokenPort;
 import com.pulse.member.application.port.out.role.FindRolePort;
 import com.pulse.member.application.port.out.role.map.CreateMemberRolePort;
 import com.pulse.member.config.jwt.JwtTokenProvider;
@@ -19,6 +22,7 @@ import com.pulse.member.domain.*;
 import com.pulse.member.mapper.JwtMapper;
 import com.pulse.member.mapper.MemberMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -35,19 +39,20 @@ import static com.pulse.member.util.Constant.*;
 /**
  * 회원 인증 관련 비즈니스 로직을 처리하는 서비스 클래스
  * 회원 인증, JWT 관련 로직을 처리합니다.
+ * Auth service는 member와
  */
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 @Service
 public class AuthService implements AuthUseCase {
 
-    private final MemberService memberService;
-    private final RefreshTokenService refreshTokenService;
-
     private final CreateMemberPort createMemberPort;
-    private final FindRolePort findRolePort;
+    private final CreateRefreshTokenPort createRefreshTokenPort;
     private final CreateMemberRolePort createMemberRolePort;
     private final FindMemberPort findMemberPort;
+    private final FindRefreshTokenPort findRefreshTokenPort;
+    private final FindRolePort findRolePort;
+    private final DeleteRefreshTokenPort deleteRefreshTokenPort;
 
     private final ApplicationEventPublisher eventPublisher;
     private final PasswordEncoder passwordEncoder;
@@ -56,6 +61,9 @@ public class AuthService implements AuthUseCase {
 
     private final MemberMapper memberMapper;
     private final JwtMapper jwtMapper;
+
+    @Value("${jwt.refreshTokenDurationMinutes}")
+    private long refreshTokenDurationMinutes;
 
 
     /**
@@ -80,14 +88,15 @@ public class AuthService implements AuthUseCase {
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
         String email = userDetails.getEmail();
         member.changeEmail(email);
-        Member findMember = memberService.findMemberByEmail(member);
+        Member findMember = findMemberPort.findMemberByEmail(member);
 
         // 4. JWT refresh 토큰을 생성하고 저장
-        RefreshToken refreshToken = refreshTokenService.createRefreshToken(findMember);
+        RefreshToken refreshToken = RefreshToken.of(member, refreshTokenDurationMinutes);
+        RefreshToken savedRefreshToken = createRefreshTokenPort.createRefreshToken(refreshToken);
 
-        // 5. JWT 도메인을 생성하고 회원 도메인에 저장
-        Jwt jwt = createJwtResponseDomain(accessToken, refreshToken, email, userDetails);
-        findMember.changeJwt(jwt);
+        // 5. JWT 도메인을 생성하고 조회해온 회원 도메인에 저장
+        Jwt jwt = Jwt.of(accessToken, savedRefreshToken.getToken(), email, userDetails.getAuthorities());
+        findMember.changeMemberInsideJwt(jwt);
 
         // 6. 활동 로그 저장 이벤트를 발행하고 JWT 토큰 발급 응답 DTO 반환
         eventPublisher.publishEvent(ActivityLogEvent.of(member.getId(), LOGIN));
@@ -145,7 +154,7 @@ public class AuthService implements AuthUseCase {
 
             // 2-2. 회원 조회 후 RefreshToken 삭제
             Member findMember = findMemberPort.findMemberByEmail(member);
-            refreshTokenService.deleteRefreshToken(findMember);
+            deleteRefreshTokenPort.deleteRefreshToken(findMember);
 
             // 2-3. SecurityContext에서 인증 정보 삭제
             SecurityContextHolder.clearContext();
@@ -169,7 +178,7 @@ public class AuthService implements AuthUseCase {
     public JwtResponseDTO reIssueRefreshToken(Map<String, String> request) {
         // 1. refresh 토큰을 조회하고 만료 여부를 확인
         String requestRefreshToken = request.get(REFRESH_TOKEN);
-        RefreshToken findRefreshToken = refreshTokenService.findRefreshToken(RefreshToken.of(requestRefreshToken));
+        RefreshToken findRefreshToken = findRefreshTokenPort.findRefreshToken(RefreshToken.of(requestRefreshToken));
         findRefreshToken.verifyTokenExpiration();
 
         // 2. access 토큰 재발급
@@ -194,37 +203,24 @@ public class AuthService implements AuthUseCase {
     /**
      * @param member 로그인 요청 도메인
      * @return 생성된 Authentication 객체
-     * @apiNote 로그인 요청을 처리하기 위해 Authentication 객체를 생성하는 메서드
-     */
-    private Authentication createAuthenticationFrom(Member member) {
-        return authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(member.getEmail(), member.getPassword())
-        );
-    }
-
-
-    /**
-     * @param accessToken  JWT access 토큰
-     * @param refreshToken JWT refresh 토큰
-     * @param email        이메일
-     * @param userDetails  UserDetailsImpl
-     * @return JWT 토큰 발급 응답 DTO
-     * @apiNote JWT 토큰 발급 응답 DTO 생성
-     */
-    private Jwt createJwtResponseDomain(String accessToken, RefreshToken refreshToken, String email, UserDetailsImpl userDetails) {
-        return Jwt.of(accessToken, refreshToken.getToken(), email, userDetails.getAuthorities());
-    }
-
-
-    /**
-     * @param member 로그인 요청 도메인
-     * @return 생성된 Authentication 객체
      * @apiNote 로그인 요청을 처리하기 위해 Authentication 객체를 생성하고 SecurityContext에 저장하는 메서드
      */
     private Authentication getAuthentication(Member member) {
         Authentication authentication = createAuthenticationFrom(member);
         SecurityContextHolder.getContext().setAuthentication(authentication);
         return authentication;
+    }
+
+
+    /**
+     * @param member 로그인 요청 도메인
+     * @return 생성된 Authentication 객체
+     * @apiNote 로그인 요청을 처리하기 위해 Authentication 객체를 생성하는 메서드
+     */
+    private Authentication createAuthenticationFrom(Member member) {
+        return authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(member.getEmail(), member.getPassword())
+        );
     }
 
 }

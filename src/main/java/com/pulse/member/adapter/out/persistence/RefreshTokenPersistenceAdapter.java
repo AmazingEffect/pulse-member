@@ -1,6 +1,7 @@
 package com.pulse.member.adapter.out.persistence;
 
 import com.pulse.member.adapter.out.persistence.entity.MemberEntity;
+import com.pulse.member.adapter.out.persistence.entity.RefreshTokenEntity;
 import com.pulse.member.adapter.out.persistence.repository.RefreshTokenRepository;
 import com.pulse.member.application.port.out.refreshtoken.CreateRefreshTokenPort;
 import com.pulse.member.application.port.out.refreshtoken.DeleteRefreshTokenPort;
@@ -11,12 +12,13 @@ import com.pulse.member.domain.RefreshToken;
 import com.pulse.member.exception.ErrorCode;
 import com.pulse.member.exception.MemberException;
 import com.pulse.member.mapper.MemberMapper;
+import com.pulse.member.mapper.RefreshTokenMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 
 /**
- * RefreshTokenAdapter
+ * 리프레시 토큰 관련 비즈니스 로직을 처리하는 어댑터 클래스
  */
 @RequiredArgsConstructor
 @Component
@@ -24,58 +26,84 @@ public class RefreshTokenPersistenceAdapter implements CreateRefreshTokenPort, F
 
     private final RefreshTokenRepository refreshTokenRepository;
     private final MemberMapper memberMapper;
+    private final RefreshTokenMapper refreshTokenMapper;
 
 
     /**
-     * RefreshToken 생성
-     *
      * @param refreshToken RefreshToken
      * @return 생성된 RefreshToken
+     * @apiNote RefreshToken 생성
      */
     @Override
     public RefreshToken createRefreshToken(RefreshToken refreshToken) {
-        return null;
+        RefreshTokenEntity refreshTokenEntity = refreshTokenMapper.domainToEntity(refreshToken);
+        validRefreshTokenEntity(refreshTokenEntity);
+        // RefreshToken 생성 및 저장
+        RefreshTokenEntity savedRefreshTokenEntity = refreshTokenRepository.save(refreshTokenEntity);
+        return refreshTokenMapper.entityToDomain(savedRefreshTokenEntity);
     }
 
 
     /**
-     * RefreshToken 삭제
-     *
      * @param member 회원
      * @return 삭제 여부
+     * @apiNote RefreshToken 삭제
      */
     @Override
     public Boolean deleteRefreshToken(Member member) {
         MemberEntity memberEntity = memberMapper.toEntity(member);
-        if (ObjectUtils.isEmpty(memberEntity)) {
-            throw new MemberException(ErrorCode.DATA_NOT_FOUND);
-        }
+        validMemberEntity(memberEntity);
+        // 회원의 RefreshToken 삭제
         refreshTokenRepository.deleteByMemberEntity(memberEntity);
         return true;
     }
 
 
     /**
-     * RefreshToken 조회
-     *
      * @param refreshToken RefreshToken
      * @return 조회된 RefreshToken
+     * @apiNote RefreshToken 조회
      */
     @Override
     public RefreshToken findRefreshToken(RefreshToken refreshToken) {
+        RefreshTokenEntity refreshTokenEntity = refreshTokenMapper.domainToEntity(refreshToken);
+        validRefreshTokenEntity(refreshTokenEntity);
+
+        // 이메일을 통해 RefreshToken 조회
+        String email = refreshTokenEntity.getMemberEntity().getEmail();
+        RefreshTokenEntity findRefreshTokenEntity = refreshTokenRepository.findRefreshTokenEntityByMemberEntity_Email(email)
+                .orElseThrow(() -> new MemberException(ErrorCode.DATA_NOT_FOUND));
+
+        return refreshTokenMapper.entityToDomain(findRefreshTokenEntity);
+    }
+
+
+    /**
+     * @param refreshToken RefreshToken
+     * @return 갱신된 RefreshToken
+     * @apiNote RefreshToken 갱신
+     */
+    @Override
+    public RefreshToken updateRefreshToken(RefreshToken refreshToken) {
         return null;
     }
 
 
     /**
-     * RefreshToken 갱신
-     *
-     * @param refreshToken RefreshToken
-     * @return 갱신된 RefreshToken
+     * @param refreshTokenEntity RefreshTokenEntity
+     * @apiNote RefreshTokenEntity 유효성 검사
      */
-    @Override
-    public RefreshToken updateRefreshToken(RefreshToken refreshToken) {
-        return null;
+    private void validRefreshTokenEntity(RefreshTokenEntity refreshTokenEntity) {
+        if (ObjectUtils.isEmpty(refreshTokenEntity)) throw new MemberException(ErrorCode.DATA_NOT_FOUND);
+    }
+
+
+    /**
+     * @param memberEntity MemberEntity
+     * @apiNote MemberEntity 유효성 검사
+     */
+    private void validMemberEntity(MemberEntity memberEntity) {
+        if (ObjectUtils.isEmpty(memberEntity)) throw new MemberException(ErrorCode.DATA_NOT_FOUND);
     }
 
 }

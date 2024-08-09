@@ -56,7 +56,7 @@ public class Member {
      *
      * @param jwt JWT 객체
      */
-    public void changeJwt(Jwt jwt) {
+    public void changeMemberInsideJwt(Jwt jwt) {
         this.jwt = jwt;
     }
 
