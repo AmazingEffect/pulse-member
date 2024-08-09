@@ -3,9 +3,9 @@ package com.pulse.member.domain;
 import com.pulse.member.exception.ErrorCode;
 import com.pulse.member.exception.MemberException;
 import lombok.*;
+import org.springframework.util.ObjectUtils;
 
 import java.time.LocalDateTime;
-import java.util.Set;
 
 /**
  * 회원
@@ -59,6 +59,9 @@ public class Member {
      * @param email 이메일
      */
     public void changeEmail(String email) {
+        if (ObjectUtils.isEmpty(email)) {
+            throw new MemberException(ErrorCode.CHANGE_EMAIL_VALUE_NOT_FOUND);
+        }
         this.email = email;
     }
 
@@ -69,6 +72,9 @@ public class Member {
      * @param jwt JWT 객체
      */
     public void changeMemberInsideJwt(Jwt jwt) {
+        if (!ObjectUtils.isEmpty(this.jwt)) {
+            throw new MemberException(ErrorCode.MEMBER_JWT_ALREADY_EXIST);
+        }
         this.jwt = jwt;
     }
 
@@ -82,10 +88,11 @@ public class Member {
         this.password = encode;
     }
 
+
     /**
      * 회원 가입시 필수 값 체크
      */
-    public void validMember() {
+    public void validSignUpMemberData() {
         // 회원 가입시 필수 값 체크
         if (email == null || password == null || name == null) {
             throw new MemberException(ErrorCode.MEMBER_REQUIRED_VALUE);

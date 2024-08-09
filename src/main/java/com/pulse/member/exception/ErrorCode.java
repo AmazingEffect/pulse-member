@@ -39,7 +39,11 @@ public enum ErrorCode {
     ROLE_ENTITY_NOT_FOUND("MEM002", "Role entity not found"),
 
     MEMBER_REQUIRED_VALUE("MEM001", "Member required value"),
-    Not_FOUND_MEMBER_OUTBOX("MEM001", "Not found member outbox");
+    Not_FOUND_MEMBER_OUTBOX("MEM001", "Not found member outbox"),
+    CHANGE_EMAIL_VALUE_NOT_FOUND("MEM001", "Change email value is empty"),
+    MEMBER_JWT_ALREADY_EXIST("MEM001", "Member JWT already exist")
+
+    ;
 
     private final String code;
     private final String message;

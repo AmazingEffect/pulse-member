@@ -38,7 +38,7 @@ public class MemberService implements CreateMemberUseCase, FindMemberUseCase, Up
      */
     @Override
     public Member createMember(Member member) {
-        member.validMember();
+        member.validSignUpMemberData();
         return createMemberPort.createMember(member);
     }
 
