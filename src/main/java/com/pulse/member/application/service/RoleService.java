@@ -34,16 +34,10 @@ public class RoleService implements CreateRoleUseCase, FindRoleUseCase, UpdateRo
     @Transactional
     @Override
     public RoleResponseDTO createRole(CreateRoleCommand createRoleCommand) {
-        // 1. command를 도메인으로 변환
-        Role role = roleMapper.commandToDomain(createRoleCommand);
+        // 1. 권한 생성 및 저장
+        Role savedRole = createRolePort.createRole(createRoleCommand.getRoleName().getRoleCode());
 
-        // 2. 도메인 검증
-        role.validRole();
-
-        // 3. 권한 생성 및 저장
-        Role savedRole = createRolePort.createRole(role);
-
-        // 4. 저장된 권한을 responseDTO로 변환 후 반환
+        // 2. 저장된 권한을 responseDTO로 변환 후 반환
         return roleMapper.domainToResponseDTO(savedRole);
     }
 

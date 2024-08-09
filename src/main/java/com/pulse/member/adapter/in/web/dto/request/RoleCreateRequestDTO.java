@@ -12,6 +12,6 @@ import lombok.*;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class RoleCreateRequestDTO {
 
-    private RoleName roleName;
+    private String roleName;
 
 }

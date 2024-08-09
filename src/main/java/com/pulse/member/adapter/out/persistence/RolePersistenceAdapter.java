@@ -27,12 +27,12 @@ public class RolePersistenceAdapter implements CreateRolePort, FindRolePort, Del
     /**
      * 권한 생성
      *
-     * @param role Role
+     * @param roleCode 권한 코드
      * @return 생성된 권한
      */
     @Override
-    public Role createRole(Role role) {
-        RoleEntity roleEntity = roleMapper.toEntity(role);
+    public Role createRole(String roleCode) {
+        RoleEntity roleEntity = RoleEntity.of(roleCode);
         RoleEntity savedRoleEntity = roleRepository.save(roleEntity);
         return roleMapper.toDomain(savedRoleEntity);
     }

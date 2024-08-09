@@ -19,7 +19,7 @@ public class CreateRoleCommand {
     // factory method
     public static CreateRoleCommand of(RoleCreateRequestDTO requestDTO) {
         return CreateRoleCommand.builder()
-                .roleName(requestDTO.getRoleName())
+                .roleName(RoleName.of(requestDTO.getRoleName()))
                 .build();
     }
 

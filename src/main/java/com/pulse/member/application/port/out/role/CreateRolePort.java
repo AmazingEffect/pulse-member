@@ -4,6 +4,6 @@ import com.pulse.member.domain.Role;
 
 public interface CreateRolePort {
 
-    Role createRole(Role role);
+    Role createRole(String roleCode);
 
 }
