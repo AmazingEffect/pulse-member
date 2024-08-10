@@ -14,7 +14,7 @@ import java.util.concurrent.CompletableFuture;
  */
 @RequiredArgsConstructor
 @Component
-public class KafkaAdapter implements KafkaProducerPort {
+public class KafkaProducerAdapter implements KafkaProducerPort {
 
     private final KafkaTemplate<String, String> kafkaTemplate;
 

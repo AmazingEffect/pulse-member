@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 
 @RequiredArgsConstructor
 @Component
-public class MemberOutboxPersistAdapter implements FindMemberOutboxPort, CreateMemberOutboxPort {
+public class MemberOutboxPersistenceAdapter implements FindMemberOutboxPort, CreateMemberOutboxPort {
 
     private final MemberOutboxRepository memberOutboxRepository;
     private final MemberOutboxMapper memberOutboxMapper;
