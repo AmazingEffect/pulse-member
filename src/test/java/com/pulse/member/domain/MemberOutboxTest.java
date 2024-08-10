@@ -23,6 +23,8 @@ class MemberOutboxTest {
 
         // then
         Assertions.assertThat(memberOutbox.getStatus()).isEqualTo(MessageStatus.PROCESSED);
+
+        // test
     }
 
 
