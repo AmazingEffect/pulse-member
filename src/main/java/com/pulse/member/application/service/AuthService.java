@@ -90,7 +90,6 @@ public class AuthService implements AuthUseCase {
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
         String email = userDetails.getEmail();
         member.changeEmail(email);
-        // todo: 여기서 stackOverflow 에러
         Member findMember = findMemberPort.findMemberByEmail(email);
 
         // 4. JWT refresh 토큰을 생성하고 저장

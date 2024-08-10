@@ -24,7 +24,7 @@ import net.devh.boot.grpc.server.service.GrpcService;
 @Slf4j
 @RequiredArgsConstructor
 @GrpcService
-public class MemberServiceGrpcImpl extends MemberServiceGrpc.MemberServiceImplBase {
+public class MemberGrpcServiceAdapter extends MemberServiceGrpc.MemberServiceImplBase {
 
     private final FindMemberUseCase memberUseCase;
     private final MemberMapper memberMapper;
