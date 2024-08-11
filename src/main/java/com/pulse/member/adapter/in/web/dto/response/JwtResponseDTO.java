@@ -27,4 +27,8 @@ public class JwtResponseDTO {
         return new JwtResponseDTO(accessToken, refreshToken, email, null);
     }
 
+    public static JwtResponseDTO of(String accessToken, String refreshToken) {
+        return new JwtResponseDTO(accessToken, refreshToken, null, null);
+    }
+
 }

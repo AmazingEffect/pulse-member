@@ -5,6 +5,7 @@ import com.pulse.member.adapter.in.web.dto.response.MemberResponseDTO;
 import com.pulse.member.adapter.out.event.ActivityLogEvent;
 import com.pulse.member.adapter.out.event.MemberCreateEvent;
 import com.pulse.member.adapter.out.persistence.entity.constant.RoleName;
+import com.pulse.member.application.command.auth.ReIssueAccessTokenCommand;
 import com.pulse.member.application.command.auth.SignInCommand;
 import com.pulse.member.application.command.auth.SignOutCommand;
 import com.pulse.member.application.command.auth.SignUpCommand;
@@ -171,34 +172,27 @@ public class AuthService implements AuthUseCase {
 
 
     /**
-     * @param request 요청 파라미터
+     * @param reIssueAccessTokenCommand JWT 토큰 갱신 요청 커맨드
      * @return 갱신된 JWT 토큰
      * @apiNote JWT 토큰 갱신 요청을 처리하는 메서드
      */
     @Transactional
     @Override
-    public JwtResponseDTO reIssueRefreshToken(Map<String, String> request) {
+    public JwtResponseDTO reIssueAccessToken(ReIssueAccessTokenCommand reIssueAccessTokenCommand) {
         // 1. refresh 토큰을 조회
-        String requestRefreshToken = request.get(REFRESH_TOKEN);
-        RefreshToken findRefreshToken = findRefreshTokenPort.findRefreshToken(RefreshToken.of(requestRefreshToken));
+        RefreshToken findRefreshToken = getRefreshToken(reIssueAccessTokenCommand);
 
         // 2. refresh 토큰의 유효성 검증 (회원 정보, 만료 날짜 존재여부, 만료 기간 확인)
         findRefreshToken.validRefreshToken();
 
         // 3. refresh 토큰의 유효성이 통과되었다면 새로운 access 토큰을 생성
-        String email = findRefreshToken.getMember().getEmail();
-        Authentication authenticationToken = new UsernamePasswordAuthenticationToken(email, null, null);
-        String newAccessToken = jwtTokenProvider.generateAccessToken(authenticationToken);
+        String newAccessToken = jwtTokenProvider.regenerateAccessToken();
 
-        // 4. SecurityContextHolder에 새로운 인증 정보를 설정
-        // todo: 여기서 authorities가 null일것같은데 get하면 NPE 발생하지 않나?
-        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-        JwtResponseDTO jwtResponseDTO = JwtResponseDTO.of(newAccessToken, requestRefreshToken, email);
-//        JwtResponseDTO jwtResponseDTO = JwtResponseDTO.of(newAccessToken, requestRefreshToken, email, authenticationToken.getAuthorities());
-
-        // 5. 활동 로그 저장 이벤트 발행
+        // 4. 활동 로그 저장 이벤트 발행
         eventPublisher.publishEvent(ActivityLogEvent.of(findRefreshToken.getMember().getId(), REISSUE_REFRESH_TOKEN));
-        return jwtResponseDTO;
+
+        // 5. 갱신된 JWT 토큰 정보를 DTO에 담아 반환
+        return JwtResponseDTO.of(newAccessToken, findRefreshToken.getToken());
     }
 
 
@@ -208,8 +202,13 @@ public class AuthService implements AuthUseCase {
      * @apiNote 로그인 요청을 처리하기 위해 Authentication 객체를 생성하고 SecurityContext에 저장하는 메서드
      */
     private Authentication getAuthentication(Member member) {
+        // 1. 시큐리티를 활용하여 회원을 조회하고 인증 정보를 생성한다.
         Authentication authentication = createAuthenticationFrom(member);
+
+        // 2. SecurityContext에 인증 정보를 저장한다.
         SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        // 3. SecurityContext에 저장된 인증 정보를 반환한다.
         return authentication;
     }
 
@@ -218,11 +217,26 @@ public class AuthService implements AuthUseCase {
      * @param member 로그인 요청 도메인
      * @return 생성된 Authentication 객체
      * @apiNote 로그인 요청을 처리하기 위해 Authentication 객체를 생성하는 메서드
+     * authenticate 메서드가 호출되면 UserDetailsServiceImpl의 loadUserByUsername 메서드가 호출된다.
+     * UserDetailsServiceImpl은 UserDetailsService 인터페이스를 구현한 클래스이다. (클래스를 검색해보자)
+     * 즉, 여기서 DB에서 회원 정보를 가져와서 UserDetails 객체를 생성하고 반환한다. (클래스를 검색해보자)
      */
     private Authentication createAuthenticationFrom(Member member) {
+        // 1. 회원 정보를 기반으로 인증 정보를 생성한다.
         return authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(member.getEmail(), member.getPassword())
         );
+    }
+
+
+    /**
+     * @param reIssueAccessTokenCommand JWT 토큰 갱신 요청 커맨드
+     * @return 조회된 refresh 토큰
+     * @apiNote refresh 토큰을 조회하는 메서드
+     */
+    private RefreshToken getRefreshToken(ReIssueAccessTokenCommand reIssueAccessTokenCommand) {
+        RefreshToken refreshToken = RefreshToken.of(reIssueAccessTokenCommand.getRefreshToken());
+        return findRefreshTokenPort.findRefreshToken(refreshToken);
     }
 
 }
