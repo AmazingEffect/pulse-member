@@ -1,24 +1,23 @@
 package com.pulse.member.adapter.in.web;
 
 import com.pulse.member.adapter.in.web.dto.request.MemberSignUpRequestDTO;
+import com.pulse.member.adapter.in.web.dto.request.ReIssueAccessTokenDTO;
 import com.pulse.member.adapter.in.web.dto.request.SignInRequestDTO;
 import com.pulse.member.adapter.in.web.dto.request.SignOutRequestDTO;
-import com.pulse.member.adapter.in.web.dto.response.api.ApiResponse;
 import com.pulse.member.adapter.in.web.dto.response.JwtResponseDTO;
 import com.pulse.member.adapter.in.web.dto.response.MemberResponseDTO;
+import com.pulse.member.adapter.in.web.dto.response.api.ApiResponse;
+import com.pulse.member.application.command.auth.ReIssueAccessTokenCommand;
 import com.pulse.member.application.command.auth.SignInCommand;
 import com.pulse.member.application.command.auth.SignOutCommand;
 import com.pulse.member.application.command.auth.SignUpCommand;
 import com.pulse.member.application.port.in.auth.AuthUseCase;
-import com.pulse.member.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.Map;
 
 /**
  * 회원 인증 관련 API 컨트롤러
@@ -77,15 +76,16 @@ public class AuthController {
 
 
     /**
-     * @param request Refresh Token 요청 DTO
+     * @param reIssueAccessTokenDTO Jwt access token 재발급 요청 DTO
      * @return JWT 토큰 응답 DTO
      * @apiNote Refresh Token을 이용하여 새로운 JWT 토큰을 발급합니다.
      */
     @PostMapping("/refreshToken")
-    public ResponseEntity<ApiResponse<JwtResponseDTO>> reIssueRefreshToken(
-            @RequestBody Map<String, String> request
+    public ResponseEntity<ApiResponse<JwtResponseDTO>> reIssueAccessToken(
+            @RequestBody ReIssueAccessTokenDTO reIssueAccessTokenDTO
     ) {
-        JwtResponseDTO responseDTO = authUseCase.reIssueRefreshToken(request);
+        ReIssueAccessTokenCommand reIssueAccessTokenCommand = ReIssueAccessTokenCommand.of(reIssueAccessTokenDTO);
+        JwtResponseDTO responseDTO = authUseCase.reIssueAccessToken(reIssueAccessTokenCommand);
         return ResponseEntity.ok(ApiResponse.success(responseDTO));
     }
 
