@@ -80,7 +80,7 @@ public class AuthController {
      * @return JWT 토큰 응답 DTO
      * @apiNote Refresh Token을 이용하여 새로운 JWT 토큰을 발급합니다.
      */
-    @PostMapping("/refreshToken")
+    @PostMapping("/reIssueAccessToken")
     public ResponseEntity<ApiResponse<JwtResponseDTO>> reIssueAccessToken(
             @RequestBody ReIssueAccessTokenDTO reIssueAccessTokenDTO
     ) {
