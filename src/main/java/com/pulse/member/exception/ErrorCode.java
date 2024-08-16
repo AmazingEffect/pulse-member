@@ -38,10 +38,14 @@ public enum ErrorCode {
     MEMBER_ENTITY_NOT_FOUND("MEM001", "Member entity not found"),
     ROLE_ENTITY_NOT_FOUND("MEM002", "Role entity not found"),
 
+    // member errors
     MEMBER_REQUIRED_VALUE("MEM001", "Member required value"),
     Not_FOUND_MEMBER_OUTBOX("MEM001", "Not found member outbox"),
     CHANGE_EMAIL_VALUE_NOT_FOUND("MEM001", "Change email value is empty"),
     MEMBER_JWT_ALREADY_EXIST("MEM001", "Member JWT already exist"),
+    MEMBER_EMAIL_NOT_MATCH("MEM008", "Member email not match"),
+    MEMBER_INNER_EMAIL_NOT_FOUND("MEM009", "Member inner email not found"),
+    MEMBER_EMAIL_PARAM_NOT_FOUND("MEM010", "Member email param not found"),
 
     // outbox errors
     OUTBOX_STATUS_NOT_FOUND("MEM001", "Outbox status not found"),

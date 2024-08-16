@@ -99,4 +99,37 @@ public class Member {
         }
     }
 
+
+    /**
+     * @param email 이메일
+     * @return 이메일이 같으면 true, 다르면 false
+     * @apiNote 로그아웃시 token 내부의 이메일과 요청을 보낸 이메일이 같은지 확인
+     */
+    public boolean isSameEmail(String email) {
+        if (ObjectUtils.isEmpty(email)) {
+            throw new MemberException(ErrorCode.MEMBER_EMAIL_PARAM_NOT_FOUND);
+        }
+
+        if (ObjectUtils.isEmpty(this.email)) {
+            throw new MemberException(ErrorCode.MEMBER_INNER_EMAIL_NOT_FOUND);
+        }
+
+        if (isNotSameEmail(email)) {
+            throw new MemberException(ErrorCode.MEMBER_EMAIL_NOT_MATCH);
+        }
+
+        // 같은 이메일이면 true
+        return true;
+    }
+
+
+    /**
+     * @param email 이메일
+     * @return 이메일이 같으면 false, 다르면 true
+     * @apiNote 이메일이 같은지 확인
+     */
+    private boolean isNotSameEmail(String email) {
+        return !this.email.equals(email);
+    }
+
 }
