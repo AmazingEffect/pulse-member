@@ -41,6 +41,7 @@ public class AuthController {
     ) {
         SignInCommand signInCommand = SignInCommand.of(signInRequestDTO);
         JwtResponseDTO responseDTO = authUseCase.signInAndPublishJwt(signInCommand);
+
         return ResponseEntity.ok(ApiResponse.success(responseDTO));
     }
 
@@ -56,6 +57,7 @@ public class AuthController {
     ) {
         SignUpCommand signUpCommand = SignUpCommand.of(signUpRequestDTO);
         MemberResponseDTO responseDTO = authUseCase.signUp(signUpCommand);
+
         return ResponseEntity.ok(ApiResponse.success(responseDTO));
     }
 
@@ -71,6 +73,7 @@ public class AuthController {
     ) {
         SignOutCommand signOutCommand = SignOutCommand.of(signOutRequestDTO);
         Long response = authUseCase.signOut(signOutCommand);
+
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
@@ -86,6 +89,7 @@ public class AuthController {
     ) {
         ReIssueAccessTokenCommand reIssueAccessTokenCommand = ReIssueAccessTokenCommand.of(reIssueAccessTokenDTO);
         JwtResponseDTO responseDTO = authUseCase.reIssueAccessToken(reIssueAccessTokenCommand);
+
         return ResponseEntity.ok(ApiResponse.success(responseDTO));
     }
 

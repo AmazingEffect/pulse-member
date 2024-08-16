@@ -50,7 +50,7 @@ public class ApiResponse<T> {
 
         return new ApiResponse<>(
                 ResponseStatus.FAIL,
-                errorCode.getMessage(),
+                errorResponse.getMessage(),
                 null,
                 errorResponse
         );
@@ -76,7 +76,7 @@ public class ApiResponse<T> {
 
         return new ApiResponse<>(
                 ResponseStatus.FAIL,
-                errorCode.getMessage(),
+                errorResponse.getMessage(),
                 null,
                 errorResponse
         );

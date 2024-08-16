@@ -20,6 +20,7 @@ public class MemberEntity extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    // todo: EmbeddedId로 전환해보기 (1개만 key여도 사용하더라)
     private Long id;               // PK
 
     @Column(unique = true, nullable = false)
