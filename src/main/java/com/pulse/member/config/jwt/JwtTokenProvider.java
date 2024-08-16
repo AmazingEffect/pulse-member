@@ -1,6 +1,8 @@
 package com.pulse.member.config.jwt;
 
 import com.pulse.member.config.security.http.user.UserDetailsImpl;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -14,6 +16,7 @@ import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
 import java.util.Collections;
 import java.util.Date;
 
@@ -49,23 +52,20 @@ public class JwtTokenProvider {
 
 
     /**
-     * @param authentication Authentication 객체
+     * @param email    사용자 이메일
+     * @param nickname 사용자 닉네임
      * @return 생성된 JWT Access 토큰
      * @apiNote JWT Access 토큰을 생성하는 메서드
      */
-    public String generateAccessToken(Authentication authentication) {
-        // 시큐리티 컨텍스트에서 인증 정보를 가져옴
-        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-
+    public String generateAccessToken(String email, String nickname) {
         // 시간 정보 생성
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + jwtExpirationMs);
 
         // JWT 토큰 생성
         return Jwts.builder()
-                .subject(userDetails.getEmail())
-                .claim("roles", userDetails.getAuthorities())
-                .claim("nickname", userDetails.getNickname())
+                .subject(email)
+                .claim("nickname", nickname)
                 .issuedAt(now)
                 .expiration(expiryDate)
                 .signWith(secretKey)
@@ -77,19 +77,15 @@ public class JwtTokenProvider {
      * @return 생성된 JWT Access 토큰
      * @apiNote JWT Access 토큰을 재발행하는 메서드
      */
-    public String regenerateAccessToken() {
-        // 시큐리티 컨텍스트에서 인증 정보를 가져옴
-        UserDetailsImpl userDetails = getUserDetails();
-
+    public String regenerateAccessToken(String email, String nickname) {
         // 시간 정보 생성
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + jwtExpirationMs);
 
         // JWT 토큰 생성
         return Jwts.builder()
-                .subject(userDetails.getEmail())
-                .claim("roles", userDetails.getAuthorities())
-                .claim("nickname", userDetails.getNickname())
+                .subject(email)
+                .claim("nickname", nickname)
                 .issuedAt(now)
                 .expiration(expiryDate)
                 .signWith(secretKey)
@@ -137,10 +133,26 @@ public class JwtTokenProvider {
      */
     public boolean validateJwtToken(String token) {
         try {
-            Jwts.parser()
+            // JWT 토큰 파싱
+            Claims claims = Jwts.parser()
                     .verifyWith(secretKey).build()
-                    .parseSignedClaims(token);
+                    .parseSignedClaims(token)
+                    .getPayload();
+
+            // 만료 시간 검증
+            Date expiration = claims.getExpiration();
+            if (expiration == null) {
+                throw new JwtException("JWT token does not have an expiration date.");
+            }
+
+            // 만료 시간이 현재 시간보다 이전인지 확인
+            if (expiration.before(Date.from(Instant.now()))) {
+                throw new ExpiredJwtException(null, claims, "JWT token is expired.");
+            }
+
             return true;
+        } catch (ExpiredJwtException e) {
+            log.error("JWT token is expired: {}", e.getMessage());
         } catch (JwtException e) {
             log.error("Invalid JWT token: {}", e.getMessage());
         }

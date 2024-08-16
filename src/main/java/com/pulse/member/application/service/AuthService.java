@@ -19,25 +19,23 @@ import com.pulse.member.application.port.out.role.FindRolePort;
 import com.pulse.member.application.port.out.role.map.CreateMemberRolePort;
 import com.pulse.member.config.jwt.JwtTokenProvider;
 import com.pulse.member.config.security.http.user.UserDetailsImpl;
-import com.pulse.member.domain.*;
-import com.pulse.member.exception.ErrorCode;
-import com.pulse.member.exception.MemberException;
+import com.pulse.member.domain.Jwt;
+import com.pulse.member.domain.Member;
+import com.pulse.member.domain.RefreshToken;
+import com.pulse.member.domain.Role;
 import com.pulse.member.mapper.JwtMapper;
 import com.pulse.member.mapper.MemberMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Map;
-
-import static com.pulse.member.util.Constant.*;
+import static com.pulse.member.util.Constant.LOGIN;
+import static com.pulse.member.util.Constant.LOGOUT;
 
 /**
  * 회원 인증 관련 비즈니스 로직을 처리하는 서비스 클래스
@@ -60,7 +58,6 @@ public class AuthService implements AuthUseCase {
     private final ApplicationEventPublisher eventPublisher;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
-    private final AuthenticationManager authenticationManager;
 
     private final MemberMapper memberMapper;
     private final JwtMapper jwtMapper;
@@ -73,7 +70,6 @@ public class AuthService implements AuthUseCase {
      * @param signInCommand 로그인 요청 도메인
      * @return JWT 토큰 발급 응답 DTO
      * @apiNote 로그인 요청을 처리하는 메서드
-     * todo: 이 한가지 메서드가 가진 역할과 책임이 좀 많은것같은데 어떻게 할까 고민이다.
      */
     @Transactional
     @Override
@@ -81,24 +77,18 @@ public class AuthService implements AuthUseCase {
         // 1. 로그인 요청 도메인을 생성
         Member member = memberMapper.commandToDomain(signInCommand);
 
-        // 2. authentication 객체를 생성하고 SecurityContext에 저장
-        Authentication authentication = getAuthentication(member);
+        // 2. db에서 회원 조회
+        Member findMember = findMemberPort.findMemberByEmail(member.getEmail());
 
         // 3. JWT access 토큰 생성
-        String accessToken = jwtTokenProvider.generateAccessToken(authentication);
-
-        // 3. 유저 도메인에 이메일을 저장하고 DB에서 조회
-        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-        String email = userDetails.getEmail();
-        member.changeEmail(email);
-        Member findMember = findMemberPort.findMemberByEmail(email);
+        String accessToken = jwtTokenProvider.generateAccessToken(findMember.getEmail(), findMember.getNickname());
 
         // 4. JWT refresh 토큰을 생성하고 저장
         RefreshToken refreshToken = RefreshToken.of(findMember, refreshTokenDurationMinutes);
         RefreshToken savedRefreshToken = createRefreshTokenPort.createRefreshToken(refreshToken);
 
         // 5. JWT 도메인을 생성하고 조회해온 회원 도메인에 저장
-        Jwt jwt = Jwt.of(accessToken, savedRefreshToken.getToken(), email, userDetails.getAuthorities());
+        Jwt jwt = Jwt.of(accessToken, savedRefreshToken.getToken(), findMember.getEmail());
         findMember.changeMemberInsideJwt(jwt);
 
         // 6. 활동 로그 저장 이벤트를 발행하고 JWT 토큰 발급 응답 DTO 반환
@@ -175,68 +165,29 @@ public class AuthService implements AuthUseCase {
      * @param reIssueAccessTokenCommand JWT 토큰 갱신 요청 커맨드
      * @return 갱신된 JWT 토큰
      * @apiNote JWT 토큰 갱신 요청을 처리하는 메서드
+     * 클라이언트가 서버에 요청을 보낼 때, 액세스 토큰이 만료된 경우 ExpiredJwtException이 발생합니다.
+     * 이 경우, SecurityContextHolder에 인증 정보가 설정되지 않고, 클라이언트는 새로운 액세스 토큰을 발급받기 위해 API를 호출하면 이 메서드가 호출됩니다.
      */
     @Transactional
     @Override
     public JwtResponseDTO reIssueAccessToken(ReIssueAccessTokenCommand reIssueAccessTokenCommand) {
-        // 1. refresh 토큰을 조회
-        RefreshToken findRefreshToken = getRefreshToken(reIssueAccessTokenCommand);
+        // 1. refresh 토큰 도메인을 생성
+        RefreshToken refreshToken = RefreshToken.of(reIssueAccessTokenCommand.getRefreshToken());
 
-        // 2. refresh 토큰의 유효성 검증 (회원 정보, 만료 날짜 존재여부, 만료 기간 확인)
+        // 2. 저장된 refresh 토큰 조회 (여기에는 유저 정보가 포함되어 있음)
+        RefreshToken findRefreshToken = findRefreshTokenPort.findRefreshToken(refreshToken);
+
+        // 3. refresh 토큰의 유효성 검증 (회원 정보, 만료 날짜 존재여부, 만료 기간 확인)
         findRefreshToken.validRefreshToken();
 
-        // 3. refresh 토큰의 유효성이 통과되었다면 새로운 access 토큰을 생성
-        String newAccessToken = jwtTokenProvider.regenerateAccessToken();
+        // 4. 토큰 내부의 회원정보 추출
+        Member member = findRefreshToken.getMember();
 
-        // 4. 활동 로그 저장 이벤트 발행
-        eventPublisher.publishEvent(ActivityLogEvent.of(findRefreshToken.getMember().getId(), REISSUE_REFRESH_TOKEN));
+        // 5. 새로운 access 토큰 생성
+        String newAccessToken = jwtTokenProvider.regenerateAccessToken(member.getEmail(), member.getNickname());
 
-        // 5. 갱신된 JWT 토큰 정보를 DTO에 담아 반환
+        // 6. 갱신된 JWT 토큰 정보를 DTO에 담아 반환
         return JwtResponseDTO.of(newAccessToken, findRefreshToken.getToken());
-    }
-
-
-    /**
-     * @param member 로그인 요청 도메인
-     * @return 생성된 Authentication 객체
-     * @apiNote 로그인 요청을 처리하기 위해 Authentication 객체를 생성하고 SecurityContext에 저장하는 메서드
-     */
-    private Authentication getAuthentication(Member member) {
-        // 1. 시큐리티를 활용하여 회원을 조회하고 인증 정보를 생성한다.
-        Authentication authentication = createAuthenticationFrom(member);
-
-        // 2. SecurityContext에 인증 정보를 저장한다.
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-
-        // 3. SecurityContext에 저장된 인증 정보를 반환한다.
-        return authentication;
-    }
-
-
-    /**
-     * @param member 로그인 요청 도메인
-     * @return 생성된 Authentication 객체
-     * @apiNote 로그인 요청을 처리하기 위해 Authentication 객체를 생성하는 메서드
-     * authenticate 메서드가 호출되면 UserDetailsServiceImpl의 loadUserByUsername 메서드가 호출된다.
-     * UserDetailsServiceImpl은 UserDetailsService 인터페이스를 구현한 클래스이다. (클래스를 검색해보자)
-     * 즉, 여기서 DB에서 회원 정보를 가져와서 UserDetails 객체를 생성하고 반환한다. (클래스를 검색해보자)
-     */
-    private Authentication createAuthenticationFrom(Member member) {
-        // 1. 회원 정보를 기반으로 인증 정보를 생성한다.
-        return authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(member.getEmail(), member.getPassword())
-        );
-    }
-
-
-    /**
-     * @param reIssueAccessTokenCommand JWT 토큰 갱신 요청 커맨드
-     * @return 조회된 refresh 토큰
-     * @apiNote refresh 토큰을 조회하는 메서드
-     */
-    private RefreshToken getRefreshToken(ReIssueAccessTokenCommand reIssueAccessTokenCommand) {
-        RefreshToken refreshToken = RefreshToken.of(reIssueAccessTokenCommand.getRefreshToken());
-        return findRefreshTokenPort.findRefreshToken(refreshToken);
     }
 
 }

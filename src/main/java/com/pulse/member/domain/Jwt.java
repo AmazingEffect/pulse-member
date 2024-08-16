@@ -29,4 +29,14 @@ public class Jwt {
                 .build();
     }
 
+    // factory method
+    public static Jwt of(String accessToken, String refreshToken, String email) {
+        return Jwt.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .email(email)
+                .authorities(null)
+                .build();
+    }
+
 }
