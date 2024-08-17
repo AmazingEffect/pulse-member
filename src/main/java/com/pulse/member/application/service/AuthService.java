@@ -110,7 +110,8 @@ public class AuthService implements AuthUseCase {
         Member member = memberMapper.commandToDomain(signUpCommand);
 
         // 2. 비밀번호 암호화
-        member.changePassword(passwordEncoder.encode(member.getPassword()));
+        String encodedPassword = passwordEncoder.encode(member.getPassword());
+        member.changePasswordEncryption(encodedPassword);
 
         // 3. 회원 저장
         Member savedMember = createMemberPort.createMember(member);

@@ -9,11 +9,9 @@ import com.pulse.member.application.port.in.member.UpdateMemberUseCase;
 import com.pulse.member.application.port.out.member.CreateMemberPort;
 import com.pulse.member.application.port.out.member.DeleteMemberPort;
 import com.pulse.member.application.port.out.member.FindMemberPort;
-import com.pulse.member.application.port.out.member.UpdateMemberPort;
 import com.pulse.member.domain.Member;
 import com.pulse.member.mapper.MemberMapper;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,11 +22,9 @@ public class MemberService implements CreateMemberUseCase, FindMemberUseCase, Up
 
     private final CreateMemberPort createMemberPort;
     private final FindMemberPort findMemberPort;
-    private final UpdateMemberPort updateMemberPort;
     private final DeleteMemberPort deleteMemberPort;
 
     private final MemberMapper memberMapper;
-    private final ApplicationEventPublisher eventPublisher;
 
 
     /**
@@ -38,7 +34,7 @@ public class MemberService implements CreateMemberUseCase, FindMemberUseCase, Up
      */
     @Override
     public Member createMember(Member member) {
-        member.validSignUpMemberData();
+        member.checkCreateRequiredValue();
         return createMemberPort.createMember(member);
     }
 

@@ -46,12 +46,15 @@ public enum ErrorCode {
     MEMBER_EMAIL_NOT_MATCH("MEM008", "Member email not match"),
     MEMBER_INNER_EMAIL_NOT_FOUND("MEM009", "Member inner email not found"),
     MEMBER_EMAIL_PARAM_NOT_FOUND("MEM010", "Member email param not found"),
+    MEMBER_CREATE_EMAIL_NOT_FOUND("MEM011", "Member create email not found"),
+    MEMBER_CREATE_PASSWORD_NOT_FOUND("MEM012", "Member create password not found"),
 
     // outbox errors
-    OUTBOX_STATUS_NOT_FOUND("MEM001", "Outbox status not found"),
-    OUTBOX_PROCESSED_AT_NOT_FOUND("MEM001", "Outbox processedAt not found"),
-    REFRESH_TOKEN_EXPIRATION_DATE_NOT_FOUND("MEM001", "Refresh token expiration date not found"),
-    REFRESH_TOKEN_NOT_EXIST("MEM001", "Refresh token not exist"),
+    OUTBOX_STATUS_NOT_FOUND("MEMBOX001", "Outbox status not found"),
+    OUTBOX_PROCESSED_AT_NOT_FOUND("MEMBOX002", "Outbox processedAt not found"),
+    REFRESH_TOKEN_EXPIRATION_DATE_NOT_FOUND("MEMBOX003", "Refresh token expiration date not found"),
+    REFRESH_TOKEN_NOT_EXIST("MEMBOX004", "Refresh token not exist"),
+
 
     ;
 

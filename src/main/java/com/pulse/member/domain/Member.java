@@ -54,9 +54,8 @@ public class Member {
 
 
     /**
-     * 이메일을 변경합니다.
-     *
      * @param email 이메일
+     * @apiNote 이메일을 변경합니다.
      */
     public void changeEmail(String email) {
         if (ObjectUtils.isEmpty(email)) {
@@ -67,9 +66,8 @@ public class Member {
 
 
     /**
-     * JWT 객체를 변경합니다.
-     *
      * @param jwt JWT 객체
+     * @apiNote JWT 객체를 변경합니다.
      */
     public void changeMemberInsideJwt(Jwt jwt) {
         if (!ObjectUtils.isEmpty(this.jwt)) {
@@ -80,22 +78,23 @@ public class Member {
 
 
     /**
-     * 비밀번호를 변경합니다.
-     *
      * @param encode 암호화된 비밀번호
+     * @apiNote 비밀번호를 변경합니다.
      */
-    public void changePassword(String encode) {
+    public void changePasswordEncryption(String encode) {
         this.password = encode;
     }
 
 
     /**
-     * 회원 가입시 필수 값 체크
+     * @apiNote 회원 가입시 필수 값 체크
      */
-    public void validSignUpMemberData() {
-        // 회원 가입시 필수 값 체크
-        if (email == null || password == null || name == null) {
-            throw new MemberException(ErrorCode.MEMBER_REQUIRED_VALUE);
+    public void checkCreateRequiredValue() {
+        if (ObjectUtils.isEmpty(this.email)) {
+            throw new MemberException(ErrorCode.MEMBER_CREATE_EMAIL_NOT_FOUND);
+        }
+        if (ObjectUtils.isEmpty(this.password)) {
+            throw new MemberException(ErrorCode.MEMBER_CREATE_PASSWORD_NOT_FOUND);
         }
     }
 
