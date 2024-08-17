@@ -23,7 +23,7 @@ import org.mapstruct.ReportingPolicy;
 )
 public interface MemberMapper {
 
-    MemberProto.MemberRetrieveResponse toProto(Member member);
+    MemberProto.MemberRetrieveResponse toProto(MemberResponseDTO memberResponseDTO);
 
     // 응답 도메인을 회원가입 응답 DTO로 변환
     MemberResponseDTO domainToResponseDTO(Member member);

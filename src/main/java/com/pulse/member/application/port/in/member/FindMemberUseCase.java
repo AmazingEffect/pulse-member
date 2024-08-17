@@ -6,9 +6,9 @@ import com.pulse.member.domain.Member;
 
 public interface FindMemberUseCase {
 
-    Member findMemberById(Member member);
+    MemberResponseDTO findMemberById(Member member);
 
-    Member findMemberByEmail(Member member);
+    MemberResponseDTO findMemberByEmail(Member member);
 
     MemberResponseDTO findMember(FindMemberCommand command);
     

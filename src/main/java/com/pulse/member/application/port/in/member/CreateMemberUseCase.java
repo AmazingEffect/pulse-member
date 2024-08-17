@@ -1,9 +1,10 @@
 package com.pulse.member.application.port.in.member;
 
+import com.pulse.member.adapter.in.web.dto.response.MemberResponseDTO;
 import com.pulse.member.domain.Member;
 
 public interface CreateMemberUseCase {
 
-    Member createMember(Member member);
+    MemberResponseDTO createMember(Member member);
 
 }

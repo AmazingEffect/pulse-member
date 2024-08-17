@@ -33,9 +33,10 @@ public class MemberService implements CreateMemberUseCase, FindMemberUseCase, Up
      * @apiNote 회원 생성
      */
     @Override
-    public Member createMember(Member member) {
+    public MemberResponseDTO createMember(Member member) {
         member.checkCreateRequiredValue();
-        return createMemberPort.createMember(member);
+        Member savedMember = createMemberPort.createMember(member);
+        return memberMapper.domainToResponseDTO(savedMember);
     }
 
 
@@ -45,8 +46,9 @@ public class MemberService implements CreateMemberUseCase, FindMemberUseCase, Up
      * @apiNote ID로 회원 조회
      */
     @Override
-    public Member findMemberById(Member member) {
-        return findMemberPort.findMemberById(member);
+    public MemberResponseDTO findMemberById(Member member) {
+        Member findedMember = findMemberPort.findMemberById(member);
+        return memberMapper.domainToResponseDTO(findedMember);
     }
 
 
@@ -56,8 +58,9 @@ public class MemberService implements CreateMemberUseCase, FindMemberUseCase, Up
      * @apiNote Email로 회원 조회
      */
     @Override
-    public Member findMemberByEmail(Member member) {
-        return findMemberPort.findMemberByEmail(member.getEmail());
+    public MemberResponseDTO findMemberByEmail(Member member) {
+        Member findedMember = findMemberPort.findMemberByEmail(member.getEmail());
+        return memberMapper.domainToResponseDTO(findedMember);
     }
 
 

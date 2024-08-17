@@ -1,5 +1,6 @@
 package com.pulse.member.adapter.in.grpc;
 
+import com.pulse.member.adapter.in.web.dto.response.MemberResponseDTO;
 import com.pulse.member.adapter.out.event.MemberCreateEvent;
 import com.pulse.member.application.port.in.member.FindMemberUseCase;
 import com.pulse.member.application.port.in.outbox.MemberOutboxUseCase;
@@ -47,7 +48,7 @@ public class MemberGrpcServiceAdapter extends MemberServiceGrpc.MemberServiceImp
         MemberCreateEvent event = new MemberCreateEvent(request.getId());
         try {
             Member member = Member.of(request.getId());
-            Member findMember = memberUseCase.findMemberById(member);
+            MemberResponseDTO findMember = memberUseCase.findMemberById(member);
             MemberProto.MemberRetrieveResponse response = memberMapper.toProto(findMember);
 
             responseObserver.onNext(response);
