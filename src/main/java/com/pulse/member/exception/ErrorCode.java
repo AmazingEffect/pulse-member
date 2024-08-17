@@ -46,8 +46,10 @@ public enum ErrorCode {
     MEMBER_EMAIL_NOT_MATCH("MEM008", "Member email not match"),
     MEMBER_INNER_EMAIL_NOT_FOUND("MEM009", "Member inner email not found"),
     MEMBER_EMAIL_PARAM_NOT_FOUND("MEM010", "Member email param not found"),
+    // create
     MEMBER_CREATE_EMAIL_NOT_FOUND("MEM011", "Member create email not found"),
     MEMBER_CREATE_PASSWORD_NOT_FOUND("MEM012", "Member create password not found"),
+    MEMBER_CREATE_NAME_NOT_FOUND("MEM013", "Member create name not found"),
 
     // outbox errors
     OUTBOX_STATUS_NOT_FOUND("MEMBOX001", "Outbox status not found"),

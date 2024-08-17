@@ -91,7 +91,7 @@ public class MemberTest {
         String password = "changePassword";
 
         // when
-        member.changePassword(password);
+        member.changePasswordEncryption(password);
 
         // then
         Assertions.assertThat(member.getPassword()).isEqualTo(password);
@@ -109,7 +109,7 @@ public class MemberTest {
                 .build();
 
         // when
-        member.validSignUpMemberData();
+        member.checkCreateRequiredValue();
 
         // then
         Assertions.assertThat(member).isNotNull();
@@ -126,9 +126,9 @@ public class MemberTest {
                 .build();
 
         // when & then
-        Assertions.assertThatThrownBy(member::validSignUpMemberData)
+        Assertions.assertThatThrownBy(member::checkCreateRequiredValue)
                 .isInstanceOf(MemberException.class)
-                .hasMessage(ErrorCode.MEMBER_REQUIRED_VALUE.getMessage());
+                .hasMessage(ErrorCode.MEMBER_CREATE_EMAIL_NOT_FOUND.getMessage());
     }
 
 
@@ -142,9 +142,9 @@ public class MemberTest {
                 .build();
 
         // when & then
-        Assertions.assertThatThrownBy(member::validSignUpMemberData)
+        Assertions.assertThatThrownBy(member::checkCreateRequiredValue)
                 .isInstanceOf(MemberException.class)
-                .hasMessage(ErrorCode.MEMBER_REQUIRED_VALUE.getMessage());
+                .hasMessage(ErrorCode.MEMBER_CREATE_PASSWORD_NOT_FOUND.getMessage());
     }
 
 
@@ -158,9 +158,9 @@ public class MemberTest {
                 .build();
 
         // when & then
-        Assertions.assertThatThrownBy(member::validSignUpMemberData)
+        Assertions.assertThatThrownBy(member::checkCreateRequiredValue)
                 .isInstanceOf(MemberException.class)
-                .hasMessage(ErrorCode.MEMBER_REQUIRED_VALUE.getMessage());
+                .hasMessage(ErrorCode.MEMBER_CREATE_NAME_NOT_FOUND.getMessage());
     }
 
 

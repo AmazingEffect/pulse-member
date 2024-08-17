@@ -96,6 +96,9 @@ public class Member {
         if (ObjectUtils.isEmpty(this.password)) {
             throw new MemberException(ErrorCode.MEMBER_CREATE_PASSWORD_NOT_FOUND);
         }
+        if (ObjectUtils.isEmpty(this.name)) {
+            throw new MemberException(ErrorCode.MEMBER_CREATE_NAME_NOT_FOUND);
+        }
     }
 
 
