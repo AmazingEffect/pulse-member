@@ -22,6 +22,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * JWT 토큰 필터링 클래스
@@ -35,6 +36,13 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     private final JwtTokenProvider jwtTokenProvider;
     private final UserDetailsService userDetailsService;
     private final ObjectMapper mapper = new ObjectMapper();
+
+    // 특정 경로를 필터링에서 제외
+    private static final Set<String> EXCLUDE_URLS = Set.of(
+            "/member/auth/signUp",
+            "/member/auth/signIn",
+            "/member/role/create"
+    );
 
     /**
      * @param request     HttpServletRequest 객체
@@ -55,7 +63,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         String requestURI = request.getRequestURI();
 
         // 특정 경로를 필터링에서 제외 (config에서 제외 불가능하기에 여기서 처리)
-        if (requestURI.equals("/member/auth/signUp") || requestURI.equals("/member/auth/signIn") || requestURI.equals("/member/role/create")) {
+        if (EXCLUDE_URLS.contains(requestURI)) {
             filterChain.doFilter(request, response);
             return;
         }
