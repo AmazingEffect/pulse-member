@@ -1,6 +1,5 @@
 package com.pulse.member.config.jwt;
 
-import com.pulse.member.config.security.http.user.UserDetailsImpl;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
@@ -11,7 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
@@ -32,9 +30,6 @@ public class JwtTokenProvider {
 
     @Value("${jwt.jwtExpirationMs}")
     private int jwtExpirationMs;
-
-    @Value("${jwt.jwtRefreshExpirationMs}")
-    private int jwtRefreshExpirationMs;
 
     private SecretKey secretKey;
 
@@ -86,25 +81,6 @@ public class JwtTokenProvider {
         return Jwts.builder()
                 .subject(email)
                 .claim("nickname", nickname)
-                .issuedAt(now)
-                .expiration(expiryDate)
-                .signWith(secretKey)
-                .compact();
-    }
-
-
-    /**
-     * @param authentication Authentication 객체
-     * @return 생성된 JWT Refresh 토큰
-     * @apiNote JWT Refresh 토큰을 생성하는 메서드
-     */
-    public String generateRefreshToken(Authentication authentication) {
-        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-        Date now = new Date();
-        Date expiryDate = new Date(now.getTime() + jwtRefreshExpirationMs);
-
-        return Jwts.builder()
-                .subject(userDetails.getEmail())
                 .issuedAt(now)
                 .expiration(expiryDate)
                 .signWith(secretKey)
@@ -171,16 +147,6 @@ public class JwtTokenProvider {
             return new UsernamePasswordAuthenticationToken(email, null, Collections.emptyList());
         }
         return null;
-    }
-
-
-    /**
-     * @return UserDetailsImpl 객체
-     * @apiNote SecurityContext에서 인증 정보를 가져오는 메서드
-     */
-    private UserDetailsImpl getUserDetails() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return (UserDetailsImpl) authentication.getPrincipal();
     }
 
 }

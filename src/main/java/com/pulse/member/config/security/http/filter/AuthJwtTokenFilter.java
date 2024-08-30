@@ -1,7 +1,6 @@
 package com.pulse.member.config.security.http.filter;
 
 import com.pulse.member.config.jwt.JwtTokenProvider;
-import com.pulse.member.config.security.http.user.UserDetailsServiceImpl;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -12,6 +11,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -29,16 +29,15 @@ import java.util.Collection;
 public class AuthJwtTokenFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
-    private final UserDetailsServiceImpl userDetailsService;
+    private final UserDetailsService userDetailsService;
 
     /**
-     * 요청을 필터링하는 메서드
-     *
      * @param request     HttpServletRequest 객체
      * @param response    HttpServletResponse 객체
      * @param filterChain FilterChain 객체
      * @throws ServletException 서블릿 예외
      * @throws IOException      입출력 예외
+     * @apiNote 모든 요청에 대해 JWT 토큰을 확인하고, 유효한 토큰인 경우 사용자 인증 정보를 설정하는 필터
      */
     @Override
     protected void doFilterInternal(
@@ -73,10 +72,9 @@ public class AuthJwtTokenFilter extends OncePerRequestFilter {
 
 
     /**
-     * HTTP 요청에서 JWT 토큰을 추출하는 메서드
-     *
      * @param request HttpServletRequest 객체
      * @return 추출된 JWT 토큰 문자열, 없으면 null
+     * @apiNote HTTP 요청에서 JWT 토큰을 추출하는 메서드
      */
     private String parseJwt(HttpServletRequest request) {
         // 1. Authorization 헤더에서 JWT 토큰을 추출

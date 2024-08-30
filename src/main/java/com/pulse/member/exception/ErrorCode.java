@@ -58,6 +58,8 @@ public enum ErrorCode {
     REFRESH_TOKEN_NOT_EXIST("MEMBOX004", "Refresh token not exist"),
 
 
+    SECURITY_USER_NOT_FOUND("SEC001", "Security user not found")
+
     ;
 
     private final String code;

@@ -23,12 +23,11 @@ public class AuthJwtEntryPoint implements AuthenticationEntryPoint {
     private final ObjectMapper mapper = new ObjectMapper();
 
     /**
-     * 인증되지 않은 요청에 대한 처리 메서드.
-     *
      * @param request       HttpServletRequest 객체
      * @param response      HttpServletResponse 객체
      * @param authException 발생한 인증 예외
      * @throws IOException 입출력 예외가 발생할 때
+     * @apiNote 인증되지 않은 요청에 대한 처리 메서드. (AuthenticationEntryPoint 인터페이스 구현)
      */
     @Override
     public void commence(
@@ -38,6 +37,7 @@ public class AuthJwtEntryPoint implements AuthenticationEntryPoint {
     ) throws IOException {
         // 1. 응답의 콘텐츠 타입을 JSON으로 설정
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+
         // 2. 응답 상태 코드를 401 Unauthorized로 설정
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 
