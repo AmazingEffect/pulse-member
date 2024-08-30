@@ -18,7 +18,7 @@ import java.util.Map;
  */
 @Slf4j
 @Component
-public class AuthJwtEntryPoint implements AuthenticationEntryPoint {
+public class AuthenticationEntryPointImpl implements AuthenticationEntryPoint {
 
     private final ObjectMapper mapper = new ObjectMapper();
 

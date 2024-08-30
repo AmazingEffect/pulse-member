@@ -31,22 +31,6 @@ public class AuthController {
 
 
     /**
-     * @param signInRequestDTO 로그인 요청 DTO
-     * @return JWT 토큰 응답 DTO
-     * @apiNote 로그인 요청을 받아 JWT 토큰을 발급합니다.
-     */
-    @PostMapping("/signIn")
-    public ResponseEntity<ApiResponse<JwtResponseDTO>> signInAndMakeJwt(
-            @RequestBody SignInRequestDTO signInRequestDTO
-    ) {
-        SignInCommand signInCommand = SignInCommand.of(signInRequestDTO);
-        JwtResponseDTO responseDTO = authUseCase.signInAndPublishJwt(signInCommand);
-
-        return ResponseEntity.ok(ApiResponse.success(responseDTO));
-    }
-
-
-    /**
      * @param signUpRequestDTO 회원가입 요청 DTO
      * @return 회원가입 응답 DTO
      * @apiNote 회원가입 요청을 받아 회원가입을 진행합니다.
@@ -57,6 +41,22 @@ public class AuthController {
     ) {
         SignUpCommand signUpCommand = SignUpCommand.of(signUpRequestDTO);
         MemberResponseDTO responseDTO = authUseCase.signUp(signUpCommand);
+
+        return ResponseEntity.ok(ApiResponse.success(responseDTO));
+    }
+
+
+    /**
+     * @param signInRequestDTO 로그인 요청 DTO
+     * @return JWT 토큰 응답 DTO
+     * @apiNote 로그인 요청을 받아 JWT 토큰을 발급합니다.
+     */
+    @PostMapping("/signIn")
+    public ResponseEntity<ApiResponse<JwtResponseDTO>> signInAndMakeJwt(
+            @RequestBody SignInRequestDTO signInRequestDTO
+    ) {
+        SignInCommand signInCommand = SignInCommand.of(signInRequestDTO);
+        JwtResponseDTO responseDTO = authUseCase.signInAndPublishJwt(signInCommand);
 
         return ResponseEntity.ok(ApiResponse.success(responseDTO));
     }

@@ -1,7 +1,6 @@
 package com.pulse.member.config.security.http;
 
-import com.pulse.member.config.security.http.exception.AuthJwtEntryPoint;
-import com.pulse.member.config.security.http.filter.AuthJwtTokenFilter;
+import com.pulse.member.config.security.http.filter.JwtTokenFilter;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,6 +15,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -30,8 +30,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final UserDetailsService userDetailsService;
-    private final AuthJwtEntryPoint authJwtEntryPoint;
-    private final AuthJwtTokenFilter authJwtTokenFilter;
+    private final AuthenticationEntryPoint authenticationEntryPoint;
+    private final JwtTokenFilter jwtTokenFilter;
 
 
     /**
@@ -97,7 +97,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)                                     // CSRF 보호 비활성화
-                .exceptionHandling(e -> e.authenticationEntryPoint(authJwtEntryPoint)) // 인증 예외 처리
+                .exceptionHandling(e -> e.authenticationEntryPoint(authenticationEntryPoint)) // 인증 예외 처리
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // 세션 상태 비저장 설정
                 .authorizeHttpRequests(auth -> {
                     auth.requestMatchers("/member/auth/**").permitAll()              // 인증 없이 접근 가능한 경로 설정
@@ -107,7 +107,7 @@ public class SecurityConfig {
                         .anyRequest().authenticated();                                 // 나머지 요청은 인증 필요
                 })
                 .authenticationProvider(authenticationProvider())                      // DaoAuthenticationProvider를 인증 제공자로 설정
-                .addFilterBefore(authJwtTokenFilter, UsernamePasswordAuthenticationFilter.class); // JWT 토큰 필터 설정
+                .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class); // JWT 토큰 필터 설정
 
         return http.build();
     }
