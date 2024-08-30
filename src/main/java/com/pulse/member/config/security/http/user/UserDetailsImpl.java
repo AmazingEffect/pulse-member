@@ -4,12 +4,12 @@ import com.pulse.member.adapter.out.persistence.entity.MemberEntity;
 import com.pulse.member.adapter.out.persistence.entity.constant.RoleName;
 import com.pulse.member.exception.ErrorCode;
 import com.pulse.member.exception.MemberException;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.util.ObjectUtils;
 
 import java.io.Serial;
 import java.util.Collection;
@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Objects;
 
 @Getter
-@AllArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class UserDetailsImpl implements UserDetails {
 
     @Serial
@@ -33,14 +33,15 @@ public class UserDetailsImpl implements UserDetails {
 
     // factory method
     public static UserDetailsImpl fromEntity(MemberEntity memberEntity) {
-        // todo: 추후 이 로직을 수정해서 여러개의 권한을 부여할 수 있도록 수정해야함. 지금은 무조건 MEMBER 권한만 부여하도록 설정
-        List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(RoleName.MEMBER.name()));
-
-        // 회원이 존재하지 않을 경우 예외 처리
-        if (ObjectUtils.isEmpty(memberEntity)) {
+        // 1. 회원이 존재하지 않을 경우 예외 처리
+        if (memberEntity == null) {
             throw new MemberException(ErrorCode.MEMBER_NOT_FOUND);
         }
 
+        // 2. 권한을 부여 (지금은 무조건 MEMBER 권한만 부여하도록 설정, 추후 수정 필요)
+        List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(RoleName.MEMBER.name()));
+
+        // 3. UserDetailsImpl 객체를 생성하여 반환 (회원 정보를 기반으로)
         return new UserDetailsImpl(
                 memberEntity.getId(),
                 memberEntity.getEmail(),
