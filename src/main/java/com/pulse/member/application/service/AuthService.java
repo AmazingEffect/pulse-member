@@ -143,7 +143,7 @@ public class AuthService implements AuthUseCase {
         UserDetailsImpl userDetails = getUserDetails();
 
         // 3. 회원 정보를 검증한 후 RefreshToken 삭제 (검증 실패시 도메인 비즈니스에서 예외 처리)
-        if (member.isSameEmail(userDetails.email())) {
+        if (member.isSameEmail(userDetails.getEmail())) {
             // 회원 조회 후 RefreshToken 삭제
             Member findMember = findMemberPort.findMemberByEmail(member.getEmail());
             deleteRefreshTokenPort.deleteRefreshToken(findMember);
