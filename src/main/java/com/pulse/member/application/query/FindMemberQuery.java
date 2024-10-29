@@ -1,4 +1,4 @@
-package com.pulse.member.application.command.member;
+package com.pulse.member.application.query;
 
 import com.pulse.member.exception.ErrorCode;
 import com.pulse.member.exception.MemberException;
@@ -12,18 +12,18 @@ import org.springframework.util.ObjectUtils;
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
-public class FindMemberCommand {
+public class FindMemberQuery {
 
     private Long memberId; // 회원 ID
 
 
     // factory method
-    public static FindMemberCommand of(Long memberId) {
+    public static FindMemberQuery of(Long memberId) {
         // 회원 ID가 없는 경우 예외 처리
         if (ObjectUtils.isEmpty(memberId)) {
             throw new MemberException(ErrorCode.MEMBER_ID_NOT_FOUND);
         }
-        return FindMemberCommand.builder()
+        return FindMemberQuery.builder()
                 .memberId(memberId)
                 .build();
     }

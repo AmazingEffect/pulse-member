@@ -2,7 +2,7 @@ package com.pulse.member.adapter.in.web;
 
 import com.pulse.member.adapter.in.web.dto.response.MemberResponseDTO;
 import com.pulse.member.adapter.in.web.dto.response.api.ApiResponse;
-import com.pulse.member.application.command.member.FindMemberCommand;
+import com.pulse.member.application.query.FindMemberQuery;
 import com.pulse.member.application.port.in.member.FindMemberUseCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +27,7 @@ public class MemberController {
     public ResponseEntity<ApiResponse<MemberResponseDTO>> getMemberInfo(
             @PathVariable Long memberId
     ) {
-        FindMemberCommand command = FindMemberCommand.of(memberId);
+        FindMemberQuery command = FindMemberQuery.of(memberId);
         MemberResponseDTO responseDTO = findMemberUseCase.findMember(command);
         return ResponseEntity.ok(ApiResponse.success(responseDTO));
     }
