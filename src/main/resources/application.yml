@@ -1,6 +1,6 @@
 # 포트 설정
 server:
-  port: 8081
+  port: 8091
 
 # JWT 설정
 jwt:
@@ -14,6 +14,11 @@ spring:
   # 애플리케이션 이름을 설정
   application:
     name: member-service
+
+  # Eureka 설정
+  cloud:
+    discovery:
+      enabled: true
 
   # 데이터베이스 설정
   datasource:
@@ -44,25 +49,49 @@ spring:
     producer:
       bootstrap-servers: localhost:10000,localhost:10001,localhost:10002
 
+# gRPC 서버 포트 설정
+grpc:
+  server:
+    port: 50051
+
+# Eureka 서버 설정
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    prefer-ip-address: true
+    metadata-map:
+      grpcPort: ${grpc.server.port}    # gRPC 포트 정보를 메타데이터로 등록
+
 # msa 로깅 설정 (jaeger)
 otel:
   resource:
     attributes:
       service.name: ${spring.application.name}  # OpenTelemetry 서비스 이름 설정
 
+# Jaeger 설정
 tracing:
   url: http://localhost:4318/v1/traces
 
+# 스프링 부트 액추에이터 설정
 management:
   tracing:
     sampling:
       probability: 1.0
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+    endpoint:
+      health:
+        show-details: always
+#    security:
+#      enabled: false
 
+# 로깅 패턴 설정
 logging:
   pattern:
     level: '%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]'
-
-# gRPC 서버 포트 설정
-grpc:
-  server:
-    port: 50051
