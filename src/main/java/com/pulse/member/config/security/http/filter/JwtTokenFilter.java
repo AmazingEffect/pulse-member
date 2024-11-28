@@ -41,7 +41,11 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     private static final Set<String> EXCLUDE_URLS = Set.of(
             "/member/auth/signUp",
             "/member/auth/signIn",
-            "/member/role/create"
+            "/member/role/create",
+            "/actuator/info",
+            "/actuator/health",
+            "/actuator/env",
+            "/actuator/metrics"
     );
 
     /**
@@ -59,7 +63,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
-
+        // 요청 URI 추출
         String requestURI = request.getRequestURI();
 
         // 특정 경로를 필터링에서 제외 (config에서 제외 불가능하기에 여기서 처리)

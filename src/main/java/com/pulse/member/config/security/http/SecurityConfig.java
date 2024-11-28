@@ -4,6 +4,7 @@ import com.pulse.member.config.security.http.filter.JwtTokenFilter;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -88,26 +89,46 @@ public class SecurityConfig {
 
 
     /**
-     * 보안 필터 체인 설정.
-     *
      * @param http HttpSecurity 객체
      * @return SecurityFilterChain
      * @throws Exception 예외
+     * @apiNote Actuator 경로에 대한 보안 필터 체인 설정
      */
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.csrf(AbstractHttpConfigurer::disable)                                     // CSRF 보호 비활성화
-                .exceptionHandling(e -> e.authenticationEntryPoint(authenticationEntryPoint)) // 인증 예외 처리
-                .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // 세션 상태 비저장 설정
+    @Order(1)
+    public SecurityFilterChain actuatorFilterChain(HttpSecurity http) throws Exception {
+        http
+                .securityMatcher("/actuator/**")
+                .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
+                .csrf(AbstractHttpConfigurer::disable);
+
+        return http.build();
+    }
+
+
+    /**
+     * @param http HttpSecurity 객체
+     * @return SecurityFilterChain
+     * @throws Exception 예외
+     * @apiNote Spring Security 필터 체인 설정
+     * Http 요청에 대한 보안 필터를 설정합니다.
+     */
+    @Bean
+    @Order(2)
+    public SecurityFilterChain mainFilterChain(HttpSecurity http) throws Exception {
+        http
+                .csrf(AbstractHttpConfigurer::disable)
+                .exceptionHandling(e -> e.authenticationEntryPoint(authenticationEntryPoint))
+                .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> {
-                    auth.requestMatchers("/member/auth/**").permitAll()              // 인증 없이 접근 가능한 경로 설정
-                        .requestMatchers("/member/auth/signUp").permitAll()          // 회원가입은 인증 없이 접근 가능
-                        .requestMatchers("/member/role/create").permitAll()          // 역할 생성은 인증 없이 접근 가능
-                        .requestMatchers("/member/role/createRoles").permitAll()     // 역할 생성은 인증 없이 접근 가능
-                        .anyRequest().authenticated();                                 // 나머지 요청은 인증 필요
+                    auth.requestMatchers("/member/auth/**").permitAll()
+                            .requestMatchers("/member/auth/signUp").permitAll()
+                            .requestMatchers("/member/role/create").permitAll()
+                            .requestMatchers("/member/role/createRoles").permitAll()
+                            .anyRequest().authenticated();
                 })
-                .authenticationProvider(authenticationProvider())                      // DaoAuthenticationProvider를 인증 제공자로 설정
-                .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class); // JWT 토큰 필터 설정
+                .authenticationProvider(authenticationProvider())
+                .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
