@@ -6,18 +6,15 @@ import com.pulse.member.application.port.out.role.CreateRolePort;
 import com.pulse.member.application.port.out.role.DeleteRolePort;
 import com.pulse.member.application.port.out.role.FindRolePort;
 import com.pulse.member.application.port.out.role.UpdateRolePort;
+import com.pulse.member.common.annotation.PersistenceAdapter;
 import com.pulse.member.domain.Role;
 import com.pulse.member.exception.ErrorCode;
 import com.pulse.member.exception.MemberException;
 import com.pulse.member.mapper.RoleMapper;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
 
-/**
- * RoleAdapter
- */
 @RequiredArgsConstructor
-@Component
+@PersistenceAdapter
 public class RolePersistenceAdapter implements CreateRolePort, FindRolePort, DeleteRolePort, UpdateRolePort {
 
     private final RoleRepository roleRepository;

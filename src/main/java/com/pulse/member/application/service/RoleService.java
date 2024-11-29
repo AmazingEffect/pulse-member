@@ -9,15 +9,15 @@ import com.pulse.member.application.port.in.role.UpdateRoleUseCase;
 import com.pulse.member.application.port.out.role.CreateRolePort;
 import com.pulse.member.application.port.out.role.FindRolePort;
 import com.pulse.member.application.port.out.role.UpdateRolePort;
+import com.pulse.member.common.annotation.UseCase;
 import com.pulse.member.domain.Role;
 import com.pulse.member.mapper.RoleMapper;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
-@Service
+@UseCase
 public class RoleService implements CreateRoleUseCase, FindRoleUseCase, UpdateRoleUseCase, DeleteRoleUseCase {
 
     private final CreateRolePort createRolePort;

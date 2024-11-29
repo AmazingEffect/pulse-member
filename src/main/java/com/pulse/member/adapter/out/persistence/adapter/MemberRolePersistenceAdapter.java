@@ -5,6 +5,7 @@ import com.pulse.member.adapter.out.persistence.entity.MemberRoleEntity;
 import com.pulse.member.adapter.out.persistence.entity.RoleEntity;
 import com.pulse.member.adapter.out.persistence.repository.MemberRoleRepository;
 import com.pulse.member.application.port.out.role.map.CreateMemberRolePort;
+import com.pulse.member.common.annotation.PersistenceAdapter;
 import com.pulse.member.domain.Member;
 import com.pulse.member.domain.Role;
 import com.pulse.member.exception.ErrorCode;
@@ -13,14 +14,10 @@ import com.pulse.member.mapper.MemberMapper;
 import com.pulse.member.mapper.MemberRoleMapper;
 import com.pulse.member.mapper.RoleMapper;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 
-/**
- * MemberRoleAdapter
- */
 @RequiredArgsConstructor
-@Component
+@PersistenceAdapter
 public class MemberRolePersistenceAdapter implements CreateMemberRolePort {
 
     private final MemberRoleRepository memberRoleRepository;

@@ -13,8 +13,8 @@ import org.springframework.stereotype.Component;
 /**
  * gRPC 클라이언트 호출 시 Span을 생성하고 종료하는 Aspect
  */
-@Aspect
 @Component
+@Aspect
 public class TraceGrpcClientAspect {
 
     private final Tracer tracer = GlobalOpenTelemetry.getTracer("grpc-client");

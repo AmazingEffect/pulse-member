@@ -7,6 +7,7 @@ import com.pulse.member.application.port.out.refreshtoken.CreateRefreshTokenPort
 import com.pulse.member.application.port.out.refreshtoken.DeleteRefreshTokenPort;
 import com.pulse.member.application.port.out.refreshtoken.FindRefreshTokenPort;
 import com.pulse.member.application.port.out.refreshtoken.UpdateRefreshTokenPort;
+import com.pulse.member.common.annotation.PersistenceAdapter;
 import com.pulse.member.domain.Member;
 import com.pulse.member.domain.RefreshToken;
 import com.pulse.member.exception.ErrorCode;
@@ -14,14 +15,10 @@ import com.pulse.member.exception.MemberException;
 import com.pulse.member.mapper.MemberMapper;
 import com.pulse.member.mapper.RefreshTokenMapper;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 
-/**
- * 리프레시 토큰 관련 비즈니스 로직을 처리하는 어댑터 클래스
- */
 @RequiredArgsConstructor
-@Component
+@PersistenceAdapter
 public class RefreshTokenPersistenceAdapter implements CreateRefreshTokenPort, FindRefreshTokenPort, DeleteRefreshTokenPort, UpdateRefreshTokenPort {
 
     private final RefreshTokenRepository refreshTokenRepository;

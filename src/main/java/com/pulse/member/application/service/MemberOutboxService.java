@@ -5,10 +5,10 @@ import com.pulse.member.adapter.out.persistence.entity.constant.MessageStatus;
 import com.pulse.member.application.port.in.outbox.MemberOutboxUseCase;
 import com.pulse.member.application.port.out.outbox.CreateMemberOutboxPort;
 import com.pulse.member.application.port.out.outbox.FindMemberOutboxPort;
+import com.pulse.member.common.annotation.UseCase;
 import com.pulse.member.domain.MemberOutbox;
 import io.opentelemetry.api.trace.Span;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
@@ -16,9 +16,9 @@ import java.time.LocalDateTime;
 /**
  * 이벤트 발행여부를 핸들링하는 OutboxService의 구현체
  */
-@Transactional
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
-@Service
+@UseCase
 public class MemberOutboxService implements MemberOutboxUseCase {
 
     private final CreateMemberOutboxPort createMemberOutboxPort;
@@ -29,6 +29,7 @@ public class MemberOutboxService implements MemberOutboxUseCase {
      * @param event OutboxEvent
      * @apiNote OutboxEvent를 저장한다. 상태는 PENDING(대기)으로 저장
      */
+    @Transactional
     @Override
     public Long saveOutboxEvent(OutboxEvent event) {
         // 1. 현재 Span에서 Trace ID를 가져옵니다.
@@ -50,6 +51,7 @@ public class MemberOutboxService implements MemberOutboxUseCase {
      * @param event OutboxEvent
      * @apiNote OutboxEvent를 처리대기(PENDING)로 변경
      */
+    @Transactional
     @Override
     public void markOutboxEventPending(OutboxEvent event) {
         // 1. 이벤트 타입에 따라 적절한 토픽 이름을 반환합니다.
@@ -70,6 +72,7 @@ public class MemberOutboxService implements MemberOutboxUseCase {
      * @apiNote OutboxEvent를 성공(SUCCESS)로 변경
      * 만약 Feign 요청이 성공해서 데이터를 전달한 후 오류가 없다면 이 메서드를 호출한다.
      */
+    @Transactional
     @Override
     public void markOutboxEventSuccess(OutboxEvent event) {
         // 1. 이벤트 타입에 따라 적절한 토픽 이름을 반환합니다.
@@ -89,6 +92,7 @@ public class MemberOutboxService implements MemberOutboxUseCase {
      * @param event OutboxEvent
      * @apiNote OutboxEvent를 실패(FAIL)로 변경
      */
+    @Transactional
     @Override
     public void markOutboxEventFailed(OutboxEvent event) {
         // 1. 이벤트 타입에 따라 적절한 토픽 이름을 반환합니다.
@@ -119,6 +123,7 @@ public class MemberOutboxService implements MemberOutboxUseCase {
      * @param event OutboxEvent
      * @apiNote OutboxEvent를 처리완료(PROCESSED)로 변경
      */
+    @Transactional
     @Override
     public void markOutboxEventProcessed(OutboxEvent event) {
         // 1. 이벤트 타입에 따라 적절한 토픽 이름을 반환합니다.

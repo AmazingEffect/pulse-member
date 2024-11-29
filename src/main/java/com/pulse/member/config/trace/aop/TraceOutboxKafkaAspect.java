@@ -18,10 +18,10 @@ import org.springframework.stereotype.Component;
 /**
  * Kafka 리스너 동작 시 Span을 생성하고 종료하는 Aspect
  */
-@Aspect
 @Slf4j
-@Component
 @RequiredArgsConstructor
+@Component
+@Aspect
 public class TraceOutboxKafkaAspect {
 
     private final Tracer tracer = GlobalOpenTelemetry.getTracer("kafka-consumer");
