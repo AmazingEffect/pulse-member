@@ -15,11 +15,6 @@ spring:
   application:
     name: member-service
 
-  # Eureka 설정
-  cloud:
-    discovery:
-      enabled: true
-
   # 데이터베이스 설정
   datasource:
     url: jdbc:postgresql://localhost:5432/member
@@ -53,18 +48,6 @@ spring:
 grpc:
   server:
     port: 50051
-
-# Eureka 서버 설정
-eureka:
-  client:
-    register-with-eureka: true
-    fetch-registry: true
-    service-url:
-      defaultZone: http://localhost:8761/eureka/
-  instance:
-    prefer-ip-address: true
-    metadata-map:
-      grpcPort: ${grpc.server.port}    # gRPC 포트 정보를 메타데이터로 등록
 
 # msa 로깅 설정 (jaeger)
 otel:
