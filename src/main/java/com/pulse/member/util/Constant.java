@@ -19,4 +19,7 @@ public class Constant {
     public static final String EMAIL_CERTIFICATION_RESEND = "EMAIL_CERTIFICATION_RESEND";
     public static final String REISSUE_REFRESH_TOKEN = "REISSUE_REFRESH_TOKEN";
 
+    // trace
+    public static final String TRACE_PARENT = "traceparent";
+
 }
