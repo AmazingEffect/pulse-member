@@ -4,15 +4,15 @@ import com.pulse.member.adapter.out.persistence.entity.MemberOutboxEntity;
 import com.pulse.member.adapter.out.persistence.repository.MemberOutboxRepository;
 import com.pulse.member.application.port.out.outbox.CreateMemberOutboxPort;
 import com.pulse.member.application.port.out.outbox.FindMemberOutboxPort;
+import com.pulse.member.common.annotation.PersistenceAdapter;
 import com.pulse.member.domain.MemberOutbox;
 import com.pulse.member.exception.ErrorCode;
 import com.pulse.member.exception.MemberException;
 import com.pulse.member.mapper.MemberOutboxMapper;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
 
 @RequiredArgsConstructor
-@Component
+@PersistenceAdapter
 public class MemberOutboxPersistenceAdapter implements FindMemberOutboxPort, CreateMemberOutboxPort {
 
     private final MemberOutboxRepository memberOutboxRepository;

@@ -6,18 +6,15 @@ import com.pulse.member.application.port.out.member.CreateMemberPort;
 import com.pulse.member.application.port.out.member.DeleteMemberPort;
 import com.pulse.member.application.port.out.member.FindMemberPort;
 import com.pulse.member.application.port.out.member.UpdateMemberPort;
+import com.pulse.member.common.annotation.PersistenceAdapter;
 import com.pulse.member.domain.Member;
 import com.pulse.member.exception.ErrorCode;
 import com.pulse.member.exception.MemberException;
 import com.pulse.member.mapper.MemberMapper;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
 
-/**
- * MemberAdapter
- */
 @RequiredArgsConstructor
-@Component
+@PersistenceAdapter
 public class MemberPersistenceAdapter implements CreateMemberPort, FindMemberPort, DeleteMemberPort, UpdateMemberPort {
 
     private final MemberRepository memberRepository;
