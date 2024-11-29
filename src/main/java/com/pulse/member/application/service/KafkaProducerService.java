@@ -2,6 +2,7 @@ package com.pulse.member.application.service;
 
 import com.pulse.member.application.port.in.kafka.KafkaProducerUseCase;
 import com.pulse.member.application.port.out.kafka.KafkaProducerPort;
+import com.pulse.member.common.annotation.UseCase;
 import io.opentelemetry.api.GlobalOpenTelemetry;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.Tracer;
@@ -14,7 +15,6 @@ import org.apache.kafka.clients.producer.RecordMetadata;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
-import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.CompletableFuture;
@@ -25,7 +25,7 @@ import java.util.concurrent.CompletableFuture;
  * 이를 위해 OpenTelemetry의 Tracer를 사용합니다.
  */
 @RequiredArgsConstructor
-@Service
+@UseCase
 public class KafkaProducerService implements KafkaProducerUseCase {
 
     private final KafkaProducerPort kafkaProducerPort;

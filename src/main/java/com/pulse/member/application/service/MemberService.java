@@ -1,7 +1,6 @@
 package com.pulse.member.application.service;
 
 import com.pulse.member.adapter.in.web.dto.response.MemberResponseDTO;
-import com.pulse.member.application.query.FindMemberQuery;
 import com.pulse.member.application.port.in.member.CreateMemberUseCase;
 import com.pulse.member.application.port.in.member.DeleteMemberUseCase;
 import com.pulse.member.application.port.in.member.FindMemberUseCase;
@@ -9,15 +8,16 @@ import com.pulse.member.application.port.in.member.UpdateMemberUseCase;
 import com.pulse.member.application.port.out.member.CreateMemberPort;
 import com.pulse.member.application.port.out.member.DeleteMemberPort;
 import com.pulse.member.application.port.out.member.FindMemberPort;
+import com.pulse.member.application.query.FindMemberQuery;
+import com.pulse.member.common.annotation.UseCase;
 import com.pulse.member.domain.Member;
 import com.pulse.member.mapper.MemberMapper;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
-@Service
+@UseCase
 public class MemberService implements CreateMemberUseCase, FindMemberUseCase, UpdateMemberUseCase, DeleteMemberUseCase {
 
     private final CreateMemberPort createMemberPort;
@@ -32,6 +32,7 @@ public class MemberService implements CreateMemberUseCase, FindMemberUseCase, Up
      * @return 생성된 회원
      * @apiNote 회원 생성
      */
+    @Transactional
     @Override
     public MemberResponseDTO createMember(Member member) {
         member.checkCreateRequiredValue();
@@ -81,6 +82,7 @@ public class MemberService implements CreateMemberUseCase, FindMemberUseCase, Up
      * @return 삭제 여부
      * @apiNote 회원 삭제
      */
+    @Transactional
     @Override
     public Boolean deleteMemberById(Member member) {
         return deleteMemberPort.deleteMemberById(member);
