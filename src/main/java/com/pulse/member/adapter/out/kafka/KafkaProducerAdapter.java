@@ -1,11 +1,11 @@
-package com.pulse.member.adapter.out.persistence.adapter.kafka;
+package com.pulse.member.adapter.out.kafka;
 
 import com.pulse.member.application.port.out.kafka.KafkaProducerPort;
+import com.pulse.member.common.annotation.MessagingAdapter;
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
-import org.springframework.stereotype.Component;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -13,7 +13,7 @@ import java.util.concurrent.CompletableFuture;
  * KafkaAdapter는 Kafka로 메시지를 전송하는 어댑터입니다.
  */
 @RequiredArgsConstructor
-@Component
+@MessagingAdapter
 public class KafkaProducerAdapter implements KafkaProducerPort {
 
     private final KafkaTemplate<String, String> kafkaTemplate;
