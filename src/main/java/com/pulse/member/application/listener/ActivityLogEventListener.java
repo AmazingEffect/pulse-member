@@ -1,4 +1,4 @@
-package com.pulse.member.adapter.in.event;
+package com.pulse.member.application.listener;
 
 import com.pulse.member.adapter.out.event.ActivityLogEvent;
 import com.pulse.member.adapter.out.persistence.entity.ActivityLogEntity;

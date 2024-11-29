@@ -1,4 +1,4 @@
-package com.pulse.member.adapter.in.event;
+package com.pulse.member.application.listener;
 
 import com.pulse.member.adapter.out.event.outbox.OutboxEvent;
 import com.pulse.member.application.port.in.kafka.KafkaProducerUseCase;
